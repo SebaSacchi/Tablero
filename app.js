@@ -2,6 +2,18 @@
 
 const loterias = ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS", "MONTEVIDEO"];
 
+const loteriasPorTurno = {
+  PREVIA: ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS"],
+  PRIMERA: ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS"],
+  MATUTINA: ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS", "MONTEVIDEO"],
+  VESPERTINA: ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS"]
+  NOCTURNA: ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS", "MONTEVIDEO"]
+};
+
+function getLoteriasTurno(turno) {
+  return loteriasPorTurno[turno] || loterias;
+}
+
 const ordenTurnos = ["PREVIA", "PRIMERA", "MATUTINA", "VESPERTINA", "NOCTURNA"];
 
 const resultados = {
@@ -98,7 +110,9 @@ function bloqueIzquierdo(turnoActual) {
   }
 
   return bloques.map(b => {
-    const lineas = loterias.map(lot => `
+    const loteriasBloque = getLoteriasTurno(b.turno);
+
+const lineas = loteriasBloque.map(lot => `
       <div class="cabeza-linea">
         <div class="cabeza-loteria">${lot}</div>
         <div class="cabeza-numero">${resultados[b.turno][lot][0]}</div>
@@ -117,7 +131,9 @@ function bloqueIzquierdo(turnoActual) {
 function renderTurno(turno) {
   pantallaActual = turno;
 
-  const columnas = loterias.map(loteria => {
+  const loteriasDelTurno = getLoteriasTurno(turno);
+
+  const columnas = loteriasDelTurno.map(loteria => {
     const filas = resultados[turno][loteria].map((num, i) => `
       <div class="fila-premio">
         <div class="posicion">${String(i + 1).padStart(2, "0")}.</div>
@@ -146,7 +162,7 @@ function renderTurno(turno) {
           ${bloqueIzquierdo(turno)}
         </aside>
 
-        <section class="tabla-sorteos">
+        <section class="tabla-sorteos" style="grid-template-columns: repeat(${loteriasDelTurno.length}, minmax(0, 1fr));">
           ${columnas}
         </section>
 
