@@ -1,5 +1,8 @@
 ﻿const app = document.getElementById("app");
 
+const SUPABASE_URL = "https://ldjwkwfkiqqfypftdeqa.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_birytOVhIQ0AoBY6f0yT-g_HpV01OhE";
+
 const loterias = ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS", "MONTEVIDEO"];
 
 const loteriasBase = ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS"];
@@ -99,6 +102,9 @@ const resultados = {
 };
 
 let pantallaActual = "PREVIA";
+let renderTurnoId = 0;
+const resultadosSupabaseCache = {};
+let ultimasCabezasCache = [];
 
 function fechaTexto() {
   const ahora = new Date();
@@ -122,6 +128,92 @@ function horaAMinutos(hora) {
   return h * 60 + m;
 }
 
+function fechaAyer(fecha = new Date()) {
+  const ayer = new Date(fecha);
+  ayer.setDate(ayer.getDate() - 1);
+  return ayer;
+}
+
+function supabaseConfigurado() {
+  return (
+    SUPABASE_URL &&
+    SUPABASE_ANON_KEY &&
+    SUPABASE_URL !== "PEGAR_SUPABASE_URL" &&
+    SUPABASE_ANON_KEY !== "PEGAR_SUPABASE_ANON_KEY"
+  );
+}
+
+function cacheKeyResultados(turno, fecha) {
+  return `${fechaISO(fecha)}|${turno}`;
+}
+
+function getResultadosTurno(turno, fecha) {
+  return resultadosSupabaseCache[cacheKeyResultados(turno, fecha)] || resultados[turno];
+}
+
+function tieneResultadosReales(resultadoTurno) {
+  return Boolean(resultadoTurno && Object.keys(resultadoTurno).length > 0);
+}
+
+async function cargarResultadosSupabase(turno, fecha) {
+  if (!supabaseConfigurado()) {
+    return null;
+  }
+
+  const fechaTxt = fechaISO(fecha);
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const params = new URLSearchParams({
+    select: "loteria,posicion,numero",
+    fecha: `eq.${fechaTxt}`,
+    turno: `eq.${turno}`,
+    order: "loteria.asc,posicion.asc"
+  });
+
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/resultados_quiniela?${params.toString()}`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+
+    if (!respuesta.ok) {
+      console.warn("No se pudieron cargar resultados desde Supabase", respuesta.status);
+      return null;
+    }
+
+    const filas = await respuesta.json();
+
+    if (!Array.isArray(filas) || filas.length === 0) {
+      delete resultadosSupabaseCache[cacheKeyResultados(turno, fecha)];
+      return null;
+    }
+
+    const agrupado = {};
+
+    filas.forEach((fila) => {
+      const loteria = fila.loteria;
+      const posicion = Number(fila.posicion);
+
+      if (!loteria || !Number.isFinite(posicion) || posicion < 1) {
+        return;
+      }
+
+      if (!agrupado[loteria]) {
+        agrupado[loteria] = [];
+      }
+
+      agrupado[loteria][posicion - 1] = String(fila.numero).padStart(4, "0");
+    });
+
+    resultadosSupabaseCache[cacheKeyResultados(turno, fecha)] = agrupado;
+    return agrupado;
+  } catch (error) {
+    console.warn("Error cargando resultados desde Supabase", error);
+    return null;
+  }
+}
+
 function estadoTurno(turno, fecha = new Date()) {
   const horario = horariosTurnos[turno];
   const minutos = fecha.getHours() * 60 + fecha.getMinutes();
@@ -132,7 +224,8 @@ function estadoTurno(turno, fecha = new Date()) {
     return {
       clase: "estado-pendiente",
       etiqueta: "AYER",
-      detalle: `PRÓXIMO HOY · INICIA ${horario.inicio}`
+      detalle: `PRÓXIMO HOY · INICIA ${horario.inicio}`,
+      fechaResultados: fechaAyer(fecha)
     };
   }
 
@@ -140,7 +233,8 @@ function estadoTurno(turno, fecha = new Date()) {
     return {
       clase: "estado-vivo",
       etiqueta: "VIVO",
-      detalle: `EN SORTEO · INICIÓ ${horario.inicio}`
+      detalle: `EN SORTEO · INICIÓ ${horario.inicio}`,
+      fechaResultados: fecha
     };
   }
 
@@ -148,87 +242,139 @@ function estadoTurno(turno, fecha = new Date()) {
     return {
       clase: "estado-finalizado",
       etiqueta: "HOY",
-      detalle: `FINALIZADO · INICIÓ ${horario.inicio}`
+      detalle: `FINALIZADO · INICIÓ ${horario.inicio}`,
+      fechaResultados: fecha
     };
   }
 }
 
-function bloqueIzquierdo(turnoActual) {
-  const bloques = [];
+function cabezasDesdeResultados(turno, fecha, resultadoTurno) {
+  const loteriasCandidatas = [...loteriasBase];
 
-  if (turnoActual === "PREVIA") {
-    bloques.push({ titulo: "PRIMERO AYER", turno: "PRIMERA", tipo: "ayer" });
-    bloques.push({ titulo: "MATUTINA AYER", turno: "MATUTINA", tipo: "ayer" });
-    bloques.push({ titulo: "VESPERTINA AYER", turno: "VESPERTINA", tipo: "ayer" });
-    bloques.push({ titulo: "NOCTURNA AYER", turno: "NOCTURNA", tipo: "ayer" });
+  if ((turno === "MATUTINA" || turno === "NOCTURNA") && resultadoTurno.MONTEVIDEO?.[0]) {
+    loteriasCandidatas.push("MONTEVIDEO");
   }
 
-  if (turnoActual === "PRIMERA") {
-    bloques.push({ titulo: "LA PREVIA HOY", turno: "PREVIA", tipo: "hoy" });
-    bloques.push({ titulo: "MATUTINA AYER", turno: "MATUTINA", tipo: "ayer" });
-    bloques.push({ titulo: "VESPERTINA AYER", turno: "VESPERTINA", tipo: "ayer" });
-    bloques.push({ titulo: "NOCTURNA AYER", turno: "NOCTURNA", tipo: "ayer" });
-  }
+  const loteriasDisponibles = loteriasCandidatas.filter((loteria) => {
+    const numero = resultadoTurno[loteria]?.[0];
+    return numero && numero !== "----";
+  });
 
-  if (turnoActual === "MATUTINA") {
-    bloques.push({ titulo: "LA PREVIA HOY", turno: "PREVIA", tipo: "hoy" });
-    bloques.push({ titulo: "PRIMERA HOY", turno: "PRIMERA", tipo: "hoy" });
-    bloques.push({ titulo: "VESPERTINA AYER", turno: "VESPERTINA", tipo: "ayer" });
-    bloques.push({ titulo: "NOCTURNA AYER", turno: "NOCTURNA", tipo: "ayer" });
-  }
+  const loteriasBloque = loteriasDisponibles.length > 0
+    ? loteriasDisponibles
+    : getLoteriasTurno(turno, fecha);
 
-  if (turnoActual === "VESPERTINA") {
-    bloques.push({ titulo: "NOCTURNA AYER", turno: "NOCTURNA", tipo: "ayer" });
-    bloques.push({ titulo: "LA PREVIA HOY", turno: "PREVIA", tipo: "hoy" });
-    bloques.push({ titulo: "PRIMERA HOY", turno: "PRIMERA", tipo: "hoy" });
-    bloques.push({ titulo: "MATUTINA HOY", turno: "MATUTINA", tipo: "hoy" });
-  }
+  return loteriasBloque.map((loteria) => ({
+    loteria,
+    numero: resultadoTurno[loteria]?.[0] || "----"
+  }));
+}
 
-  if (turnoActual === "NOCTURNA") {
-    bloques.push({ titulo: "LA PREVIA HOY", turno: "PREVIA", tipo: "hoy" });
-    bloques.push({ titulo: "PRIMERA HOY", turno: "PRIMERA", tipo: "hoy" });
-    bloques.push({ titulo: "MATUTINA HOY", turno: "MATUTINA", tipo: "hoy" });
-    bloques.push({ titulo: "VESPERTINA HOY", turno: "VESPERTINA", tipo: "hoy" });
-  }
+async function cargarUltimasCabezasSupabase() {
+  const hoy = new Date();
+  const ayer = fechaAyer(hoy);
 
- return bloques.map(b => {
-  const fechaBloque = new Date();
+  const bloques = await Promise.all(ordenTurnos.map(async (turno) => {
+    const resultadoHoy = await cargarResultadosSupabase(turno, hoy);
 
-  if (b.tipo === "ayer") {
-    fechaBloque.setDate(fechaBloque.getDate() - 1);
-  }
+    if (tieneResultadosReales(resultadoHoy)) {
+      return {
+        turno,
+        etiqueta: "HOY",
+        fecha: hoy,
+        cabezas: cabezasDesdeResultados(turno, hoy, resultadoHoy)
+      };
+    }
 
-  const loteriasBloque = getLoteriasTurno(b.turno, fechaBloque);
+    const resultadoAyer = await cargarResultadosSupabase(turno, ayer);
 
-const lineas = loteriasBloque.map(lot => `
+    if (tieneResultadosReales(resultadoAyer)) {
+      return {
+        turno,
+        etiqueta: "AYER",
+        fecha: ayer,
+        cabezas: cabezasDesdeResultados(turno, ayer, resultadoAyer)
+      };
+    }
+
+    const fallback = resultados[turno];
+
+    return {
+      turno,
+      etiqueta: "AYER",
+      fecha: ayer,
+      cabezas: cabezasDesdeResultados(turno, ayer, fallback)
+    };
+  }));
+
+  ultimasCabezasCache = bloques;
+  return bloques;
+}
+
+function getBloquesCabezasFallback() {
+  return ordenTurnos.map((turno) => {
+    const fecha = fechaAyer();
+    return {
+      turno,
+      etiqueta: "AYER",
+      fecha,
+      cabezas: cabezasDesdeResultados(turno, fecha, resultados[turno])
+    };
+  });
+}
+
+function bloqueIzquierdo() {
+ return (ultimasCabezasCache.length ? ultimasCabezasCache : getBloquesCabezasFallback()).map(b => {
+const lineas = b.cabezas.map(cabeza => `
       <div class="cabeza-linea">
-        <div class="cabeza-loteria">${lot}</div>
-        <div class="cabeza-numero">${resultados[b.turno][lot][0]}</div>
+        <div class="cabeza-loteria">${cabeza.loteria}</div>
+        <div class="cabeza-numero">${cabeza.numero}</div>
       </div>
     `).join("");
 
     return `
-      <div class="bloque-cabezas ${b.tipo}">
-        <h3>${b.titulo}</h3>
+      <div class="bloque-cabezas ${b.etiqueta.toLowerCase()}">
+        <h3>${b.turno} ${b.etiqueta}</h3>
         ${lineas}
       </div>
     `;
   }).join("");
 }
 
-function renderTurno(turno) {
-  pantallaActual = turno;
+async function cargarDatosPantalla(turno, estado) {
+  const pedidos = [
+    cargarResultadosSupabase(turno, estado.fechaResultados),
+    cargarUltimasCabezasSupabase()
+  ];
 
-  const loteriasDelTurno = getLoteriasTurno(turno);
+  await Promise.all(pedidos);
+}
+
+async function renderTurno(turno) {
+  pantallaActual = turno;
+  const idRender = ++renderTurnoId;
+
   const estado = estadoTurno(turno);
+  await cargarDatosPantalla(turno, estado);
+
+  if (pantallaActual !== turno || idRender !== renderTurnoId) {
+    return;
+  }
+
+  const loteriasDelTurno = getLoteriasTurno(turno, estado.fechaResultados);
+  const resultadosTurno = getResultadosTurno(turno, estado.fechaResultados);
 
   const columnas = loteriasDelTurno.map(loteria => {
-    const filas = resultados[turno][loteria].map((num, i) => `
+    const numeros = resultadosTurno[loteria] || resultados[turno][loteria] || [];
+    const filas = Array.from({ length: 20 }, (_, i) => {
+      const num = numeros[i] || "----";
+      return `
       <div class="fila-premio">
         <div class="posicion">${String(i + 1).padStart(2, "0")}.</div>
         <div class="numero">${num}</div>
       </div>
-    `).join("");
+    `;
+    }).join("");
 
     return `
       <div class="columna-loteria">
@@ -448,4 +594,4 @@ setInterval(() => {
   if (ordenTurnos.includes(pantallaActual)) {
     renderTurno(pantallaActual);
   }
-}, 60000);
+}, 10000);
