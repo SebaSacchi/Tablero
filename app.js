@@ -47,6 +47,14 @@ function getLoteriasTurno(turno, fecha = new Date()) {
 
 const ordenTurnos = ["PREVIA", "PRIMERA", "MATUTINA", "VESPERTINA", "NOCTURNA"];
 
+const horariosTurnos = {
+  PREVIA: { inicio: "10:15", fin: "10:45" },
+  PRIMERA: { inicio: "12:00", fin: "12:30" },
+  MATUTINA: { inicio: "15:00", fin: "15:30" },
+  VESPERTINA: { inicio: "18:00", fin: "18:30" },
+  NOCTURNA: { inicio: "21:00", fin: "21:30" }
+};
+
 const resultados = {
   PREVIA: {
     PROVINCIA: ["2170","3790","8687","9382","2432","4576","6224","8999","2896","7729","6833","2685","0028","8996","4266","9387","0263","1383","9975","0550"],
@@ -94,12 +102,55 @@ let pantallaActual = "PREVIA";
 
 function fechaTexto() {
   const ahora = new Date();
-  return ahora.toLocaleDateString("es-AR", {
+  const fecha = ahora.toLocaleDateString("es-AR", {
     weekday: "long",
     day: "2-digit",
     month: "2-digit",
     year: "numeric"
   }).toUpperCase();
+  const hora = ahora.toLocaleTimeString("es-AR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+
+  return `${fecha} · ${hora}`;
+}
+
+function horaAMinutos(hora) {
+  const [h, m] = hora.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function estadoTurno(turno, fecha = new Date()) {
+  const horario = horariosTurnos[turno];
+  const minutos = fecha.getHours() * 60 + fecha.getMinutes();
+  const inicio = horaAMinutos(horario.inicio);
+  const fin = horaAMinutos(horario.fin);
+
+  if (minutos < inicio) {
+    return {
+      clase: "estado-pendiente",
+      etiqueta: "AYER",
+      detalle: `PRÓXIMO HOY · INICIA ${horario.inicio}`
+    };
+  }
+
+  if (minutos >= inicio && minutos <= fin) {
+    return {
+      clase: "estado-vivo",
+      etiqueta: "VIVO",
+      detalle: `EN SORTEO · INICIÓ ${horario.inicio}`
+    };
+  }
+
+  if (minutos > fin) {
+    return {
+      clase: "estado-finalizado",
+      etiqueta: "HOY",
+      detalle: `FINALIZADO · INICIÓ ${horario.inicio}`
+    };
+  }
 }
 
 function bloqueIzquierdo(turnoActual) {
@@ -169,6 +220,7 @@ function renderTurno(turno) {
   pantallaActual = turno;
 
   const loteriasDelTurno = getLoteriasTurno(turno);
+  const estado = estadoTurno(turno);
 
   const columnas = loteriasDelTurno.map(loteria => {
     const filas = resultados[turno][loteria].map((num, i) => `
@@ -187,10 +239,16 @@ function renderTurno(turno) {
   }).join("");
 
   app.innerHTML = `
-    <main class="pantalla">
+    <main class="pantalla ${estado.clase}">
       <header class="topbar">
         <div class="marca">TABLERO AGENCIA</div>
-        <div class="titulo-turno">${turno} EN VIVO</div>
+        <div class="titulo-turno">
+          <div class="linea-titulo">
+            <span>${turno}</span>
+            <strong>${estado.etiqueta}</strong>
+          </div>
+          <small>${estado.detalle}</small>
+        </div>
         <div class="fecha">${fechaTexto()}</div>
       </header>
 
@@ -220,6 +278,8 @@ function renderTurno(turno) {
 }
 
 function renderCabezas() {
+  pantallaActual = "CABEZAS";
+
   const header = `
     <div class="celda titulo">TURNO</div>
     ${loterias.map(l => `<div class="celda titulo">${l}</div>`).join("")}
@@ -245,6 +305,8 @@ function renderCabezas() {
 }
 
 function renderHistorial() {
+  pantallaActual = "HISTORIAL";
+
   const dias = ["JUEVES", "VIERNES", "SÁBADO", "LUNES", "MARTES", "HOY"];
   const turnos = ["PREVIA", "PRIMERA", "MATUTINA", "VESPERTINA", "NOCTURNA"];
 
@@ -279,6 +341,8 @@ function numero4() {
 }
 
 function renderAleatorio() {
+  pantallaActual = "ALEATORIO";
+
   app.innerHTML = `
     <main class="pantalla-simple">
       <header class="simple-header">
@@ -309,6 +373,8 @@ function randomQuini() {
 }
 
 function renderQuini() {
+  pantallaActual = "QUINI";
+
   const jugada = randomQuini();
 
   app.innerHTML = `
@@ -330,6 +396,8 @@ function renderQuini() {
 }
 
 function renderPublicidad() {
+  pantallaActual = "PUBLICIDAD";
+
   app.innerHTML = `
     <main class="pantalla-simple">
       <header class="simple-header">
@@ -353,11 +421,11 @@ function pantallaPorHora() {
   const m = new Date().getMinutes();
   const minutos = h * 60 + m;
 
-  if (minutos >= 21 * 60) return "NOCTURNA";
-  if (minutos >= 18 * 60) return "VESPERTINA";
-  if (minutos >= 15 * 60) return "MATUTINA";
-  if (minutos >= 12 * 60) return "PRIMERA";
-  if (minutos >= 10 * 60 + 15) return "PREVIA";
+  if (minutos >= horaAMinutos(horariosTurnos.NOCTURNA.inicio)) return "NOCTURNA";
+  if (minutos >= horaAMinutos(horariosTurnos.VESPERTINA.inicio)) return "VESPERTINA";
+  if (minutos >= horaAMinutos(horariosTurnos.MATUTINA.inicio)) return "MATUTINA";
+  if (minutos >= horaAMinutos(horariosTurnos.PRIMERA.inicio)) return "PRIMERA";
+  if (minutos >= horaAMinutos(horariosTurnos.PREVIA.inicio)) return "PREVIA";
   return "NOCTURNA";
 }
 
@@ -375,3 +443,9 @@ document.addEventListener("keydown", (e) => {
 });
 
 renderTurno(pantallaPorHora());
+
+setInterval(() => {
+  if (ordenTurnos.includes(pantallaActual)) {
+    renderTurno(pantallaActual);
+  }
+}, 60000);
