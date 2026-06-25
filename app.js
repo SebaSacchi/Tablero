@@ -2,17 +2,48 @@
 
 const loterias = ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS", "MONTEVIDEO"];
 
-const loteriasPorTurno = {
-  PREVIA: ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS"],
-  PRIMERA: ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS"],
-  MATUTINA: ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS", "MONTEVIDEO"],
-  VESPERTINA: ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS"],
-  NOCTURNA: ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS", "MONTEVIDEO"]
-};
+const loteriasBase = ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS"];
 
-function getLoteriasTurno(turno) {
-  return loteriasPorTurno[turno] || loterias;
+// Más adelante estos feriados los cargamos desde Supabase.
+// Formato: "YYYY-MM-DD"
+const feriadosUruguay = [
+  // "2026-06-19"
+];
+
+function fechaISO(fecha) {
+  const y = fecha.getFullYear();
+  const m = String(fecha.getMonth() + 1).padStart(2, "0");
+  const d = String(fecha.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
+
+function esFeriadoUruguay(fecha) {
+  return feriadosUruguay.includes(fechaISO(fecha));
+}
+
+function getLoteriasTurno(turno, fecha = new Date()) {
+  const dia = fecha.getDay();
+  // 0 domingo, 1 lunes, 2 martes, 3 miércoles, 4 jueves, 5 viernes, 6 sábado
+
+  const esLunesAViernes = dia >= 1 && dia <= 5;
+  const esSabado = dia === 6;
+
+  let lista = [...loteriasBase];
+
+  const montevideoHabilitado =
+    !esFeriadoUruguay(fecha) &&
+    (
+      (esLunesAViernes && (turno === "MATUTINA" || turno === "NOCTURNA")) ||
+      (esSabado && turno === "NOCTURNA")
+    );
+
+  if (montevideoHabilitado) {
+    lista.push("MONTEVIDEO");
+  }
+
+  return lista;
+}
+
 
 const ordenTurnos = ["PREVIA", "PRIMERA", "MATUTINA", "VESPERTINA", "NOCTURNA"];
 
@@ -109,8 +140,14 @@ function bloqueIzquierdo(turnoActual) {
     bloques.push({ titulo: "VESPERTINA HOY", turno: "VESPERTINA", tipo: "hoy" });
   }
 
-  return bloques.map(b => {
-    const loteriasBloque = getLoteriasTurno(b.turno);
+ return bloques.map(b => {
+  const fechaBloque = new Date();
+
+  if (b.tipo === "ayer") {
+    fechaBloque.setDate(fechaBloque.getDate() - 1);
+  }
+
+  const loteriasBloque = getLoteriasTurno(b.turno, fechaBloque);
 
 const lineas = loteriasBloque.map(lot => `
       <div class="cabeza-linea">
