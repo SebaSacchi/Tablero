@@ -378,6 +378,198 @@ body {
   white-space: nowrap;
 }
 
+.pantalla-cabezas {
+  padding: 2cqh 2cqw;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(135deg, #052a78, #075fb4 52%, #021742);
+  background-size: 26px 26px, 26px 26px, auto;
+  grid-template-rows: 8.4cqh minmax(0, 1fr) 5.4cqh;
+}
+
+.cabezas-header h1 span {
+  color: #fff200;
+}
+
+.planilla-cabezas {
+  width: min(96%, 86cqw);
+  display: grid;
+  grid-template-columns: 14.5cqw repeat(5, minmax(0, 1fr));
+  align-self: center;
+  border-left: 0.35cqh solid #ffd400;
+  border-radius: 6px 6px 0 0;
+  overflow: hidden;
+  box-shadow: 0.75cqh 0.75cqh 0 rgba(0, 0, 0, 0.45);
+}
+
+.planilla-celda {
+  min-width: 0;
+  min-height: 6.7cqh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #d9e0ec;
+  border-bottom: 1px solid #d9e0ec;
+  overflow: hidden;
+}
+
+.planilla-titulo {
+  min-height: 5cqh;
+  background: #1b48b8;
+  color: #fff;
+  font-size: clamp(0.72rem, 1.1cqw, 1.15rem);
+  font-weight: 1000;
+  text-shadow: 0.2cqh 0.2cqh 0 #00154d;
+}
+
+.planilla-loteria {
+  justify-content: flex-start;
+  padding: 0 1.2cqw;
+  background: #f6f8fc;
+  color: #045da8;
+  font-size: clamp(0.76rem, 1.35cqw, 1.45rem);
+  font-weight: 1000;
+  text-align: left;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.planilla-numero {
+  background: #f2f4f8;
+  color: #050505;
+  font-size: clamp(1.4rem, 3cqw, 3.15rem);
+  font-weight: 1000;
+  text-shadow: 0.22cqh 0.22cqh 0 rgba(0, 72, 150, 0.22);
+  letter-spacing: 0;
+}
+
+.cabezas-cargando {
+  font-size: clamp(2rem, 4cqw, 4rem);
+  font-weight: 1000;
+  color: #fff200;
+  text-shadow: 0.45cqh 0.45cqh 0 #000;
+}
+
+.pantalla-historial {
+  padding: 0.65cqh 0.7cqw;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.08), transparent 32%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(135deg, #090738, #12136a 48%, #020316);
+  background-size: auto, 28px 28px, 28px 28px, auto;
+  grid-template-rows: 5.2cqh minmax(0, 1fr) 4.1cqh;
+}
+
+.historial-header {
+  border-bottom: 0;
+}
+
+.historial-header h1 {
+  font-size: clamp(1.25rem, 2.55cqw, 2.55rem);
+}
+
+.historial-cabezas {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 2.45cqw 11.25cqw repeat(6, minmax(0, 1fr));
+  align-content: center;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.24);
+  box-shadow: inset 0 0 2cqh rgba(0, 0, 0, 0.45);
+}
+
+.historial-celda {
+  min-width: 0;
+  min-height: 2.82cqh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.historial-esquina {
+  grid-column: span 2;
+  background: #d91717;
+  color: #fff;
+  font-size: clamp(0.7rem, 1.25cqw, 1.35rem);
+  font-weight: 1000;
+  text-shadow: 0.22cqh 0.22cqh 0 #000;
+}
+
+.historial-dia {
+  background: #313131;
+  color: #fff;
+  font-size: clamp(0.9rem, 1.85cqw, 1.95rem);
+  font-weight: 1000;
+  text-shadow: 0.22cqh 0.22cqh 0 #000;
+}
+
+.historial-dia.hoy {
+  color: #ffa400;
+}
+
+.historial-turno {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: #fff;
+  font-size: clamp(0.68rem, 1.05cqw, 1.15rem);
+  font-weight: 1000;
+  text-shadow: 0.18cqh 0.18cqh 0 #000;
+  letter-spacing: 0;
+  border-right: 0.15cqw solid #fff;
+}
+
+.historial-turno.previa,
+.historial-turno.matutina,
+.historial-turno.nocturna {
+  background: #2a1582;
+}
+
+.historial-turno.primera,
+.historial-turno.vespertina {
+  background: #06913c;
+}
+
+.historial-loteria {
+  justify-content: flex-end;
+  padding-right: 0.8cqw;
+  background: #050505;
+  color: #fff;
+  font-size: clamp(0.65rem, 1.25cqw, 1.35rem);
+  font-weight: 1000;
+  text-align: right;
+  text-shadow: 0.16cqh 0.16cqh 0 #b00000;
+  white-space: nowrap;
+}
+
+.historial-numero {
+  background: rgba(7, 7, 53, 0.86);
+  color: #fff;
+  font-size: clamp(1rem, 2.05cqw, 2.2rem);
+  font-weight: 1000;
+  text-shadow: 0.16cqh 0.16cqh 0 #b00000;
+  line-height: 1;
+}
+
+.historial-numero.hoy {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.04)),
+    #5b5f82;
+  color: #ffe600;
+  text-shadow: 0.2cqh 0.2cqh 0 #000;
+}
+
+.historial-cargando {
+  font-size: clamp(2rem, 4cqw, 4rem);
+  font-weight: 1000;
+  color: #fff200;
+  text-shadow: 0.45cqh 0.45cqh 0 #000;
+}
+
 .simple-body {
   display: flex;
   align-items: center;

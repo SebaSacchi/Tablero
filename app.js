@@ -123,6 +123,26 @@ function fechaTexto() {
   return `${fecha} · ${hora}`;
 }
 
+function fechaCortaTexto(fecha = new Date()) {
+  const d = String(fecha.getDate()).padStart(2, "0");
+  const m = String(fecha.getMonth() + 1).padStart(2, "0");
+  const y = fecha.getFullYear();
+  return `${d}-${m}-${y}`;
+}
+
+function fechaDesdeISO(fechaTxt) {
+  const [y, m, d] = fechaTxt.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function etiquetaDiaHistorial(fecha, esHoy = false) {
+  if (esHoy) {
+    return "HOY";
+  }
+
+  return fecha.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase();
+}
+
 function horaAMinutos(hora) {
   const [h, m] = hora.split(":").map(Number);
   return h * 60 + m;
@@ -311,6 +331,133 @@ async function cargarUltimasCabezasSupabase() {
   return bloques;
 }
 
+async function cargarCabezasDelDiaSupabase(fecha = new Date()) {
+  const entradas = await Promise.all(ordenTurnos.map(async (turno) => {
+    const resultadoTurno = await cargarResultadosSupabase(turno, fecha);
+    return [turno, resultadoTurno];
+  }));
+
+  return Object.fromEntries(entradas);
+}
+
+async function cargarFechasHistorialSupabase() {
+  const hoy = new Date();
+  const hoyTxt = fechaISO(hoy);
+
+  if (!supabaseConfigurado()) {
+    return fechasHistorialFallback(hoy);
+  }
+
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const params = new URLSearchParams({
+    select: "fecha",
+    fecha: `lte.${hoyTxt}`,
+    order: "fecha.desc",
+    limit: "1000"
+  });
+
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/resultados_quiniela?${params.toString()}`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+
+    if (!respuesta.ok) {
+      return fechasHistorialFallback(hoy);
+    }
+
+    const filas = await respuesta.json();
+    const unicas = [...new Set((Array.isArray(filas) ? filas : []).map(f => f.fecha).filter(Boolean))];
+    const anteriores = unicas.filter(f => f < hoyTxt).slice(0, 5).reverse();
+    const fechas = anteriores.map(fechaDesdeISO);
+
+    while (fechas.length < 5) {
+      const fecha = fechaAyer(fechas[0] || hoy);
+      if (!fechas.some(f => fechaISO(f) === fechaISO(fecha))) {
+        fechas.unshift(fecha);
+      }
+    }
+
+    fechas.push(hoy);
+    return fechas;
+  } catch (error) {
+    console.warn("Error cargando fechas de historial", error);
+    return fechasHistorialFallback(hoy);
+  }
+}
+
+function fechasHistorialFallback(hoy = new Date()) {
+  const fechas = [];
+
+  for (let i = 5; i >= 1; i -= 1) {
+    const fecha = new Date(hoy);
+    fecha.setDate(fecha.getDate() - i);
+    fechas.push(fecha);
+  }
+
+  fechas.push(hoy);
+  return fechas;
+}
+
+async function cargarHistorialCabezasSupabase() {
+  const fechas = await cargarFechasHistorialSupabase();
+  const datos = {};
+
+  await Promise.all(fechas.flatMap((fecha) => (
+    ordenTurnos.map(async (turno) => {
+      const resultadoTurno = await cargarResultadosSupabase(turno, fecha);
+      const fechaTxt = fechaISO(fecha);
+
+      if (!datos[fechaTxt]) {
+        datos[fechaTxt] = {};
+      }
+
+      datos[fechaTxt][turno] = resultadoTurno;
+    })
+  )));
+
+  return { fechas, datos };
+}
+
+function cabezaPlanillaDia(resultadosDia, turno, loteria) {
+  const resultadoTurno = resultadosDia[turno];
+
+  if (tieneResultadosReales(resultadoTurno)) {
+    return resultadoTurno[loteria]?.[0] || "—";
+  }
+
+  if (!supabaseConfigurado()) {
+    return resultados[turno][loteria]?.[0] || "—";
+  }
+
+  return "—";
+}
+
+function cabezaHistorial(datos, fecha, turno, loteria) {
+  const fechaTxt = fechaISO(fecha);
+  const resultadoTurno = datos[fechaTxt]?.[turno];
+
+  if (tieneResultadosReales(resultadoTurno)) {
+    return resultadoTurno[loteria]?.[0] || "-";
+  }
+
+  if (!supabaseConfigurado() && fechaISO(fecha) === fechaISO(new Date())) {
+    return resultados[turno][loteria]?.[0] || "-";
+  }
+
+  return "-";
+}
+
+function loteriasHistorialTurno(turno, fechas, datos) {
+  const incluirMontevideo =
+    (turno === "MATUTINA" || turno === "NOCTURNA") &&
+    fechas.some(fecha => datos[fechaISO(fecha)]?.[turno]?.MONTEVIDEO?.[0]);
+
+  return incluirMontevideo ? [...loteriasBase, "MONTEVIDEO"] : [...loteriasBase];
+}
+
 function getBloquesCabezasFallback() {
   return ordenTurnos.map((turno) => {
     const fecha = fechaAyer();
@@ -423,61 +570,116 @@ async function renderTurno(turno) {
   `;
 }
 
-function renderCabezas() {
+async function renderCabezas({ mostrarCarga = true } = {}) {
   pantallaActual = "CABEZAS";
+  const idRender = ++renderTurnoId;
+  const fecha = new Date();
 
-  const header = `
-    <div class="celda titulo">TURNO</div>
-    ${loterias.map(l => `<div class="celda titulo">${l}</div>`).join("")}
+  if (mostrarCarga) {
+    app.innerHTML = `
+      <main class="pantalla-simple pantalla-cabezas">
+        <header class="simple-header cabezas-header">
+          <h1>CABEZAS DEL DÍA: <span>${fechaCortaTexto(fecha)}</span></h1>
+          <h1>${fechaTexto()}</h1>
+        </header>
+        <section class="simple-body">
+          <div class="cabezas-cargando">CARGANDO CABEZAS</div>
+        </section>
+        <footer class="footer">Teclas: 1 a 5 sorteos · 7 últimos días · 8 aleatorio · 9 Quini/Loto · 0 publicidades</footer>
+      </main>
+    `;
+  }
+
+  const resultadosDia = await cargarCabezasDelDiaSupabase(fecha);
+
+  if (pantallaActual !== "CABEZAS" || idRender !== renderTurnoId) {
+    return;
+  }
+
+  const encabezado = `
+    <div class="planilla-celda planilla-titulo">SORTEO</div>
+    ${ordenTurnos.map(t => `<div class="planilla-celda planilla-titulo">${t}</div>`).join("")}
   `;
 
-  const filas = ordenTurnos.map(t => `
-    <div class="celda turno">${t}</div>
-    ${loterias.map(l => `<div class="celda">${resultados[t][l][0]}</div>`).join("")}
+  const filas = loterias.map(loteria => `
+    <div class="planilla-celda planilla-loteria">${loteria}</div>
+    ${ordenTurnos.map(turno => `<div class="planilla-celda planilla-numero">${cabezaPlanillaDia(resultadosDia, turno, loteria)}</div>`).join("")}
   `).join("");
 
   app.innerHTML = `
-    <main class="pantalla-simple">
-      <header class="simple-header">
-        <h1>CABEZAS DEL DÍA</h1>
+    <main class="pantalla-simple pantalla-cabezas">
+      <header class="simple-header cabezas-header">
+        <h1>CABEZAS DEL DÍA: <span>${fechaCortaTexto(fecha)}</span></h1>
         <h1>${fechaTexto()}</h1>
       </header>
       <section class="simple-body">
-        <div class="grilla-cabezas">${header}${filas}</div>
+        <div class="planilla-cabezas">${encabezado}${filas}</div>
       </section>
       <footer class="footer">Teclas: 1 a 5 sorteos · 7 últimos días · 8 aleatorio · 9 Quini/Loto · 0 publicidades</footer>
     </main>
   `;
 }
 
-function renderHistorial() {
+async function renderHistorial({ mostrarCarga = true } = {}) {
   pantallaActual = "HISTORIAL";
+  const idRender = ++renderTurnoId;
 
-  const dias = ["JUEVES", "VIERNES", "SÁBADO", "LUNES", "MARTES", "HOY"];
-  const turnos = ["PREVIA", "PRIMERA", "MATUTINA", "VESPERTINA", "NOCTURNA"];
+  if (mostrarCarga) {
+    app.innerHTML = `
+      <main class="pantalla-simple pantalla-historial">
+        <header class="simple-header historial-header">
+          <h1>ÚLTIMAS CABEZAS</h1>
+          <h1>${fechaTexto()}</h1>
+        </header>
+        <section class="simple-body">
+          <div class="historial-cargando">CARGANDO HISTORIAL</div>
+        </section>
+        <footer class="footer">Teclas: 1 a 5 sorteos · 6 Cabezas · 8 aleatorio · 9 Quini/Loto · 0 publicidades</footer>
+      </main>
+    `;
+  }
 
-  let html = `<div class="grilla-cabezas" style="grid-template-columns: 180px repeat(6, 1fr);">`;
-  html += `<div class="celda titulo">ÚLTIMAS</div>${dias.map(d => `<div class="celda titulo">${d}</div>`).join("")}`;
+  const { fechas, datos } = await cargarHistorialCabezasSupabase();
 
-  turnos.forEach((t, idx) => {
-    html += `<div class="celda turno">${t}</div>`;
-    dias.forEach((d, i) => {
-      const base = resultados[t]["PROVINCIA"][0];
-      const valor = i === dias.length - 1 ? base : String((Number(base) + i * 137 + idx * 41) % 10000).padStart(4, "0");
-      html += `<div class="celda">${valor}</div>`;
-    });
-  });
+  if (pantallaActual !== "HISTORIAL" || idRender !== renderTurnoId) {
+    return;
+  }
 
-  html += `</div>`;
+  const hoyTxt = fechaISO(new Date());
+  const encabezado = `
+    <div class="historial-celda historial-esquina">ÚLTIMAS CABEZAS</div>
+    ${fechas.map(fecha => `
+      <div class="historial-celda historial-dia ${fechaISO(fecha) === hoyTxt ? "hoy" : ""}">
+        ${etiquetaDiaHistorial(fecha, fechaISO(fecha) === hoyTxt)}
+      </div>
+    `).join("")}
+  `;
+
+  const filas = ordenTurnos.map((turno) => {
+    const loteriasTurno = loteriasHistorialTurno(turno, fechas, datos);
+    const filasTurno = loteriasTurno.map((loteria, index) => `
+      ${index === 0 ? `<div class="historial-celda historial-turno ${turno.toLowerCase()}" style="grid-row: span ${loteriasTurno.length};">${turno}</div>` : ""}
+      <div class="historial-celda historial-loteria">${loteria}</div>
+      ${fechas.map(fecha => `
+        <div class="historial-celda historial-numero ${fechaISO(fecha) === hoyTxt ? "hoy" : ""}">
+          ${cabezaHistorial(datos, fecha, turno, loteria)}
+        </div>
+      `).join("")}
+    `).join("");
+
+    return filasTurno;
+  }).join("");
 
   app.innerHTML = `
-    <main class="pantalla-simple">
-      <header class="simple-header">
-        <h1>ÚLTIMOS 7 / 10 DÍAS</h1>
-        <h1>HOY RESALTADO</h1>
+    <main class="pantalla-simple pantalla-historial">
+      <header class="simple-header historial-header">
+        <h1>ÚLTIMAS CABEZAS</h1>
+        <h1>${fechaTexto()}</h1>
       </header>
-      <section class="simple-body">${html}</section>
-      <footer class="footer">Esta pantalla después se alimenta sola con Supabase</footer>
+      <section class="simple-body">
+        <div class="historial-cabezas">${encabezado}${filas}</div>
+      </section>
+      <footer class="footer">Teclas: 1 a 5 sorteos · 6 Cabezas · 8 aleatorio · 9 Quini/Loto · 0 publicidades</footer>
     </main>
   `;
 }
@@ -593,5 +795,11 @@ renderTurno(pantallaPorHora());
 setInterval(() => {
   if (ordenTurnos.includes(pantallaActual)) {
     renderTurno(pantallaActual);
+  }
+  if (pantallaActual === "CABEZAS") {
+    renderCabezas({ mostrarCarga: false });
+  }
+  if (pantallaActual === "HISTORIAL") {
+    renderHistorial({ mostrarCarga: false });
   }
 }, 10000);
