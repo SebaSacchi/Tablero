@@ -1,6 +1,13 @@
 ﻿* {
   box-sizing: border-box;
 }
+git add .
+git commit -m "Ajustar layout 16-9 del tablero"
+git push
+@'
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -23,65 +30,80 @@ body {
     radial-gradient(circle at center, rgba(255,255,255,0.08), transparent 35%),
     linear-gradient(135deg, #5e0000, #b90000 45%, #380000);
   display: grid;
-  grid-template-rows: 62px 1fr 48px;
-  padding: 8px;
+  grid-template-rows: 54px minmax(0, 1fr) 38px;
+  padding: 6px;
 }
 
 .topbar {
   display: grid;
-  grid-template-columns: 260px 1fr 330px;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(440px, 1.7fr) minmax(250px, 0.9fr);
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   border-bottom: 4px solid #fff;
+  min-width: 0;
 }
 
 .marca {
-  font-size: 28px;
+  font-size: clamp(20px, 2vw, 32px);
   font-weight: 1000;
   letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
 }
 
 .titulo-turno {
   text-align: center;
-  font-size: 44px;
+  font-size: clamp(32px, 3.2vw, 52px);
   font-weight: 1000;
   line-height: 1;
   text-shadow: 4px 4px 0 #000;
+  white-space: nowrap;
 }
 
 .fecha {
   text-align: right;
-  font-size: 28px;
+  font-size: clamp(20px, 1.8vw, 31px);
   font-weight: 1000;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .zona-vivo {
   display: grid;
-  grid-template-columns: 235px 1fr 310px;
-  gap: 8px;
+  grid-template-columns: clamp(200px, 13.5vw, 235px) minmax(0, 1fr) clamp(230px, 17vw, 300px);
+  gap: 5px;
   min-height: 0;
-  padding-top: 8px;
+  padding-top: 5px;
 }
 
 .panel-izquierdo {
   background: rgba(0,0,0,0.35);
   border: 3px solid rgba(255,255,255,0.65);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .bloque-cabezas {
   border-bottom: 2px solid rgba(255,255,255,0.5);
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 25px repeat(6, 1fr);
 }
 
 .bloque-cabezas h3 {
   margin: 0;
-  padding: 5px;
+  padding: 3px;
   text-align: center;
   background: #003bd1;
   color: white;
-  font-size: 18px;
+  font-size: clamp(14px, 1vw, 18px);
   font-weight: 1000;
   text-shadow: 2px 2px 0 #000;
+  line-height: 1;
 }
 
 .bloque-cabezas.hoy h3 {
@@ -90,31 +112,36 @@ body {
 
 .cabeza-linea {
   display: grid;
-  grid-template-columns: 1fr 88px;
+  grid-template-columns: minmax(0, 1fr) 74px;
   gap: 4px;
-  padding: 3px 6px;
+  padding: 1px 5px;
   align-items: center;
+  min-height: 0;
 }
 
 .cabeza-loteria {
-  font-size: 16px;
+  font-size: clamp(12px, 0.9vw, 16px);
   font-weight: 1000;
   text-shadow: 2px 2px 0 #000;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .cabeza-numero {
   text-align: right;
-  font-size: 31px;
+  font-size: clamp(22px, 1.9vw, 31px);
   font-weight: 1000;
   color: #fff;
   text-shadow: 3px 3px 0 #000;
+  line-height: 1;
 }
 
 .tabla-sorteos {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
   min-width: 0;
+  min-height: 0;
 }
 
 .columna-loteria {
@@ -122,46 +149,52 @@ body {
   background: rgba(0,0,0,0.22);
   border-left: 2px solid rgba(255,255,255,0.25);
   border-right: 2px solid rgba(0,0,0,0.35);
+  display: grid;
+  grid-template-rows: 29px repeat(20, minmax(0, 1fr));
+  min-height: 0;
 }
 
 .columna-loteria h2 {
-  margin: 0 0 4px;
-  padding: 4px;
+  margin: 0;
+  padding: 4px 2px;
   text-align: center;
-  font-size: 18px;
+  font-size: clamp(13px, 1.05vw, 18px);
   font-weight: 1000;
   background: rgba(0,0,0,0.45);
   color: #fff;
   text-shadow: 2px 2px 0 #000;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .fila-premio {
   display: grid;
-  grid-template-columns: 34px 1fr;
+  grid-template-columns: 30px minmax(0, 1fr);
   align-items: center;
-  gap: 4px;
-  padding: 1px 4px;
-  height: calc((100vh - 135px) / 20);
-  min-height: 26px;
+  gap: 3px;
+  padding: 0 4px;
+  min-height: 0;
 }
 
 .posicion {
-  font-size: 14px;
+  font-size: clamp(11px, 0.8vw, 14px);
   opacity: 0.95;
   text-align: right;
 }
 
 .numero {
-  font-size: 30px;
+  font-size: clamp(20px, 1.85vw, 31px);
   line-height: 1;
   font-weight: 1000;
   letter-spacing: 1px;
   color: white;
   text-shadow: 3px 3px 0 #000;
+  white-space: nowrap;
 }
 
 .fila-premio:first-of-type .numero {
-  font-size: 41px;
+  font-size: clamp(30px, 2.7vw, 43px);
   color: #fff200;
 }
 
@@ -172,19 +205,21 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
-  padding: 10px;
+  border-radius: 12px;
+  padding: 8px;
   text-align: center;
+  min-width: 0;
+  min-height: 0;
 }
 
 .promo-lateral .mini {
-  font-size: 22px;
+  font-size: clamp(17px, 1.4vw, 23px);
   font-weight: 1000;
   color: #fff;
 }
 
 .promo-lateral .grande {
-  font-size: 70px;
+  font-size: clamp(54px, 5vw, 82px);
   font-weight: 1000;
   color: #ff1b1b;
   text-shadow: 4px 4px 0 #000, -2px -2px 0 #fff;
@@ -192,7 +227,7 @@ body {
 }
 
 .promo-lateral .texto {
-  font-size: 28px;
+  font-size: clamp(20px, 1.8vw, 30px);
   font-weight: 1000;
   color: #00d9ff;
   text-shadow: 3px 3px 0 #000;
@@ -200,28 +235,32 @@ body {
 
 .footer {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   border-top: 4px solid #fff;
-  font-size: 21px;
+  font-size: clamp(14px, 1.2vw, 21px);
   font-weight: 1000;
   text-shadow: 2px 2px 0 #000;
-  padding-top: 5px;
+  padding-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .atajos {
-  font-size: 18px;
+  font-size: clamp(12px, 1vw, 17px);
   color: #ffe600;
+  white-space: nowrap;
 }
 
 .pantalla-simple {
   width: 100vw;
   height: 100vh;
-  padding: 28px;
+  padding: 20px;
   background: linear-gradient(135deg, #001c4e, #005bbb, #00122d);
   display: grid;
-  grid-template-rows: 80px 1fr 60px;
+  grid-template-rows: 70px minmax(0, 1fr) 45px;
 }
 
 .simple-header {
@@ -229,13 +268,15 @@ body {
   justify-content: space-between;
   align-items: center;
   border-bottom: 5px solid white;
+  gap: 15px;
 }
 
 .simple-header h1 {
   margin: 0;
-  font-size: 48px;
+  font-size: clamp(30px, 3vw, 48px);
   font-weight: 1000;
   text-shadow: 4px 4px 0 #000;
+  white-space: nowrap;
 }
 
 .simple-body {
@@ -244,10 +285,11 @@ body {
   justify-content: center;
   text-align: center;
   flex-direction: column;
+  min-height: 0;
 }
 
 .numero-gigante {
-  font-size: 190px;
+  font-size: clamp(130px, 15vw, 210px);
   font-weight: 1000;
   color: #ff1616;
   text-shadow: 7px 7px 0 #000, -4px -4px 0 #fff;
@@ -256,22 +298,22 @@ body {
 
 .quini-bolas {
   display: flex;
-  gap: 18px;
+  gap: 16px;
   flex-wrap: wrap;
   justify-content: center;
-  margin: 30px 0;
+  margin: 24px 0;
 }
 
 .bola {
-  width: 130px;
-  height: 130px;
+  width: clamp(95px, 8vw, 130px);
+  height: clamp(95px, 8vw, 130px);
   border-radius: 50%;
   background: radial-gradient(circle at 35% 25%, #fff, #ffd000 35%, #ff8c00 70%);
   color: #111;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 58px;
+  font-size: clamp(42px, 4vw, 58px);
   font-weight: 1000;
   border: 6px solid #111;
   box-shadow: 6px 6px 0 rgba(0,0,0,0.55);
@@ -286,16 +328,16 @@ body {
 .grilla-cabezas {
   width: 95%;
   display: grid;
-  grid-template-columns: 190px repeat(6, 1fr);
+  grid-template-columns: 170px repeat(6, 1fr);
   gap: 4px;
-  font-size: 30px;
+  font-size: clamp(20px, 2vw, 30px);
   font-weight: 1000;
 }
 
 .celda {
   background: rgba(255,255,255,0.9);
   color: #111;
-  padding: 9px;
+  padding: 8px;
   border: 3px solid #000;
   text-align: center;
 }
@@ -325,30 +367,12 @@ body {
 }
 
 .publicidad-demo h2 {
-  font-size: 72px;
+  font-size: clamp(44px, 5vw, 72px);
   margin: 0;
   color: #d60000;
 }
 
 .publicidad-demo p {
-  font-size: 38px;
+  font-size: clamp(24px, 2.8vw, 38px);
   font-weight: 1000;
-}
-
-@media (max-width: 1200px) {
-  .zona-vivo {
-    grid-template-columns: 205px 1fr 250px;
-  }
-
-  .numero {
-    font-size: 25px;
-  }
-
-  .fila-premio:first-of-type .numero {
-    font-size: 34px;
-  }
-
-  .promo-lateral .grande {
-    font-size: 58px;
-  }
 }
