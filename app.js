@@ -599,10 +599,7 @@ function dibujarTurno(turno) {
         </section>
 
         <aside class="promo-lateral">
-          <div class="mini">PROMO DEL DÍA</div>
-          <div class="grande">39</div>
-          <div class="texto">HOY ES DÍA PARA JUGARLE</div>
-          <div class="grande">039</div>
+          <img src="${supabaseConfigurado() ? SUPABASE_URL.replace(/\/$/, '') + '/storage/v1/object/public/media' : 'media'}/img3.jpg?v=${Date.now()}" alt="">
         </aside>
       </section>
 

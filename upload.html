@@ -100,7 +100,14 @@
     <input type="file" id="file2" accept="image/*">
   </div>
 
-  <button id="btn-subir" disabled>SUBIR PUBLICIDADES</button>
+  <div class="card">
+    <h2>PROMO LATERAL (se ve en todas las pantallas)</h2>
+    <img class="preview" id="preview3">
+    <button class="btn-elegir" id="btn3">ELEGIR IMAGEN</button>
+    <input type="file" id="file3" accept="image/*">
+  </div>
+
+  <button id="btn-subir" disabled>SUBIR IMAGENES</button>
   <div id="estado"></div>
 
   <script>
@@ -109,8 +116,13 @@
 
     const file1 = document.getElementById("file1");
     const file2 = document.getElementById("file2");
+    const file3 = document.getElementById("file3");
     const btnSubir = document.getElementById("btn-subir");
     const estado = document.getElementById("estado");
+
+    function checkReady() {
+      btnSubir.disabled = !(file1.files[0] || file2.files[0] || file3.files[0]);
+    }
 
     function setup(fileInput, previewId, btnId) {
       const preview = document.getElementById(previewId);
@@ -123,13 +135,14 @@
           preview.classList.add("visible");
           btn.textContent = "CAMBIAR IMAGEN";
           btn.classList.add("selected");
-          btnSubir.disabled = !(file1.files[0] || file2.files[0]);
+          checkReady();
         }
       });
     }
 
     setup(file1, "preview1", "btn1");
     setup(file2, "preview2", "btn2");
+    setup(file3, "preview3", "btn3");
 
     async function uploadFile(file, name) {
       const res = await fetch(
@@ -160,9 +173,10 @@
         const uploads = [];
         if (file1.files[0]) uploads.push(uploadFile(file1.files[0], "img1.jpg"));
         if (file2.files[0]) uploads.push(uploadFile(file2.files[0], "img2.jpg"));
+        if (file3.files[0]) uploads.push(uploadFile(file3.files[0], "img3.jpg"));
         await Promise.all(uploads);
         estado.className = "ok";
-        estado.textContent = "Publicidades actualizadas correctamente";
+        estado.textContent = "Imagenes actualizadas correctamente";
       } catch (err) {
         estado.className = "err";
         estado.textContent = "Error al subir: " + err.message;

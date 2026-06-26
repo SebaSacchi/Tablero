@@ -36,9 +36,9 @@ body {
 }
 
 .pantalla {
-  --base-oscura: #350404;
-  --base-media: #8c0b0b;
-  --base-clara: #c41616;
+  --base-oscura: #04102e;
+  --base-media: #0b2870;
+  --base-clara: #1640a8;
   display: grid;
   grid-template-rows: 8.2cqh minmax(0, 1fr) 5.3cqh;
   padding: 0.75cqh;
@@ -53,21 +53,21 @@ body {
 }
 
 .pantalla.estado-vivo {
-  --base-oscura: #420000;
-  --base-media: #8e0000;
-  --base-clara: #d41919;
+  --base-oscura: #0a1040;
+  --base-media: #1a2a80;
+  --base-clara: #2040c0;
 }
 
 .pantalla.estado-finalizado {
-  --base-oscura: #063611;
-  --base-media: #0d6f26;
-  --base-clara: #18a943;
+  --base-oscura: #041430;
+  --base-media: #0a2868;
+  --base-clara: #1040a0;
 }
 
 .pantalla.estado-pendiente {
-  --base-oscura: #242424;
-  --base-media: #444;
-  --base-clara: #686868;
+  --base-oscura: #1a1a2e;
+  --base-media: #2a2a4e;
+  --base-clara: #3a3a6e;
 }
 
 .topbar {
@@ -148,7 +148,7 @@ body {
 
 .zona-vivo {
   display: grid;
-  grid-template-columns: 13.8cqw minmax(0, 1fr) 16.8cqw;
+  grid-template-columns: 13.8cqw minmax(0, 1fr) 20cqw;
   gap: 0.5cqw;
   min-height: 0;
   padding-top: 0.75cqh;
@@ -292,42 +292,20 @@ body {
 }
 
 .promo-lateral {
-  border: 0.55cqh solid #fff200;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 35%),
-    #111;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   border-radius: 8px;
-  padding: 0.75cqh 0.5cqw;
-  text-align: center;
+  overflow: hidden;
   min-width: 0;
   min-height: 0;
-  box-shadow: 0.55cqh 0.55cqh 0 rgba(0, 0, 0, 0.55), inset 0 0 1.6cqh #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
 }
 
-.promo-lateral .mini {
-  font-size: clamp(0.86rem, 1.35cqw, 1.35rem);
-  font-weight: 1000;
-  color: #fff;
-  text-shadow: 0.22cqh 0.22cqh 0 #000;
-}
-
-.promo-lateral .grande {
-  font-size: clamp(2.6rem, 5cqw, 5rem);
-  font-weight: 1000;
-  color: #ff1b1b;
-  text-shadow: 0.48cqh 0.48cqh 0 #000, -0.14cqh -0.14cqh 0 #fff;
-  line-height: 1;
-}
-
-.promo-lateral .texto {
-  font-size: clamp(0.98rem, 1.68cqw, 1.8rem);
-  font-weight: 1000;
-  color: #00d9ff;
-  text-shadow: 0.3cqh 0.3cqh 0 #000;
+.promo-lateral img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .footer {
