@@ -130,6 +130,11 @@ function fechaCortaTexto(fecha = new Date()) {
   return `${d}-${m}-${y}`;
 }
 
+function fechaCabezasTexto(fecha = new Date()) {
+  const dia = fecha.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase();
+  return `${dia} ${fechaCortaTexto(fecha)}`;
+}
+
 function fechaDesdeISO(fechaTxt) {
   const [y, m, d] = fechaTxt.split("-").map(Number);
   return new Date(y, m - 1, d);
@@ -443,10 +448,23 @@ function claseLogoLoteria(loteria) {
     .replace(/\s+/g, "-");
 }
 
+const logosLoterias = {
+  PROVINCIA: "assets/logos/PROVINCIA.png",
+  CIUDAD: "assets/logos/CIUDAD.png",
+  CORDOBA: "assets/logos/CÓRDOBA.png",
+  "SANTA FE": "assets/logos/SANTA FE.png",
+  "ENTRE RIOS": "assets/logos/ENTRE RIOS.png",
+  MONTEVIDEO: "assets/logos/MONTEVIDEO.png"
+};
+
 function logoLoteria(loteria) {
+  const clase = claseLogoLoteria(loteria);
+  const src = logosLoterias[loteria];
+
   return `
-    <div class="loteria-logo ${claseLogoLoteria(loteria)}">
-      <span class="logo-icon" aria-hidden="true"></span>
+    <div class="loteria-logo ${clase}">
+      ${src ? `<img class="logo-img" src="${src}" alt="" onerror="this.hidden=true; this.nextElementSibling.hidden=false;">` : ""}
+      <span class="logo-icon" aria-hidden="true" ${src ? "hidden" : ""}></span>
       <span class="logo-text">${loteria}</span>
     </div>
   `;
@@ -596,8 +614,7 @@ async function renderCabezas({ mostrarCarga = true } = {}) {
     app.innerHTML = `
       <main class="pantalla-simple pantalla-cabezas">
         <header class="simple-header cabezas-header">
-          <h1>CABEZAS DEL DÍA: <span>${fechaCortaTexto(fecha)}</span></h1>
-          <h1>${fechaTexto()}</h1>
+          <h1>CABEZAS DEL DÍA: <span>${fechaCabezasTexto(fecha)}</span></h1>
         </header>
         <section class="simple-body">
           <div class="cabezas-cargando">CARGANDO CABEZAS</div>
@@ -626,8 +643,7 @@ async function renderCabezas({ mostrarCarga = true } = {}) {
   app.innerHTML = `
     <main class="pantalla-simple pantalla-cabezas">
       <header class="simple-header cabezas-header">
-        <h1>CABEZAS DEL DÍA: <span>${fechaCortaTexto(fecha)}</span></h1>
-        <h1>${fechaTexto()}</h1>
+        <h1>CABEZAS DEL DÍA: <span>${fechaCabezasTexto(fecha)}</span></h1>
       </header>
       <section class="simple-body">
         <div class="planilla-cabezas">${encabezado}${filas}</div>
