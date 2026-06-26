@@ -232,14 +232,18 @@ body {
     #50BE00;
 }
 
-.bloque-cabezas.hoy {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.1)),
-    #000096;
+.bloque-cabezas.hoy .cabeza-linea {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.bloque-cabezas.hoy .cabeza-loteria {
+  color: #000096;
+  text-shadow: none;
 }
 
 .bloque-cabezas.hoy .cabeza-numero {
-  color: #FFCC00;
+  color: #000096;
+  text-shadow: none;
 }
 
 .bloque-cabezas.ayer {
