@@ -249,8 +249,8 @@ function calcularCuentaRegresiva(turno) {
   const sPad = String(s).padStart(2, "0");
   const mPad = String(m).padStart(2, "0");
 
-  if (h > 0) return `${h}h ${mPad}m ${sPad}s`;
-  return `${mPad}m ${sPad}s`;
+  if (h > 0) return `${h}:${mPad}:${sPad}`;
+  return `${mPad}:${sPad}`;
 }
 
 function actualizarTopbar(turno) {
@@ -259,7 +259,7 @@ function actualizarTopbar(turno) {
   if (horaEl) horaEl.textContent = soloHoraTexto();
   if (cierreEl) {
     const cuenta = calcularCuentaRegresiva(turno);
-    cierreEl.textContent = cuenta || "";
+    cierreEl.innerHTML = cuenta ? `<small>CIERRA EN</small> ${cuenta}` : "";
   }
 }
 

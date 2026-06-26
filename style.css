@@ -160,16 +160,20 @@ body {
 
 .topbar-cierre {
   text-align: center;
-  font-size: clamp(1.4rem, 2.5cqw, 2.8rem);
+  font-size: clamp(1.2rem, 2.2cqw, 2.4rem);
   font-weight: 1000;
-  color: #fff;
-  text-shadow:
-    0.3cqh 0.3cqh 0 #000,
-    -0.12cqh -0.12cqh 0 #cc0000,
-    0.12cqh -0.12cqh 0 #cc0000,
-    -0.12cqh 0.12cqh 0 #cc0000,
-    0.12cqh 0.12cqh 0 #cc0000;
+  color: #ff4444;
+  text-shadow: 0.25cqh 0.25cqh 0 #000, 0 0 0.5cqh rgba(0, 0, 0, 0.8);
   white-space: nowrap;
+  padding: 0 0.5cqw;
+}
+
+.topbar-cierre small {
+  font-size: clamp(0.6rem, 0.9cqw, 1rem);
+  color: #fff;
+  font-weight: 900;
+  text-shadow: 0.18cqh 0.18cqh 0 #000;
+  margin-right: 0.3cqw;
 }
 
 .fecha {
