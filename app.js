@@ -782,21 +782,14 @@ function renderQuini() {
 
 function renderPublicidad() {
   pantallaActual = "PUBLICIDAD";
+  const cache = Date.now();
 
   app.innerHTML = `
-    <main class="pantalla-simple">
-      <header class="simple-header">
-        <h1>PUBLICIDADES</h1>
-        <h1>TABLERO AGENCIA</h1>
-      </header>
-      <section class="simple-body">
-        <div class="publicidad-demo">
-          <h2>ACÁ VAN TUS LÁMINAS</h2>
-          <p>Quini · Loto · Datelli · Numerazo · Avisos</p>
-          <p>Después las leemos desde Supabase Storage</p>
-        </div>
+    <main class="pantalla-simple pantalla-publicidad">
+      <section class="publicidad-contenedor">
+        <img class="publicidad-img" src="publicidades/pub1.jpg?v=${cache}" alt="" onerror="this.classList.add('pub-error')">
+        <img class="publicidad-img" src="publicidades/pub2.jpg?v=${cache}" alt="" onerror="this.classList.add('pub-error')">
       </section>
-      <footer class="footer">Presioná 0 para volver a esta pantalla</footer>
     </main>
   `;
 }
