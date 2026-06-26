@@ -631,7 +631,7 @@ async function renderCabezas({ mostrarCarga = true } = {}) {
   }
 
   const encabezado = `
-    <div class="planilla-celda planilla-titulo">SORTEO</div>
+    <div class="planilla-celda planilla-titulo"></div>
     ${ordenTurnos.map(t => `<div class="planilla-celda planilla-titulo">${t}</div>`).join("")}
   `;
 
