@@ -176,6 +176,10 @@ function getResultadosTurno(turno, fecha) {
   return resultadosSupabaseCache[cacheKeyResultados(turno, fecha)] || resultados[turno];
 }
 
+function getResultadosRealesTurno(turno, fecha) {
+  return resultadosSupabaseCache[cacheKeyResultados(turno, fecha)] || null;
+}
+
 function tieneResultadosReales(resultadoTurno) {
   return Boolean(resultadoTurno && Object.keys(resultadoTurno).length > 0);
 }
@@ -544,12 +548,13 @@ async function renderTurno(turno) {
   }
 
   const loteriasDelTurno = getLoteriasTurno(turno, estado.fechaResultados);
-  const resultadosTurno = getResultadosTurno(turno, estado.fechaResultados);
+  const resultadosRealesTurno = getResultadosRealesTurno(turno, estado.fechaResultados);
+  const resultadosTurno = resultadosRealesTurno || (supabaseConfigurado() ? {} : resultados[turno]);
 
   const columnas = loteriasDelTurno.map(loteria => {
-    const numeros = resultadosTurno[loteria] || resultados[turno][loteria] || [];
+    const numeros = resultadosTurno[loteria] || [];
     const filas = Array.from({ length: 20 }, (_, i) => {
-      const num = numeros[i] || "----";
+      const num = numeros[i] || "";
       return `
       <div class="fila-premio">
         <div class="posicion">${String(i + 1).padStart(2, "0")}.</div>
