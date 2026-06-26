@@ -828,17 +828,39 @@ function pantallaPorHora() {
   return "NOCTURNA";
 }
 
+const pantallasOrden = [
+  { key: "1", fn: () => renderTurno("PREVIA") },
+  { key: "2", fn: () => renderTurno("PRIMERA") },
+  { key: "3", fn: () => renderTurno("MATUTINA") },
+  { key: "4", fn: () => renderTurno("VESPERTINA") },
+  { key: "5", fn: () => renderTurno("NOCTURNA") },
+  { key: "6", fn: () => renderCabezas() },
+  { key: "7", fn: () => renderHistorial() },
+  { key: "8", fn: () => renderAleatorio() },
+  { key: "9", fn: () => renderQuini() },
+  { key: "0", fn: () => renderPublicidad() }
+];
+
+function indicePantallaActual() {
+  const mapa = { PREVIA: 0, PRIMERA: 1, MATUTINA: 2, VESPERTINA: 3, NOCTURNA: 4, CABEZAS: 5, HISTORIAL: 6, ALEATORIO: 7, QUINI: 8, PUBLICIDAD: 9 };
+  return mapa[pantallaActual] ?? 0;
+}
+
+function navegarPantalla(dir) {
+  const total = pantallasOrden.length;
+  const nuevo = (indicePantallaActual() + dir + total) % total;
+  pantallasOrden[nuevo].fn();
+}
+
 document.addEventListener("keydown", (e) => {
-  if (e.key === "1") renderTurno("PREVIA");
-  if (e.key === "2") renderTurno("PRIMERA");
-  if (e.key === "3") renderTurno("MATUTINA");
-  if (e.key === "4") renderTurno("VESPERTINA");
-  if (e.key === "5") renderTurno("NOCTURNA");
-  if (e.key === "6") renderCabezas();
-  if (e.key === "7") renderHistorial();
-  if (e.key === "8") renderAleatorio();
-  if (e.key === "9") renderQuini();
-  if (e.key === "0") renderPublicidad();
+  const tecla = e.key || String.fromCharCode(e.keyCode);
+
+  for (const p of pantallasOrden) {
+    if (tecla === p.key) { p.fn(); return; }
+  }
+
+  if (tecla === "ArrowRight" || e.keyCode === 22 || e.keyCode === 166) navegarPantalla(1);
+  if (tecla === "ArrowLeft" || e.keyCode === 21 || e.keyCode === 167) navegarPantalla(-1);
 });
 
 renderTurno(pantallaPorHora());
