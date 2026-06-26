@@ -807,25 +807,12 @@ function renderPublicidad() {
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-publicidad">
-      <section class="publicidad-contenedor">
-        <img class="publicidad-img" data-name="pub1.jpg" alt="">
-        <img class="publicidad-img" data-name="pub2.jpg" alt="">
-      </section>
+      <div class="publicidad-contenedor">
+        <img class="publicidad-img" src="${base}/pub1.jpg?v=${cache}">
+        <img class="publicidad-img" src="${base}/pub2.jpg?v=${cache}">
+      </div>
     </main>
   `;
-
-  app.querySelectorAll(".publicidad-img").forEach(img => {
-    const name = img.dataset.name;
-    img.onerror = () => {
-      if (base !== "publicidades" && !img.dataset.fallback) {
-        img.dataset.fallback = "1";
-        img.src = `publicidades/${name}?v=${cache}`;
-      } else {
-        img.classList.add("pub-error");
-      }
-    };
-    img.src = `${base}/${name}?v=${cache}`;
-  });
 }
 
 function pantallaPorHora() {
