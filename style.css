@@ -809,7 +809,12 @@ body {
 
 .pantalla-laminas {
   padding: 0 !important;
-  background: #000 !important;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.06), transparent 32%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(135deg, #040418, #080840 48%, #020210) !important;
+  background-size: auto, 28px 28px, 28px 28px, auto !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
