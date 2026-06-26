@@ -171,7 +171,7 @@ function iniciarLatRotacion() {
         img.style.opacity = "1";
       }, 300);
     }
-  }, 30000);
+  }, 60000);
 }
 
 function latImagenActual() {
@@ -651,7 +651,7 @@ function dibujarTurno(turno) {
   app.innerHTML = `
     <main class="pantalla ${estado.clase}">
       <header class="topbar">
-        <div class="marca">TABLERO AGENCIA</div>
+        <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
         <div class="titulo-turno">
           <div class="linea-titulo">
             <span>${turno}</span>
@@ -675,11 +675,6 @@ function dibujarTurno(turno) {
           ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
         </aside>
       </section>
-
-      <footer class="footer">
-        <div>Los resultados son de carácter informativo · TABLERO AGENCIA</div>
-        <div class="atajos">1 Previa · 2 Primera · 3 Matutina · 4 Vespertina · 5 Nocturna · 6 Cabezas · 7 Historial · 8 Aleatorio · 9 Quini · 0 Publicidad</div>
-      </footer>
     </main>
   `;
 }

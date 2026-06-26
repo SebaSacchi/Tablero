@@ -40,7 +40,7 @@ body {
   --base-media: #0b2870;
   --base-clara: #1640a8;
   display: grid;
-  grid-template-rows: 8.2cqh minmax(0, 1fr) 5.3cqh;
+  grid-template-rows: 8.2cqh minmax(0, 1fr);
   padding: 0.75cqh;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
@@ -95,6 +95,15 @@ body {
 
 .marca {
   font-size: clamp(1rem, 2.1cqw, 2rem);
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.marca img {
+  height: 85%;
+  object-fit: contain;
+  filter: drop-shadow(0 0.2cqh 0.4cqh rgba(0, 0, 0, 0.6));
 }
 
 .titulo-turno {
@@ -148,7 +157,7 @@ body {
 
 .zona-vivo {
   display: grid;
-  grid-template-columns: 13.8cqw minmax(0, 1fr) 20cqw;
+  grid-template-columns: 13.8cqw minmax(0, 1fr) 24cqw;
   gap: 0.5cqw;
   min-height: 0;
   padding-top: 0.75cqh;
@@ -192,6 +201,20 @@ body {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent),
     #079438;
+}
+
+.bloque-cabezas.hoy .cabeza-linea {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.bloque-cabezas.hoy .cabeza-loteria {
+  color: #111;
+  text-shadow: none;
+}
+
+.bloque-cabezas.hoy .cabeza-numero {
+  color: #111;
+  text-shadow: none;
 }
 
 .cabeza-linea {
@@ -299,7 +322,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #000;
+  background: #fff;
 }
 
 .promo-lateral img {
