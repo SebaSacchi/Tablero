@@ -687,6 +687,7 @@ function dibujarTurno(turno) {
 async function renderTurno(turno) {
   pantallaActual = turno;
   limpiarPubInterval();
+  limpiarPubCabezasInterval();
   const idRender = ++renderTurnoId;
 
   dibujarTurno(turno);
@@ -706,6 +707,7 @@ async function renderTurno(turno) {
 async function renderCabezas({ mostrarCarga = true } = {}) {
   pantallaActual = "CABEZAS";
   limpiarPubInterval();
+  limpiarPubCabezasInterval();
   limpiarLatInterval();
   const idRender = ++renderTurnoId;
   const fecha = new Date();
@@ -756,6 +758,7 @@ async function renderCabezas({ mostrarCarga = true } = {}) {
 async function renderHistorial({ mostrarCarga = true } = {}) {
   pantallaActual = "HISTORIAL";
   limpiarPubInterval();
+  limpiarPubCabezasInterval();
   limpiarLatInterval();
   const idRender = ++renderTurnoId;
 
@@ -825,6 +828,7 @@ function numero4() {
 function renderAleatorio() {
   pantallaActual = "ALEATORIO";
   limpiarPubInterval();
+  limpiarPubCabezasInterval();
   limpiarLatInterval();
 
   app.innerHTML = `
@@ -859,6 +863,7 @@ function randomQuini() {
 function renderQuini() {
   pantallaActual = "QUINI";
   limpiarPubInterval();
+  limpiarPubCabezasInterval();
   limpiarLatInterval();
 
   const jugada = randomQuini();
@@ -881,50 +886,66 @@ function renderQuini() {
   `;
 }
 
-function cabezasPublicidadHTML() {
-  const bloques = ultimasCabezasCache.length ? ultimasCabezasCache : getBloquesCabezasFallback();
-  const ultimo = [...bloques].reverse().find(b => b.cabezas.some(c => c.numero !== "----"));
-  if (!ultimo) return "";
+let pubCabezasIndex = 0;
+let pubCabezasInterval = null;
 
-  const items = ultimo.cabezas.map(c =>
+function limpiarPubCabezasInterval() {
+  if (pubCabezasInterval) { clearInterval(pubCabezasInterval); pubCabezasInterval = null; }
+}
+
+function getBloquesCabezasConResultados() {
+  const bloques = ultimasCabezasCache.length ? ultimasCabezasCache : getBloquesCabezasFallback();
+  return bloques.filter(b => b.cabezas.some(c => c.numero !== "----"));
+}
+
+function renderCabezasBar() {
+  const bar = document.getElementById("laminas-cabezas-bar");
+  if (!bar) return;
+
+  const bloques = getBloquesCabezasConResultados();
+  if (bloques.length === 0) return;
+
+  const b = bloques[pubCabezasIndex % bloques.length];
+  const items = b.cabezas.map(c =>
     `<span class="laminas-cabezas-item">${c.loteria} <span class="laminas-cabezas-num">${c.numero}</span></span>`
   ).join('<span class="laminas-cabezas-sep">|</span>');
 
-  return `
-    <div class="laminas-cabezas">
-      <span class="laminas-cabezas-turno">${ultimo.turno} ${ultimo.etiqueta}</span>
-      <span class="laminas-cabezas-sep">|</span>
-      ${items}
-    </div>
+  bar.innerHTML = `
+    <span class="laminas-cabezas-turno">${b.turno} ${b.etiqueta}</span>
+    <span class="laminas-cabezas-sep">|</span>
+    ${items}
   `;
 }
 
 function dibujarPublicidad() {
+  const base = getMediaBase();
   const img1src = pubImagesCargadas[pubIndex] || "";
   const img2src = pubImagesCargadas[pubIndex + 1] || "";
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-laminas">
-      <header class="laminas-header">
-        <h1>PRONOSTICOS DEL DIA</h1>
-      </header>
-      <div class="laminas-contenedor">
+      <div class="laminas-cuerpo">
+        <div class="lamina-logo"><img src="${base}/logo-izq.png" onerror="this.parentElement.style.display='none'"></div>
         ${img1src ? `<div class="lamina-cuadro"><img class="lamina-img" src="${img1src}"></div>` : ""}
         ${img2src ? `<div class="lamina-cuadro"><img class="lamina-img" src="${img2src}"></div>` : ""}
+        <div class="lamina-logo"><img src="${base}/logo-der.png" onerror="this.parentElement.style.display='none'"></div>
       </div>
-      ${cabezasPublicidadHTML()}
+      <div class="laminas-cabezas" id="laminas-cabezas-bar"></div>
     </main>
   `;
+
+  renderCabezasBar();
 }
 
 async function renderPublicidad() {
   pantallaActual = "PUBLICIDAD";
   limpiarPubInterval();
   limpiarLatInterval();
+  limpiarPubCabezasInterval();
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-laminas">
-      <div class="laminas-contenedor">
+      <div class="laminas-cuerpo">
         <div class="lamina-cargando">CARGANDO</div>
       </div>
     </main>
@@ -940,7 +961,7 @@ async function renderPublicidad() {
   if (pubImagesCargadas.length === 0) {
     app.innerHTML = `
       <main class="pantalla-simple pantalla-laminas">
-        <div class="laminas-contenedor">
+        <div class="laminas-cuerpo">
           <div class="lamina-cargando">SIN PUBLICIDADES</div>
         </div>
       </main>
@@ -949,6 +970,7 @@ async function renderPublicidad() {
   }
 
   pubIndex = 0;
+  pubCabezasIndex = 0;
   dibujarPublicidad();
 
   if (pubImagesCargadas.length > 2) {
@@ -960,6 +982,15 @@ async function renderPublicidad() {
       const cuadros = document.querySelectorAll(".lamina-cuadro");
       cuadros.forEach(c => c.style.opacity = "0");
       setTimeout(() => dibujarPublicidad(), 300);
+    }, 30000);
+  }
+
+  const bloquesConResultados = getBloquesCabezasConResultados();
+  if (bloquesConResultados.length > 1) {
+    pubCabezasInterval = setInterval(() => {
+      if (pantallaActual !== "PUBLICIDAD") { limpiarPubCabezasInterval(); return; }
+      pubCabezasIndex = (pubCabezasIndex + 1) % bloquesConResultados.length;
+      renderCabezasBar();
     }, 30000);
   }
 }

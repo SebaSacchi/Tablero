@@ -787,7 +787,7 @@ body {
 }
 
 .pantalla-laminas {
-  padding: 1.5cqh 2cqw !important;
+  padding: 0.8cqh 1cqw !important;
   background:
     radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.06), transparent 32%),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
@@ -795,39 +795,37 @@ body {
     linear-gradient(135deg, #040418, #080840 48%, #020210) !important;
   background-size: auto, 28px 28px, 28px 28px, auto !important;
   display: grid !important;
-  grid-template-rows: 7cqh minmax(0, 1fr) auto !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
   align-items: stretch !important;
 }
 
-.laminas-header {
+.laminas-cuerpo {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 0.4cqh solid #ffe600;
-  padding-bottom: 0.5cqh;
-}
-
-.laminas-header h1 {
-  margin: 0;
-  font-size: clamp(1.8rem, 3.6cqw, 3.8rem);
-  font-weight: 1000;
-  color: #ffe600;
-  text-shadow: 0.35cqh 0.35cqh 0 #000;
-  text-align: center;
-}
-
-.laminas-contenedor {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2.5cqw;
-  padding: 1cqh 2cqw;
+  gap: 1.5cqw;
   height: 100%;
+  min-height: 0;
+}
+
+.lamina-logo {
+  height: 60%;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lamina-logo img {
+  height: 100%;
+  max-width: 12cqw;
+  object-fit: contain;
+  filter: drop-shadow(0 0.3cqh 0.6cqh rgba(0, 0, 0, 0.6));
 }
 
 .lamina-cuadro {
-  height: 100%;
-  max-width: 48%;
+  height: 92%;
+  flex: 0 1 auto;
   border: 0.55cqh solid #fff;
   border-radius: 0.8cqh;
   overflow: hidden;
@@ -852,34 +850,35 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.8cqw;
-  padding: 0.6cqh 0;
-  border-top: 0.2cqh solid rgba(255, 255, 255, 0.2);
+  gap: 1cqw;
+  padding: 0.8cqh 0 0.3cqh;
+  border-top: 0.25cqh solid rgba(255, 255, 255, 0.25);
   white-space: nowrap;
   overflow: hidden;
+  min-height: 4cqh;
 }
 
 .laminas-cabezas-turno {
-  font-size: clamp(0.65rem, 1.05cqw, 1.1rem);
+  font-size: clamp(0.9rem, 1.5cqw, 1.6rem);
   font-weight: 1000;
   color: #ffe600;
-  text-shadow: 0.18cqh 0.18cqh 0 #000;
+  text-shadow: 0.22cqh 0.22cqh 0 #000;
 }
 
 .laminas-cabezas-item {
-  font-size: clamp(0.6rem, 0.95cqw, 1rem);
-  font-weight: 800;
-  color: #fff;
-  text-shadow: 0.15cqh 0.15cqh 0 #000;
+  font-size: clamp(0.8rem, 1.25cqw, 1.35rem);
+  font-weight: 900;
+  color: #ccc;
+  text-shadow: 0.18cqh 0.18cqh 0 #000;
 }
 
 .laminas-cabezas-num {
   color: #fff;
   font-weight: 1000;
-  font-size: clamp(0.7rem, 1.15cqw, 1.2rem);
+  font-size: clamp(1rem, 1.6cqw, 1.7rem);
 }
 
 .laminas-cabezas-sep {
-  color: rgba(255, 255, 255, 0.3);
-  margin: 0 0.15cqw;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: clamp(0.8rem, 1.2cqw, 1.3rem);
 }
