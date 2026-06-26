@@ -802,14 +802,14 @@ function renderPublicidad() {
   pantallaActual = "PUBLICIDAD";
   const cache = Date.now();
   const base = supabaseConfigurado()
-    ? `${SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/publicidades`
-    : "publicidades";
+    ? `${SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/media`
+    : "media";
 
   app.innerHTML = `
-    <main class="pantalla-simple pantalla-publicidad">
-      <div class="publicidad-contenedor">
-        <img class="publicidad-img" src="${base}/pub1.jpg?v=${cache}">
-        <img class="publicidad-img" src="${base}/pub2.jpg?v=${cache}">
+    <main class="pantalla-simple pantalla-laminas">
+      <div class="laminas-contenedor">
+        <img class="lamina-img" src="${base}/img1.jpg?v=${cache}">
+        <img class="lamina-img" src="${base}/img2.jpg?v=${cache}">
       </div>
     </main>
   `;

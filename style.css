@@ -807,7 +807,7 @@ body {
   text-shadow: 0.22cqh 0.22cqh 0 #000;
 }
 
-.pantalla-publicidad {
+.pantalla-laminas {
   padding: 0 !important;
   background: #000 !important;
   display: flex !important;
@@ -815,7 +815,7 @@ body {
   justify-content: center !important;
 }
 
-.publicidad-contenedor {
+.laminas-contenedor {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -824,7 +824,7 @@ body {
   gap: 4px;
 }
 
-.publicidad-img {
+.lamina-img {
   display: block;
   height: 100%;
   flex: 1;

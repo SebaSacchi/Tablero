@@ -133,7 +133,7 @@
 
     async function uploadFile(file, name) {
       const res = await fetch(
-        `${SUPABASE_URL}/storage/v1/object/publicidades/${name}`,
+        `${SUPABASE_URL}/storage/v1/object/media/${name}`,
         {
           method: "POST",
           headers: {
@@ -158,8 +158,8 @@
 
       try {
         const uploads = [];
-        if (file1.files[0]) uploads.push(uploadFile(file1.files[0], "pub1.jpg"));
-        if (file2.files[0]) uploads.push(uploadFile(file2.files[0], "pub2.jpg"));
+        if (file1.files[0]) uploads.push(uploadFile(file1.files[0], "img1.jpg"));
+        if (file2.files[0]) uploads.push(uploadFile(file2.files[0], "img2.jpg"));
         await Promise.all(uploads);
         estado.className = "ok";
         estado.textContent = "Publicidades actualizadas correctamente";
