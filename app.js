@@ -593,8 +593,10 @@ function getBloquesCabezasFallback() {
   });
 }
 
-function bloqueIzquierdo() {
- return (ultimasCabezasCache.length ? ultimasCabezasCache : getBloquesCabezasFallback()).map(b => {
+function bloqueIzquierdo(turnoActual) {
+ const bloques = (ultimasCabezasCache.length ? ultimasCabezasCache : getBloquesCabezasFallback())
+   .filter(b => b.turno !== turnoActual);
+ return bloques.map(b => {
 const lineas = b.cabezas.map(cabeza => `
       <div class="cabeza-linea">
         <div class="cabeza-loteria">${cabeza.loteria}</div>
