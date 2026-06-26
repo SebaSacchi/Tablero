@@ -795,7 +795,7 @@ body {
     linear-gradient(135deg, #040418, #080840 48%, #020210) !important;
   background-size: auto, 28px 28px, 28px 28px, auto !important;
   display: grid !important;
-  grid-template-rows: 7cqh minmax(0, 1fr) !important;
+  grid-template-rows: 7cqh minmax(0, 1fr) auto !important;
   align-items: stretch !important;
 }
 
@@ -828,10 +828,10 @@ body {
 .lamina-cuadro {
   height: 100%;
   max-width: 48%;
-  border: 0.3cqh solid rgba(255, 255, 255, 0.35);
+  border: 0.55cqh solid #fff;
   border-radius: 0.8cqh;
   overflow: hidden;
-  box-shadow: 0 0.4cqh 1.5cqh rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0.4cqh 1.8cqh rgba(0, 0, 0, 0.55), 0 0 0.6cqh rgba(255, 255, 255, 0.15);
   transition: opacity 0.3s ease;
 }
 
@@ -846,5 +846,40 @@ body {
   font-weight: 1000;
   color: #fff200;
   text-shadow: 0.45cqh 0.45cqh 0 #000;
-  grid-column: span 2;
+}
+
+.laminas-cabezas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8cqw;
+  padding: 0.6cqh 0;
+  border-top: 0.2cqh solid rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.laminas-cabezas-turno {
+  font-size: clamp(0.65rem, 1.05cqw, 1.1rem);
+  font-weight: 1000;
+  color: #ffe600;
+  text-shadow: 0.18cqh 0.18cqh 0 #000;
+}
+
+.laminas-cabezas-item {
+  font-size: clamp(0.6rem, 0.95cqw, 1rem);
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0.15cqh 0.15cqh 0 #000;
+}
+
+.laminas-cabezas-num {
+  color: #fff;
+  font-weight: 1000;
+  font-size: clamp(0.7rem, 1.15cqw, 1.2rem);
+}
+
+.laminas-cabezas-sep {
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 0.15cqw;
 }

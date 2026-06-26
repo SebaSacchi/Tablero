@@ -881,6 +881,24 @@ function renderQuini() {
   `;
 }
 
+function cabezasPublicidadHTML() {
+  const bloques = ultimasCabezasCache.length ? ultimasCabezasCache : getBloquesCabezasFallback();
+  const ultimo = [...bloques].reverse().find(b => b.cabezas.some(c => c.numero !== "----"));
+  if (!ultimo) return "";
+
+  const items = ultimo.cabezas.map(c =>
+    `<span class="laminas-cabezas-item">${c.loteria} <span class="laminas-cabezas-num">${c.numero}</span></span>`
+  ).join('<span class="laminas-cabezas-sep">|</span>');
+
+  return `
+    <div class="laminas-cabezas">
+      <span class="laminas-cabezas-turno">${ultimo.turno} ${ultimo.etiqueta}</span>
+      <span class="laminas-cabezas-sep">|</span>
+      ${items}
+    </div>
+  `;
+}
+
 function dibujarPublicidad() {
   const img1src = pubImagesCargadas[pubIndex] || "";
   const img2src = pubImagesCargadas[pubIndex + 1] || "";
@@ -894,6 +912,7 @@ function dibujarPublicidad() {
         ${img1src ? `<div class="lamina-cuadro"><img class="lamina-img" src="${img1src}"></div>` : ""}
         ${img2src ? `<div class="lamina-cuadro"><img class="lamina-img" src="${img2src}"></div>` : ""}
       </div>
+      ${cabezasPublicidadHTML()}
     </main>
   `;
 }
@@ -911,7 +930,10 @@ async function renderPublicidad() {
     </main>
   `;
 
-  pubImagesCargadas = await preloadImages(PUB_FILES);
+  await Promise.all([
+    preloadImages(PUB_FILES).then(urls => { pubImagesCargadas = urls; }),
+    cargarUltimasCabezasSupabase()
+  ]);
 
   if (pantallaActual !== "PUBLICIDAD") return;
 
