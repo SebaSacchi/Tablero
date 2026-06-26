@@ -704,13 +704,22 @@ async function renderTurno(turno) {
   }
 }
 
+function fechaCabezasPantalla() {
+  const ahora = new Date();
+  const minutos = ahora.getHours() * 60 + ahora.getMinutes();
+  if (minutos < horaAMinutos(horariosTurnos.PREVIA.inicio)) {
+    return fechaAyer(ahora);
+  }
+  return ahora;
+}
+
 async function renderCabezas({ mostrarCarga = true } = {}) {
   pantallaActual = "CABEZAS";
   limpiarPubInterval();
   limpiarPubCabezasInterval();
   limpiarLatInterval();
   const idRender = ++renderTurnoId;
-  const fecha = new Date();
+  const fecha = fechaCabezasPantalla();
 
   if (mostrarCarga) {
     app.innerHTML = `
