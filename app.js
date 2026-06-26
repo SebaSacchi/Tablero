@@ -435,6 +435,23 @@ function cabezaPlanillaDia(resultadosDia, turno, loteria) {
   return "—";
 }
 
+function claseLogoLoteria(loteria) {
+  return loteria
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-");
+}
+
+function logoLoteria(loteria) {
+  return `
+    <div class="loteria-logo ${claseLogoLoteria(loteria)}">
+      <span class="logo-icon" aria-hidden="true"></span>
+      <span class="logo-text">${loteria}</span>
+    </div>
+  `;
+}
+
 function cabezaHistorial(datos, fecha, turno, loteria) {
   const fechaTxt = fechaISO(fecha);
   const resultadoTurno = datos[fechaTxt]?.[turno];
@@ -602,7 +619,7 @@ async function renderCabezas({ mostrarCarga = true } = {}) {
   `;
 
   const filas = loterias.map(loteria => `
-    <div class="planilla-celda planilla-loteria">${loteria}</div>
+    <div class="planilla-celda planilla-loteria">${logoLoteria(loteria)}</div>
     ${ordenTurnos.map(turno => `<div class="planilla-celda planilla-numero">${cabezaPlanillaDia(resultadosDia, turno, loteria)}</div>`).join("")}
   `).join("");
 

@@ -379,13 +379,13 @@ body {
 }
 
 .pantalla-cabezas {
-  padding: 2cqh 2cqw;
+  padding: 1.35cqh 1.55cqw;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
     linear-gradient(0deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(135deg, #052a78, #075fb4 52%, #021742);
   background-size: 26px 26px, 26px 26px, auto;
-  grid-template-rows: 8.4cqh minmax(0, 1fr) 5.4cqh;
+  grid-template-rows: 8.2cqh minmax(0, 1fr) 4.6cqh;
 }
 
 .cabezas-header h1 span {
@@ -393,9 +393,11 @@ body {
 }
 
 .planilla-cabezas {
-  width: min(96%, 86cqw);
+  width: 98%;
+  height: 76cqh;
   display: grid;
-  grid-template-columns: 14.5cqw repeat(5, minmax(0, 1fr));
+  grid-template-columns: 20cqw repeat(5, minmax(0, 1fr));
+  grid-template-rows: 7cqh repeat(6, minmax(0, 1fr));
   align-self: center;
   border-left: 0.35cqh solid #ffd400;
   border-radius: 6px 6px 0 0;
@@ -405,7 +407,7 @@ body {
 
 .planilla-celda {
   min-width: 0;
-  min-height: 6.7cqh;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -415,20 +417,20 @@ body {
 }
 
 .planilla-titulo {
-  min-height: 5cqh;
+  min-height: 0;
   background: #1b48b8;
   color: #fff;
-  font-size: clamp(0.72rem, 1.1cqw, 1.15rem);
+  font-size: clamp(0.82rem, 1.35cqw, 1.45rem);
   font-weight: 1000;
   text-shadow: 0.2cqh 0.2cqh 0 #00154d;
 }
 
 .planilla-loteria {
   justify-content: flex-start;
-  padding: 0 1.2cqw;
+  padding: 0 1cqw;
   background: #f6f8fc;
   color: #045da8;
-  font-size: clamp(0.76rem, 1.35cqw, 1.45rem);
+  font-size: clamp(0.84rem, 1.3cqw, 1.48rem);
   font-weight: 1000;
   text-align: left;
   text-shadow: none;
@@ -438,10 +440,125 @@ body {
 .planilla-numero {
   background: #f2f4f8;
   color: #050505;
-  font-size: clamp(1.4rem, 3cqw, 3.15rem);
+  font-size: clamp(2.1rem, 4.25cqw, 4.75rem);
   font-weight: 1000;
-  text-shadow: 0.22cqh 0.22cqh 0 rgba(0, 72, 150, 0.22);
+  text-shadow: 0.32cqh 0.32cqh 0 rgba(0, 72, 150, 0.22);
   letter-spacing: 0;
+}
+
+.loteria-logo {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75cqw;
+  min-width: 0;
+}
+
+.logo-icon {
+  width: clamp(1.9rem, 3.15cqw, 3.5rem);
+  height: clamp(1.9rem, 3.15cqw, 3.5rem);
+  flex: 0 0 auto;
+  position: relative;
+  display: inline-block;
+}
+
+.logo-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: clip;
+  font-size: clamp(0.9rem, 1.45cqw, 1.65rem);
+  line-height: 1;
+  font-weight: 1000;
+}
+
+.loteria-logo.provincia .logo-icon {
+  border-radius: 50%;
+  background:
+    linear-gradient(160deg, transparent 54%, #0067aa 55%),
+    radial-gradient(circle at 55% 42%, #fff 0 18%, transparent 19%),
+    linear-gradient(150deg, #66d043, #00a95a);
+}
+
+.loteria-logo.provincia .logo-text {
+  color: #0064ac;
+}
+
+.loteria-logo.ciudad .logo-icon {
+  border-radius: 50% 50% 50% 8%;
+  transform: rotate(-45deg);
+  background:
+    radial-gradient(circle at 46% 45%, #fff 0 6%, transparent 7%),
+    radial-gradient(circle at 36% 34%, #fff 0 5%, transparent 6%),
+    radial-gradient(circle at 58% 34%, #fff 0 5%, transparent 6%),
+    radial-gradient(circle at 36% 58%, #fff 0 5%, transparent 6%),
+    radial-gradient(circle at 58% 58%, #fff 0 5%, transparent 6%),
+    linear-gradient(135deg, #ffe300 0 32%, #00a9d8 33%);
+}
+
+.loteria-logo.ciudad .logo-text {
+  color: #00a1d3;
+}
+
+.loteria-logo.cordoba .logo-icon {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 28%, #7ac943 0 9%, transparent 10%),
+    radial-gradient(circle at 64% 40%, #ff2a43 0 10%, transparent 11%),
+    radial-gradient(circle at 50% 55%, #ffd000 0 17%, transparent 18%),
+    radial-gradient(circle at 36% 44%, #8e44ad 0 13%, transparent 14%),
+    linear-gradient(150deg, transparent 38%, #0064ac 39% 51%, transparent 52%);
+}
+
+.loteria-logo.cordoba .logo-text {
+  color: #0064ac;
+}
+
+.loteria-logo.santa-fe .logo-icon {
+  border-left: 0.22cqw solid #ff5a00;
+  border-right: 0.22cqw solid #ff5a00;
+}
+
+.loteria-logo.santa-fe .logo-icon::before {
+  content: "";
+  position: absolute;
+  inset: 12% 24%;
+  background:
+    radial-gradient(circle, #ff5a00 0 18%, transparent 20%) 0 0 / 50% 38%,
+    radial-gradient(circle, #ff5a00 0 18%, transparent 20%) 100% 50% / 50% 38%,
+    radial-gradient(circle, #ff5a00 0 18%, transparent 20%) 0 100% / 50% 38%;
+}
+
+.loteria-logo.santa-fe .logo-text {
+  color: #34314f;
+}
+
+.loteria-logo.entre-rios .logo-icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #00a800;
+  clip-path: polygon(42% 0, 55% 0, 51% 35%, 78% 12%, 85% 23%, 56% 49%, 100% 42%, 100% 55%, 57% 61%, 76% 95%, 62% 100%, 49% 66%, 36% 100%, 22% 95%, 42% 60%, 0 55%, 0 42%, 43% 49%, 15% 23%, 22% 12%, 47% 35%);
+}
+
+.loteria-logo.entre-rios .logo-text {
+  color: #ef1010;
+}
+
+.loteria-logo.montevideo .logo-icon {
+  background:
+    radial-gradient(circle, #ffe600 0 16%, transparent 17%) 0 0 / 33% 33%,
+    radial-gradient(circle, #00aee8 0 16%, transparent 17%) 50% 0 / 33% 33%,
+    radial-gradient(circle, #00aee8 0 16%, transparent 17%) 100% 0 / 33% 33%,
+    radial-gradient(circle, #00aee8 0 16%, transparent 17%) 0 50% / 33% 33%,
+    radial-gradient(circle, #00aee8 0 16%, transparent 17%) 50% 50% / 33% 33%,
+    radial-gradient(circle, #00aee8 0 16%, transparent 17%) 100% 50% / 33% 33%,
+    radial-gradient(circle, #00aee8 0 16%, transparent 17%) 25% 100% / 33% 33%,
+    radial-gradient(circle, #00aee8 0 16%, transparent 17%) 75% 100% / 33% 33%;
+  background-repeat: no-repeat;
+}
+
+.loteria-logo.montevideo .logo-text {
+  color: #333;
 }
 
 .cabezas-cargando {
