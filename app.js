@@ -672,7 +672,6 @@ async function renderHistorial({ mostrarCarga = true } = {}) {
         <section class="simple-body">
           <div class="historial-cargando">CARGANDO HISTORIAL</div>
         </section>
-        <footer class="footer">Teclas: 1 a 5 sorteos · 6 Cabezas · 8 aleatorio · 9 Quini/Loto · 0 publicidades</footer>
       </main>
     `;
   }
@@ -695,11 +694,12 @@ async function renderHistorial({ mostrarCarga = true } = {}) {
 
   const filas = ordenTurnos.map((turno) => {
     const loteriasTurno = loteriasHistorialTurno(turno, fechas, datos);
+    const turnoClass = turno.toLowerCase();
     const filasTurno = loteriasTurno.map((loteria, index) => `
-      ${index === 0 ? `<div class="historial-celda historial-turno ${turno.toLowerCase()}" style="grid-row: span ${loteriasTurno.length};">${turno}</div>` : ""}
-      <div class="historial-celda historial-loteria">${loteria}</div>
+      ${index === 0 ? `<div class="historial-celda historial-turno ${turnoClass}" style="grid-row: span ${loteriasTurno.length};">${turno}</div>` : ""}
+      <div class="historial-celda historial-loteria turno-${turnoClass}">${loteria}</div>
       ${fechas.map(fecha => `
-        <div class="historial-celda historial-numero ${fechaISO(fecha) === hoyTxt ? "hoy" : ""}">
+        <div class="historial-celda historial-numero turno-${turnoClass} ${fechaISO(fecha) === hoyTxt ? "hoy" : ""}">
           ${cabezaHistorial(datos, fecha, turno, loteria)}
         </div>
       `).join("")}
@@ -717,7 +717,6 @@ async function renderHistorial({ mostrarCarga = true } = {}) {
       <section class="simple-body">
         <div class="historial-cabezas">${encabezado}${filas}</div>
       </section>
-      <footer class="footer">Teclas: 1 a 5 sorteos · 6 Cabezas · 8 aleatorio · 9 Quini/Loto · 0 publicidades</footer>
     </main>
   `;
 }

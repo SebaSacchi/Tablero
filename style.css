@@ -586,14 +586,14 @@ body {
 }
 
 .pantalla-historial {
-  padding: 0.65cqh 0.7cqw;
+  padding: 0.3cqh 0.4cqw;
   background:
-    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.08), transparent 32%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(135deg, #090738, #12136a 48%, #020316);
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.05), transparent 32%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(135deg, #040418, #080840 48%, #020210);
   background-size: auto, 28px 28px, 28px 28px, auto;
-  grid-template-rows: 5.2cqh minmax(0, 1fr) 4.1cqh;
+  grid-template-rows: 4.5cqh minmax(0, 1fr);
 }
 
 .historial-header {
@@ -609,10 +609,10 @@ body {
   height: 100%;
   display: grid;
   grid-template-columns: 2.45cqw 11.25cqw repeat(6, minmax(0, 1fr));
-  align-content: center;
+  align-content: stretch;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.24);
-  box-shadow: inset 0 0 2cqh rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 2cqh rgba(0, 0, 0, 0.5);
 }
 
 .historial-celda {
@@ -635,9 +635,9 @@ body {
 }
 
 .historial-dia {
-  background: #313131;
+  background: #252525;
   color: #fff;
-  font-size: clamp(0.9rem, 1.85cqw, 1.95rem);
+  font-size: clamp(1rem, 2cqw, 2.1rem);
   font-weight: 1000;
   text-shadow: 0.22cqh 0.22cqh 0 #000;
 }
@@ -660,41 +660,71 @@ body {
 .historial-turno.previa,
 .historial-turno.matutina,
 .historial-turno.nocturna {
-  background: #2a1582;
+  background: #0a2080;
 }
 
 .historial-turno.primera,
 .historial-turno.vespertina {
-  background: #06913c;
+  background: #067a32;
 }
 
 .historial-loteria {
   justify-content: flex-end;
   padding-right: 0.8cqw;
-  background: #050505;
+  background: #080808;
   color: #fff;
-  font-size: clamp(0.65rem, 1.25cqw, 1.35rem);
+  font-size: clamp(0.75rem, 1.35cqw, 1.5rem);
   font-weight: 1000;
   text-align: right;
-  text-shadow: 0.16cqh 0.16cqh 0 #b00000;
+  text-shadow: 0.16cqh 0.16cqh 0 #000;
   white-space: nowrap;
+}
+
+.historial-loteria.turno-previa,
+.historial-loteria.turno-matutina,
+.historial-loteria.turno-nocturna {
+  background: #080e2a;
+}
+
+.historial-loteria.turno-primera,
+.historial-loteria.turno-vespertina {
+  background: #061208;
 }
 
 .historial-numero {
   background: rgba(7, 7, 53, 0.86);
   color: #fff;
-  font-size: clamp(1rem, 2.05cqw, 2.2rem);
+  font-size: clamp(1.1rem, 2.2cqw, 2.4rem);
   font-weight: 1000;
-  text-shadow: 0.16cqh 0.16cqh 0 #b00000;
+  text-shadow: 0.18cqh 0.18cqh 0 #000;
   line-height: 1;
 }
 
+.historial-numero.turno-previa,
+.historial-numero.turno-matutina,
+.historial-numero.turno-nocturna {
+  background: #0e1a58;
+}
+
+.historial-numero.turno-primera,
+.historial-numero.turno-vespertina {
+  background: #083a1a;
+}
+
 .historial-numero.hoy {
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.04)),
-    #5b5f82;
   color: #ffe600;
   text-shadow: 0.2cqh 0.2cqh 0 #000;
+}
+
+.historial-numero.turno-previa.hoy,
+.historial-numero.turno-matutina.hoy,
+.historial-numero.turno-nocturna.hoy {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)), #1e3090;
+}
+
+.historial-numero.turno-primera.hoy,
+.historial-numero.turno-vespertina.hoy {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)), #0c6030;
 }
 
 .historial-cargando {
