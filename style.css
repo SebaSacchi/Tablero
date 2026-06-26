@@ -813,13 +813,13 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 3cqh;
+  padding-top: 1cqh;
 }
 
 .lamina-logo img {
-  width: 14cqw;
+  width: 18cqw;
   object-fit: contain;
-  filter: drop-shadow(0 0.4cqh 0.8cqh rgba(0, 0, 0, 0.7));
+  filter: drop-shadow(0 0.5cqh 1cqh rgba(0, 0, 0, 0.7));
 }
 
 .lamina-logo:first-child img {
