@@ -228,22 +228,28 @@ body {
 
 .bloque-cabezas.hoy h3 {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent),
-    #079438;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent),
+    #50BE00;
 }
 
 .bloque-cabezas.hoy {
-  background: rgba(255, 255, 255, 0.92);
-}
-
-.bloque-cabezas.hoy .cabeza-loteria {
-  color: #111;
-  text-shadow: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.1)),
+    #000096;
 }
 
 .bloque-cabezas.hoy .cabeza-numero {
-  color: #111;
-  text-shadow: none;
+  color: #FFCC00;
+}
+
+.bloque-cabezas.ayer {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.15)),
+    #1a1a30;
+}
+
+.bloque-cabezas.ayer .cabeza-numero {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .cabeza-linea {
