@@ -104,7 +104,9 @@ const resultados = {
 let pantallaActual = "PREVIA";
 let renderTurnoId = 0;
 const resultadosSupabaseCache = {};
+const resultadosCacheTiempo = {};
 let ultimasCabezasCache = [];
+let ultimasCabezasCacheTiempo = 0;
 
 function fechaTexto() {
   const ahora = new Date();
@@ -189,6 +191,11 @@ async function cargarResultadosSupabase(turno, fecha) {
     return null;
   }
 
+  const key = cacheKeyResultados(turno, fecha);
+  if (resultadosSupabaseCache[key] && (Date.now() - (resultadosCacheTiempo[key] || 0)) < 15000) {
+    return resultadosSupabaseCache[key];
+  }
+
   const fechaTxt = fechaISO(fecha);
   const baseUrl = SUPABASE_URL.replace(/\/$/, "");
   const params = new URLSearchParams({
@@ -235,7 +242,8 @@ async function cargarResultadosSupabase(turno, fecha) {
       agrupado[loteria][posicion - 1] = String(fila.numero).padStart(4, "0");
     });
 
-    resultadosSupabaseCache[cacheKeyResultados(turno, fecha)] = agrupado;
+    resultadosSupabaseCache[key] = agrupado;
+    resultadosCacheTiempo[key] = Date.now();
     return agrupado;
   } catch (error) {
     console.warn("Error cargando resultados desde Supabase", error);
@@ -300,6 +308,10 @@ function cabezasDesdeResultados(turno, fecha, resultadoTurno) {
 }
 
 async function cargarUltimasCabezasSupabase() {
+  if (ultimasCabezasCache.length > 0 && (Date.now() - ultimasCabezasCacheTiempo) < 30000) {
+    return ultimasCabezasCache;
+  }
+
   const hoy = new Date();
   const ayer = fechaAyer(hoy);
 
@@ -337,6 +349,7 @@ async function cargarUltimasCabezasSupabase() {
   }));
 
   ultimasCabezasCache = bloques;
+  ultimasCabezasCacheTiempo = Date.now();
   return bloques;
 }
 
@@ -536,17 +549,8 @@ async function cargarDatosPantalla(turno, estado) {
   await Promise.all(pedidos);
 }
 
-async function renderTurno(turno) {
-  pantallaActual = turno;
-  const idRender = ++renderTurnoId;
-
+function dibujarTurno(turno) {
   const estado = estadoTurno(turno);
-  await cargarDatosPantalla(turno, estado);
-
-  if (pantallaActual !== turno || idRender !== renderTurnoId) {
-    return;
-  }
-
   const loteriasDelTurno = getLoteriasTurno(turno, estado.fechaResultados);
   const resultadosRealesTurno = getResultadosRealesTurno(turno, estado.fechaResultados);
   const resultadosTurno = resultadosRealesTurno || (supabaseConfigurado() ? {} : resultados[turno]);
@@ -608,6 +612,20 @@ async function renderTurno(turno) {
       </footer>
     </main>
   `;
+}
+
+async function renderTurno(turno) {
+  pantallaActual = turno;
+  const idRender = ++renderTurnoId;
+
+  dibujarTurno(turno);
+
+  const estado = estadoTurno(turno);
+  await cargarDatosPantalla(turno, estado);
+
+  if (pantallaActual === turno && idRender === renderTurnoId) {
+    dibujarTurno(turno);
+  }
 }
 
 async function renderCabezas({ mostrarCarga = true } = {}) {
