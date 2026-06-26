@@ -259,12 +259,7 @@ function actualizarTopbar(turno) {
   if (horaEl) horaEl.textContent = soloHoraTexto();
   if (cierreEl) {
     const cuenta = calcularCuentaRegresiva(turno);
-    if (cuenta) {
-      cierreEl.innerHTML = `CIERRA EN <strong>${cuenta}</strong>`;
-      cierreEl.style.display = "";
-    } else {
-      cierreEl.style.display = "none";
-    }
+    cierreEl.textContent = cuenta || "";
   }
 }
 
