@@ -153,6 +153,12 @@ body {
 .fecha {
   text-align: right;
   font-size: clamp(0.74rem, 1.3cqw, 1.42rem);
+  line-height: 1.1;
+}
+
+.fecha-hora {
+  font-size: clamp(1.2rem, 2.2cqw, 2.4rem);
+  color: #ffe600;
 }
 
 .zona-vivo {
@@ -203,7 +209,7 @@ body {
     #079438;
 }
 
-.bloque-cabezas.hoy .cabeza-linea {
+.bloque-cabezas.hoy {
   background: rgba(255, 255, 255, 0.92);
 }
 

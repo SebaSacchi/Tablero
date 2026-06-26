@@ -167,7 +167,7 @@ function iniciarLatRotacion() {
     if (img) {
       img.style.opacity = "0";
       setTimeout(() => {
-        img.src = latImagesCargadas[latIndex] + "?v=" + Date.now();
+        img.src = latImagesCargadas[latIndex];
         img.style.opacity = "1";
       }, 300);
     }
@@ -176,7 +176,7 @@ function iniciarLatRotacion() {
 
 function latImagenActual() {
   if (latImagesCargadas.length === 0) return "";
-  return latImagesCargadas[latIndex % latImagesCargadas.length] + "?v=" + Date.now();
+  return latImagesCargadas[latIndex % latImagesCargadas.length];
 }
 
 function fechaTexto() {
@@ -194,6 +194,23 @@ function fechaTexto() {
   });
 
   return `${fecha} · ${hora}`;
+}
+
+function fechaConHoraGrande() {
+  const ahora = new Date();
+  const fecha = ahora.toLocaleDateString("es-AR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  }).toUpperCase();
+  const hora = ahora.toLocaleTimeString("es-AR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+
+  return `${fecha}<br><span class="fecha-hora">${hora}</span>`;
 }
 
 function fechaCortaTexto(fecha = new Date()) {
@@ -659,7 +676,7 @@ function dibujarTurno(turno) {
           </div>
           <small>${estado.detalle}</small>
         </div>
-        <div class="fecha">${fechaTexto()}</div>
+        <div class="fecha">${fechaConHoraGrande()}</div>
       </header>
 
       <section class="zona-vivo">
