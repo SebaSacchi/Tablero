@@ -72,9 +72,9 @@ body {
 
 .topbar {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.65fr) minmax(0, 1.05fr);
+  grid-template-columns: auto auto minmax(0, 1.4fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 0.75cqw;
+  gap: 0.5cqw;
   min-width: 0;
   border: 0.35cqh solid #f4f0d8;
   background:
@@ -150,15 +150,31 @@ body {
   text-overflow: clip;
 }
 
+.topbar-hora {
+  font-size: clamp(1.4rem, 2.5cqw, 2.8rem);
+  font-weight: 1000;
+  color: #ffe600;
+  text-shadow: 0.3cqh 0.3cqh 0 #000, 0 0 0.6cqh rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+}
+
+.topbar-cierre {
+  text-align: center;
+  font-size: clamp(0.7rem, 1.15cqw, 1.2rem);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0.2cqh 0.2cqh 0 #000;
+  white-space: nowrap;
+}
+
+.topbar-cierre strong {
+  font-size: clamp(0.9rem, 1.5cqw, 1.6rem);
+  color: #ff4444;
+}
+
 .fecha {
   text-align: right;
   font-size: clamp(0.74rem, 1.3cqw, 1.42rem);
-  line-height: 1.1;
-}
-
-.fecha-hora {
-  font-size: clamp(1.2rem, 2.2cqw, 2.4rem);
-  color: #ffe600;
 }
 
 .zona-vivo {

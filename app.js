@@ -196,21 +196,82 @@ function fechaTexto() {
   return `${fecha} · ${hora}`;
 }
 
-function fechaConHoraGrande() {
-  const ahora = new Date();
-  const fecha = ahora.toLocaleDateString("es-AR", {
+function soloFechaTexto() {
+  return new Date().toLocaleDateString("es-AR", {
     weekday: "long",
     day: "2-digit",
     month: "2-digit",
     year: "numeric"
   }).toUpperCase();
-  const hora = ahora.toLocaleTimeString("es-AR", {
+}
+
+function soloHoraTexto() {
+  return new Date().toLocaleTimeString("es-AR", {
     hour: "2-digit",
     minute: "2-digit",
+    second: "2-digit",
     hour12: false
   });
+}
 
-  return `${fecha}<br><span class="fecha-hora">${hora}</span>`;
+const cierreTurnos = {
+  PREVIA: "10:05",
+  PRIMERA: "11:50",
+  MATUTINA: "14:50",
+  VESPERTINA: "17:50",
+  NOCTURNA: "20:50"
+};
+
+let cierreInterval = null;
+
+function limpiarCierreInterval() {
+  if (cierreInterval) { clearInterval(cierreInterval); cierreInterval = null; }
+}
+
+function calcularCuentaRegresiva(turno) {
+  const cierre = cierreTurnos[turno];
+  if (!cierre) return null;
+
+  const ahora = new Date();
+  const [ch, cm] = cierre.split(":").map(Number);
+  const cierreMin = ch * 60 + cm;
+  const ahoraMin = ahora.getHours() * 60 + ahora.getMinutes();
+  const ahoraSeg = ahoraMin * 60 + ahora.getSeconds();
+  const cierreSeg = cierreMin * 60;
+  const diff = cierreSeg - ahoraSeg;
+
+  if (diff <= 0) return null;
+
+  const h = Math.floor(diff / 3600);
+  const m = Math.floor((diff % 3600) / 60);
+  const s = diff % 60;
+
+  const sPad = String(s).padStart(2, "0");
+  const mPad = String(m).padStart(2, "0");
+
+  if (h > 0) return `${h}h ${mPad}m ${sPad}s`;
+  return `${mPad}m ${sPad}s`;
+}
+
+function actualizarTopbar(turno) {
+  const horaEl = document.getElementById("topbar-hora");
+  const cierreEl = document.getElementById("topbar-cierre");
+  if (horaEl) horaEl.textContent = soloHoraTexto();
+  if (cierreEl) {
+    const cuenta = calcularCuentaRegresiva(turno);
+    if (cuenta) {
+      cierreEl.innerHTML = `CIERRA EN <strong>${cuenta}</strong>`;
+      cierreEl.style.display = "";
+    } else {
+      cierreEl.style.display = "none";
+    }
+  }
+}
+
+function iniciarCierreInterval(turno) {
+  limpiarCierreInterval();
+  actualizarTopbar(turno);
+  cierreInterval = setInterval(() => actualizarTopbar(turno), 1000);
 }
 
 function fechaCortaTexto(fecha = new Date()) {
@@ -669,6 +730,7 @@ function dibujarTurno(turno) {
     <main class="pantalla ${estado.clase}">
       <header class="topbar">
         <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
+        <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
         <div class="titulo-turno">
           <div class="linea-titulo">
             <span>${turno}</span>
@@ -676,7 +738,8 @@ function dibujarTurno(turno) {
           </div>
           <small>${estado.detalle}</small>
         </div>
-        <div class="fecha">${fechaConHoraGrande()}</div>
+        <div class="topbar-cierre" id="topbar-cierre"></div>
+        <div class="fecha">${soloFechaTexto()}</div>
       </header>
 
       <section class="zona-vivo">
@@ -703,6 +766,7 @@ async function renderTurno(turno) {
   const idRender = ++renderTurnoId;
 
   dibujarTurno(turno);
+  iniciarCierreInterval(turno);
 
   const estado = estadoTurno(turno);
   await Promise.all([
@@ -712,6 +776,7 @@ async function renderTurno(turno) {
 
   if (pantallaActual === turno && idRender === renderTurnoId) {
     dibujarTurno(turno);
+    iniciarCierreInterval(turno);
     iniciarLatRotacion();
   }
 }
@@ -730,6 +795,7 @@ async function renderCabezas({ mostrarCarga = true } = {}) {
   limpiarPubInterval();
   limpiarPubCabezasInterval();
   limpiarLatInterval();
+  limpiarCierreInterval();
   const idRender = ++renderTurnoId;
   const fecha = fechaCabezasPantalla();
 
@@ -781,6 +847,7 @@ async function renderHistorial({ mostrarCarga = true } = {}) {
   limpiarPubInterval();
   limpiarPubCabezasInterval();
   limpiarLatInterval();
+  limpiarCierreInterval();
   const idRender = ++renderTurnoId;
 
   if (mostrarCarga) {
@@ -850,6 +917,7 @@ function renderAleatorio() {
   pantallaActual = "ALEATORIO";
   limpiarPubInterval();
   limpiarPubCabezasInterval();
+  limpiarCierreInterval();
   limpiarLatInterval();
 
   app.innerHTML = `
@@ -885,6 +953,7 @@ function renderQuini() {
   pantallaActual = "QUINI";
   limpiarPubInterval();
   limpiarPubCabezasInterval();
+  limpiarCierreInterval();
   limpiarLatInterval();
 
   const jugada = randomQuini();
@@ -971,6 +1040,7 @@ async function renderPublicidad() {
   limpiarPubInterval();
   limpiarLatInterval();
   limpiarPubCabezasInterval();
+  limpiarCierreInterval();
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-laminas">
