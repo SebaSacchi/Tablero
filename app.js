@@ -801,15 +801,31 @@ function renderQuini() {
 function renderPublicidad() {
   pantallaActual = "PUBLICIDAD";
   const cache = Date.now();
+  const base = supabaseConfigurado()
+    ? `${SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/publicidades`
+    : "publicidades";
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-publicidad">
       <section class="publicidad-contenedor">
-        <img class="publicidad-img" src="publicidades/pub1.jpg?v=${cache}" alt="" onerror="this.classList.add('pub-error')">
-        <img class="publicidad-img" src="publicidades/pub2.jpg?v=${cache}" alt="" onerror="this.classList.add('pub-error')">
+        <img class="publicidad-img" data-name="pub1.jpg" alt="">
+        <img class="publicidad-img" data-name="pub2.jpg" alt="">
       </section>
     </main>
   `;
+
+  app.querySelectorAll(".publicidad-img").forEach(img => {
+    const name = img.dataset.name;
+    img.onerror = () => {
+      if (base !== "publicidades" && !img.dataset.fallback) {
+        img.dataset.fallback = "1";
+        img.src = `publicidades/${name}?v=${cache}`;
+      } else {
+        img.classList.add("pub-error");
+      }
+    };
+    img.src = `${base}/${name}?v=${cache}`;
+  });
 }
 
 function pantallaPorHora() {

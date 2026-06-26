@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Subir Publicidades</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a2e;
+      color: #fff;
+      min-height: 100dvh;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #ffe600;
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .card h2 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: #ccc;
+    }
+    .preview {
+      width: 100%;
+      max-height: 280px;
+      object-fit: contain;
+      border-radius: 8px;
+      display: none;
+      margin-bottom: 12px;
+      background: rgba(0,0,0,0.3);
+    }
+    .preview.visible { display: block; }
+    input[type="file"] { display: none; }
+    .btn-elegir {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: #1a3a8a;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-elegir.selected { background: #06913c; }
+    #btn-subir {
+      display: block;
+      width: 100%;
+      padding: 18px;
+      background: #ffe600;
+      color: #000;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.3rem;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #btn-subir:disabled { opacity: 0.35; }
+    #estado {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      min-height: 2em;
+    }
+    .ok { color: #4cff4c; }
+    .err { color: #ff4c4c; }
+    .subiendo { color: #ffe600; }
+  </style>
+</head>
+<body>
+  <h1>PUBLICIDADES DEL DIA</h1>
+
+  <div class="card">
+    <h2>IMAGEN 1</h2>
+    <img class="preview" id="preview1">
+    <button class="btn-elegir" id="btn1">ELEGIR IMAGEN</button>
+    <input type="file" id="file1" accept="image/*">
+  </div>
+
+  <div class="card">
+    <h2>IMAGEN 2</h2>
+    <img class="preview" id="preview2">
+    <button class="btn-elegir" id="btn2">ELEGIR IMAGEN</button>
+    <input type="file" id="file2" accept="image/*">
+  </div>
+
+  <button id="btn-subir" disabled>SUBIR PUBLICIDADES</button>
+  <div id="estado"></div>
+
+  <script>
+    const SUPABASE_URL = "https://ldjwkwfkiqqfypftdeqa.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_birytOVhIQ0AoBY6f0yT-g_HpV01OhE";
+
+    const file1 = document.getElementById("file1");
+    const file2 = document.getElementById("file2");
+    const btnSubir = document.getElementById("btn-subir");
+    const estado = document.getElementById("estado");
+
+    function setup(fileInput, previewId, btnId) {
+      const preview = document.getElementById(previewId);
+      const btn = document.getElementById(btnId);
+      btn.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", () => {
+        const f = fileInput.files[0];
+        if (f) {
+          preview.src = URL.createObjectURL(f);
+          preview.classList.add("visible");
+          btn.textContent = "CAMBIAR IMAGEN";
+          btn.classList.add("selected");
+          btnSubir.disabled = !(file1.files[0] || file2.files[0]);
+        }
+      });
+    }
+
+    setup(file1, "preview1", "btn1");
+    setup(file2, "preview2", "btn2");
+
+    async function uploadFile(file, name) {
+      const res = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/publicidades/${name}`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "apikey": SUPABASE_ANON_KEY,
+            "Content-Type": file.type,
+            "x-upsert": "true"
+          },
+          body: file
+        }
+      );
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt);
+      }
+    }
+
+    btnSubir.addEventListener("click", async () => {
+      btnSubir.disabled = true;
+      estado.className = "subiendo";
+      estado.textContent = "Subiendo...";
+
+      try {
+        const uploads = [];
+        if (file1.files[0]) uploads.push(uploadFile(file1.files[0], "pub1.jpg"));
+        if (file2.files[0]) uploads.push(uploadFile(file2.files[0], "pub2.jpg"));
+        await Promise.all(uploads);
+        estado.className = "ok";
+        estado.textContent = "Publicidades actualizadas correctamente";
+      } catch (err) {
+        estado.className = "err";
+        estado.textContent = "Error al subir: " + err.message;
+        btnSubir.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
