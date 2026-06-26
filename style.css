@@ -817,35 +817,26 @@ body {
 }
 
 .laminas-contenedor {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2cqw;
-  align-items: stretch;
-  justify-items: center;
-  padding: 1.5cqh 1cqw;
-}
-
-.laminas-contenedor.laminas-uno {
-  grid-template-columns: 1fr;
-}
-
-.lamina-cuadro {
-  width: 100%;
-  height: 100%;
-  background: #000;
-  border: 0.45cqh solid #cc0000;
-  border-radius: 0.6cqh;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 1.5cqh rgba(204, 0, 0, 0.4), 0 0.5cqh 2cqh rgba(0, 0, 0, 0.5);
+  gap: 2.5cqw;
+  padding: 1cqh 2cqw;
+  height: 100%;
+}
+
+.lamina-cuadro {
+  height: 100%;
+  max-width: 48%;
+  border: 0.3cqh solid rgba(255, 255, 255, 0.35);
+  border-radius: 0.8cqh;
+  overflow: hidden;
+  box-shadow: 0 0.4cqh 1.5cqh rgba(0, 0, 0, 0.6);
   transition: opacity 0.3s ease;
 }
 
 .lamina-img {
   display: block;
-  width: 100%;
   height: 100%;
   object-fit: contain;
 }

@@ -881,27 +881,18 @@ function renderQuini() {
   `;
 }
 
-function dibujarPublicidad(cache) {
+function dibujarPublicidad() {
   const img1src = pubImagesCargadas[pubIndex] || "";
   const img2src = pubImagesCargadas[pubIndex + 1] || "";
-
-  const cuadro1 = img1src
-    ? `<img class="lamina-img" src="${img1src}?v=${cache}">`
-    : "";
-  const cuadro2 = img2src
-    ? `<img class="lamina-img" src="${img2src}?v=${cache}">`
-    : "";
-
-  const soloUno = !cuadro2;
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-laminas">
       <header class="laminas-header">
         <h1>PRONOSTICOS DEL DIA</h1>
       </header>
-      <div class="laminas-contenedor ${soloUno ? "laminas-uno" : ""}">
-        ${cuadro1 ? `<div class="lamina-cuadro">${cuadro1}</div>` : ""}
-        ${cuadro2 ? `<div class="lamina-cuadro">${cuadro2}</div>` : ""}
+      <div class="laminas-contenedor">
+        ${img1src ? `<div class="lamina-cuadro"><img class="lamina-img" src="${img1src}"></div>` : ""}
+        ${img2src ? `<div class="lamina-cuadro"><img class="lamina-img" src="${img2src}"></div>` : ""}
       </div>
     </main>
   `;
@@ -936,9 +927,9 @@ async function renderPublicidad() {
   }
 
   pubIndex = 0;
-  dibujarPublicidad(Date.now());
+  dibujarPublicidad();
 
-  if (pubImagesCargadas.length > 1) {
+  if (pubImagesCargadas.length > 2) {
     pubInterval = setInterval(() => {
       if (pantallaActual !== "PUBLICIDAD") { limpiarPubInterval(); return; }
       pubIndex = pubIndex + 2;
@@ -946,9 +937,7 @@ async function renderPublicidad() {
 
       const cuadros = document.querySelectorAll(".lamina-cuadro");
       cuadros.forEach(c => c.style.opacity = "0");
-      setTimeout(() => {
-        dibujarPublicidad(Date.now());
-      }, 300);
+      setTimeout(() => dibujarPublicidad(), 300);
     }, 30000);
   }
 }
