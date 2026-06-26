@@ -795,40 +795,34 @@ body {
     linear-gradient(135deg, #040418, #080840 48%, #020210) !important;
   background-size: auto, 28px 28px, 28px 28px, auto !important;
   display: grid !important;
-  grid-template-rows: 7cqh minmax(0, 1fr) 5cqh !important;
+  grid-template-rows: 7cqh minmax(0, 1fr) !important;
   align-items: stretch !important;
 }
 
 .laminas-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   border-bottom: 0.4cqh solid #ffe600;
   padding-bottom: 0.5cqh;
 }
 
 .laminas-header h1 {
   margin: 0;
-  font-size: clamp(1.6rem, 3.2cqw, 3.4rem);
+  font-size: clamp(1.8rem, 3.6cqw, 3.8rem);
   font-weight: 1000;
   color: #ffe600;
   text-shadow: 0.35cqh 0.35cqh 0 #000;
-}
-
-.laminas-header span {
-  font-size: clamp(0.9rem, 1.6cqw, 1.8rem);
-  font-weight: 1000;
-  color: #fff;
-  text-shadow: 0.25cqh 0.25cqh 0 #000;
+  text-align: center;
 }
 
 .laminas-contenedor {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2cqw;
-  align-items: center;
+  align-items: stretch;
   justify-items: center;
-  padding: 1.5cqh 0;
+  padding: 1.5cqh 1cqw;
 }
 
 .laminas-contenedor.laminas-uno {
@@ -838,14 +832,14 @@ body {
 .lamina-cuadro {
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 0.35cqh solid rgba(255, 255, 255, 0.25);
-  border-radius: 1cqh;
+  background: #000;
+  border: 0.45cqh solid #cc0000;
+  border-radius: 0.6cqh;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0.5cqh 2cqh rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 1.5cqh rgba(204, 0, 0, 0.4), 0 0.5cqh 2cqh rgba(0, 0, 0, 0.5);
   transition: opacity 0.3s ease;
 }
 
@@ -854,19 +848,6 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
-}
-
-.laminas-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(1rem, 1.8cqw, 2rem);
-  font-weight: 1000;
-  color: rgba(255, 255, 255, 0.5);
-  text-shadow: 0.2cqh 0.2cqh 0 #000;
-  letter-spacing: 0.3cqw;
-  border-top: 0.25cqh solid rgba(255, 255, 255, 0.15);
-  padding-top: 0.4cqh;
 }
 
 .lamina-cargando {

@@ -898,13 +898,11 @@ function dibujarPublicidad(cache) {
     <main class="pantalla-simple pantalla-laminas">
       <header class="laminas-header">
         <h1>PRONOSTICOS DEL DIA</h1>
-        <span>${fechaTexto()}</span>
       </header>
       <div class="laminas-contenedor ${soloUno ? "laminas-uno" : ""}">
         ${cuadro1 ? `<div class="lamina-cuadro">${cuadro1}</div>` : ""}
         ${cuadro2 ? `<div class="lamina-cuadro">${cuadro2}</div>` : ""}
       </div>
-      <footer class="laminas-footer">TABLERO AGENCIA</footer>
     </main>
   `;
 }
