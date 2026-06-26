@@ -19,25 +19,32 @@
       margin-bottom: 20px;
       color: #ffe600;
     }
+    h2.seccion {
+      font-size: 1.1rem;
+      color: #ffe600;
+      margin: 24px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
     .card {
       background: rgba(255,255,255,0.08);
       border-radius: 16px;
       padding: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       text-align: center;
     }
-    .card h2 {
-      font-size: 1rem;
-      margin-bottom: 12px;
+    .card h3 {
+      font-size: 0.9rem;
+      margin-bottom: 10px;
       color: #ccc;
     }
     .preview {
       width: 100%;
-      max-height: 280px;
+      max-height: 200px;
       object-fit: contain;
       border-radius: 8px;
       display: none;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       background: rgba(0,0,0,0.3);
     }
     .preview.visible { display: block; }
@@ -45,12 +52,12 @@
     .btn-elegir {
       display: block;
       width: 100%;
-      padding: 16px;
+      padding: 14px;
       background: #1a3a8a;
       color: #fff;
       border: none;
       border-radius: 12px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
@@ -67,7 +74,7 @@
       font-size: 1.3rem;
       font-weight: 900;
       cursor: pointer;
-      margin-top: 8px;
+      margin-top: 16px;
       -webkit-tap-highlight-color: transparent;
     }
     #btn-subir:disabled { opacity: 0.35; }
@@ -86,26 +93,11 @@
 <body>
   <h1>PUBLICIDADES DEL DIA</h1>
 
-  <div class="card">
-    <h2>IMAGEN 1</h2>
-    <img class="preview" id="preview1">
-    <button class="btn-elegir" id="btn1">ELEGIR IMAGEN</button>
-    <input type="file" id="file1" accept="image/*">
-  </div>
+  <h2 class="seccion">PUBLICIDAD PANTALLA COMPLETA (tecla 0)</h2>
+  <div id="seccion-pub"></div>
 
-  <div class="card">
-    <h2>IMAGEN 2</h2>
-    <img class="preview" id="preview2">
-    <button class="btn-elegir" id="btn2">ELEGIR IMAGEN</button>
-    <input type="file" id="file2" accept="image/*">
-  </div>
-
-  <div class="card">
-    <h2>PROMO LATERAL (se ve en todas las pantallas)</h2>
-    <img class="preview" id="preview3">
-    <button class="btn-elegir" id="btn3">ELEGIR IMAGEN</button>
-    <input type="file" id="file3" accept="image/*">
-  </div>
+  <h2 class="seccion">PROMO LATERAL (panel derecho en sorteos)</h2>
+  <div id="seccion-lat"></div>
 
   <button id="btn-subir" disabled>SUBIR IMAGENES</button>
   <div id="estado"></div>
@@ -114,35 +106,71 @@
     const SUPABASE_URL = "https://ldjwkwfkiqqfypftdeqa.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_birytOVhIQ0AoBY6f0yT-g_HpV01OhE";
 
-    const file1 = document.getElementById("file1");
-    const file2 = document.getElementById("file2");
-    const file3 = document.getElementById("file3");
+    const PUB_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg", "pub4.jpg", "pub5.jpg", "pub6.jpg", "pub7.jpg", "pub8.jpg"];
+    const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg"];
+
     const btnSubir = document.getElementById("btn-subir");
     const estado = document.getElementById("estado");
+    const inputs = [];
 
-    function checkReady() {
-      btnSubir.disabled = !(file1.files[0] || file2.files[0] || file3.files[0]);
-    }
+    function crearCards(contenedorId, archivos, prefijo) {
+      const contenedor = document.getElementById(contenedorId);
+      archivos.forEach((archivo, i) => {
+        const idx = prefijo + i;
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>IMAGEN ${i + 1}</h3>
+          <img class="preview" id="preview_${idx}">
+          <button class="btn-elegir" id="btn_${idx}">ELEGIR IMAGEN</button>
+          <input type="file" id="file_${idx}" accept="image/*">
+        `;
+        contenedor.appendChild(card);
 
-    function setup(fileInput, previewId, btnId) {
-      const preview = document.getElementById(previewId);
-      const btn = document.getElementById(btnId);
-      btn.addEventListener("click", () => fileInput.click());
-      fileInput.addEventListener("change", () => {
-        const f = fileInput.files[0];
-        if (f) {
-          preview.src = URL.createObjectURL(f);
-          preview.classList.add("visible");
-          btn.textContent = "CAMBIAR IMAGEN";
-          btn.classList.add("selected");
-          checkReady();
-        }
+        const fileInput = card.querySelector(`#file_${idx}`);
+        const preview = card.querySelector(`#preview_${idx}`);
+        const btn = card.querySelector(`#btn_${idx}`);
+
+        btn.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", () => {
+          const f = fileInput.files[0];
+          if (f) {
+            preview.src = URL.createObjectURL(f);
+            preview.classList.add("visible");
+            btn.textContent = "CAMBIAR IMAGEN";
+            btn.classList.add("selected");
+            checkReady();
+          }
+        });
+
+        inputs.push({ fileInput, archivo });
       });
     }
 
-    setup(file1, "preview1", "btn1");
-    setup(file2, "preview2", "btn2");
-    setup(file3, "preview3", "btn3");
+    crearCards("seccion-pub", PUB_FILES, "pub");
+    crearCards("seccion-lat", LAT_FILES, "lat");
+
+    function cargarExistentes() {
+      const base = `${SUPABASE_URL}/storage/v1/object/public/media`;
+      const cache = Date.now();
+      inputs.forEach(({ archivo }, i) => {
+        const img = new Image();
+        const preview = document.getElementById(`preview_${i < 8 ? "pub" : "lat"}${i < 8 ? i : i - 8}`);
+        img.onload = () => {
+          if (preview) {
+            preview.src = `${base}/${archivo}?v=${cache}`;
+            preview.classList.add("visible");
+          }
+        };
+        img.src = `${base}/${archivo}?v=${cache}`;
+      });
+    }
+
+    cargarExistentes();
+
+    function checkReady() {
+      btnSubir.disabled = !inputs.some(({ fileInput }) => fileInput.files[0]);
+    }
 
     async function uploadFile(file, name) {
       const res = await fetch(
@@ -171,9 +199,11 @@
 
       try {
         const uploads = [];
-        if (file1.files[0]) uploads.push(uploadFile(file1.files[0], "img1.jpg"));
-        if (file2.files[0]) uploads.push(uploadFile(file2.files[0], "img2.jpg"));
-        if (file3.files[0]) uploads.push(uploadFile(file3.files[0], "img3.jpg"));
+        for (const { fileInput, archivo } of inputs) {
+          if (fileInput.files[0]) {
+            uploads.push(uploadFile(fileInput.files[0], archivo));
+          }
+        }
         await Promise.all(uploads);
         estado.className = "ok";
         estado.textContent = "Imagenes actualizadas correctamente";

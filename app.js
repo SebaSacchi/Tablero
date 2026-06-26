@@ -108,6 +108,77 @@ const resultadosCacheTiempo = {};
 let ultimasCabezasCache = [];
 let ultimasCabezasCacheTiempo = 0;
 
+const PUB_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg", "pub4.jpg", "pub5.jpg", "pub6.jpg", "pub7.jpg", "pub8.jpg"];
+const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg"];
+
+let pubImagesCargadas = [];
+let pubIndex = 0;
+let pubInterval = null;
+
+let latImagesCargadas = [];
+let latIndex = 0;
+let latInterval = null;
+let latCacheTiempo = 0;
+
+function getMediaBase() {
+  return supabaseConfigurado()
+    ? `${SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/media`
+    : "media";
+}
+
+function preloadImages(files) {
+  const base = getMediaBase();
+  const cache = Date.now();
+  return Promise.all(
+    files.map(file => new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(`${base}/${file}`);
+      img.onerror = () => resolve(null);
+      img.src = `${base}/${file}?v=${cache}`;
+    }))
+  ).then(urls => urls.filter(Boolean));
+}
+
+function limpiarPubInterval() {
+  if (pubInterval) { clearInterval(pubInterval); pubInterval = null; }
+}
+
+function limpiarLatInterval() {
+  if (latInterval) { clearInterval(latInterval); latInterval = null; }
+}
+
+async function cargarLatImages() {
+  if (latImagesCargadas.length > 0 && (Date.now() - latCacheTiempo) < 300000) {
+    return latImagesCargadas;
+  }
+  latImagesCargadas = await preloadImages(LAT_FILES);
+  latCacheTiempo = Date.now();
+  if (latImagesCargadas.length === 0) latIndex = 0;
+  else latIndex = latIndex % latImagesCargadas.length;
+  return latImagesCargadas;
+}
+
+function iniciarLatRotacion() {
+  if (latInterval) return;
+  if (latImagesCargadas.length <= 1) return;
+  latInterval = setInterval(() => {
+    latIndex = (latIndex + 1) % latImagesCargadas.length;
+    const img = document.querySelector(".promo-lateral img");
+    if (img) {
+      img.style.opacity = "0";
+      setTimeout(() => {
+        img.src = latImagesCargadas[latIndex] + "?v=" + Date.now();
+        img.style.opacity = "1";
+      }, 300);
+    }
+  }, 30000);
+}
+
+function latImagenActual() {
+  if (latImagesCargadas.length === 0) return "";
+  return latImagesCargadas[latIndex % latImagesCargadas.length] + "?v=" + Date.now();
+}
+
 function fechaTexto() {
   const ahora = new Date();
   const fecha = ahora.toLocaleDateString("es-AR", {
@@ -599,7 +670,7 @@ function dibujarTurno(turno) {
         </section>
 
         <aside class="promo-lateral">
-          <img src="${supabaseConfigurado() ? SUPABASE_URL.replace(/\/$/, '') + '/storage/v1/object/public/media' : 'media'}/img3.jpg?v=${Date.now()}" alt="">
+          ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
         </aside>
       </section>
 
@@ -613,20 +684,27 @@ function dibujarTurno(turno) {
 
 async function renderTurno(turno) {
   pantallaActual = turno;
+  limpiarPubInterval();
   const idRender = ++renderTurnoId;
 
   dibujarTurno(turno);
 
   const estado = estadoTurno(turno);
-  await cargarDatosPantalla(turno, estado);
+  await Promise.all([
+    cargarDatosPantalla(turno, estado),
+    cargarLatImages()
+  ]);
 
   if (pantallaActual === turno && idRender === renderTurnoId) {
     dibujarTurno(turno);
+    iniciarLatRotacion();
   }
 }
 
 async function renderCabezas({ mostrarCarga = true } = {}) {
   pantallaActual = "CABEZAS";
+  limpiarPubInterval();
+  limpiarLatInterval();
   const idRender = ++renderTurnoId;
   const fecha = new Date();
 
@@ -675,6 +753,8 @@ async function renderCabezas({ mostrarCarga = true } = {}) {
 
 async function renderHistorial({ mostrarCarga = true } = {}) {
   pantallaActual = "HISTORIAL";
+  limpiarPubInterval();
+  limpiarLatInterval();
   const idRender = ++renderTurnoId;
 
   if (mostrarCarga) {
@@ -742,6 +822,8 @@ function numero4() {
 
 function renderAleatorio() {
   pantallaActual = "ALEATORIO";
+  limpiarPubInterval();
+  limpiarLatInterval();
 
   app.innerHTML = `
     <main class="pantalla-simple">
@@ -774,6 +856,8 @@ function randomQuini() {
 
 function renderQuini() {
   pantallaActual = "QUINI";
+  limpiarPubInterval();
+  limpiarLatInterval();
 
   const jugada = randomQuini();
 
@@ -795,21 +879,78 @@ function renderQuini() {
   `;
 }
 
-function renderPublicidad() {
+function dibujarPublicidad(cache) {
+  const img1src = pubImagesCargadas[pubIndex] || "";
+  const img2src = pubImagesCargadas[pubIndex + 1] || "";
+
+  const cuadro1 = img1src
+    ? `<img class="lamina-img" src="${img1src}?v=${cache}">`
+    : "";
+  const cuadro2 = img2src
+    ? `<img class="lamina-img" src="${img2src}?v=${cache}">`
+    : "";
+
+  const soloUno = !cuadro2;
+
+  app.innerHTML = `
+    <main class="pantalla-simple pantalla-laminas">
+      <header class="laminas-header">
+        <h1>PRONOSTICOS DEL DIA</h1>
+        <span>${fechaTexto()}</span>
+      </header>
+      <div class="laminas-contenedor ${soloUno ? "laminas-uno" : ""}">
+        ${cuadro1 ? `<div class="lamina-cuadro">${cuadro1}</div>` : ""}
+        ${cuadro2 ? `<div class="lamina-cuadro">${cuadro2}</div>` : ""}
+      </div>
+      <footer class="laminas-footer">TABLERO AGENCIA</footer>
+    </main>
+  `;
+}
+
+async function renderPublicidad() {
   pantallaActual = "PUBLICIDAD";
-  const cache = Date.now();
-  const base = supabaseConfigurado()
-    ? `${SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/media`
-    : "media";
+  limpiarPubInterval();
+  limpiarLatInterval();
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-laminas">
       <div class="laminas-contenedor">
-        <img class="lamina-img" src="${base}/img1.jpg?v=${cache}">
-        <img class="lamina-img" src="${base}/img2.jpg?v=${cache}">
+        <div class="lamina-cargando">CARGANDO</div>
       </div>
     </main>
   `;
+
+  pubImagesCargadas = await preloadImages(PUB_FILES);
+
+  if (pantallaActual !== "PUBLICIDAD") return;
+
+  if (pubImagesCargadas.length === 0) {
+    app.innerHTML = `
+      <main class="pantalla-simple pantalla-laminas">
+        <div class="laminas-contenedor">
+          <div class="lamina-cargando">SIN PUBLICIDADES</div>
+        </div>
+      </main>
+    `;
+    return;
+  }
+
+  pubIndex = 0;
+  dibujarPublicidad(Date.now());
+
+  if (pubImagesCargadas.length > 1) {
+    pubInterval = setInterval(() => {
+      if (pantallaActual !== "PUBLICIDAD") { limpiarPubInterval(); return; }
+      pubIndex = pubIndex + 2;
+      if (pubIndex >= pubImagesCargadas.length) pubIndex = 0;
+
+      const cuadros = document.querySelectorAll(".lamina-cuadro");
+      cuadros.forEach(c => c.style.opacity = "0");
+      setTimeout(() => {
+        dibujarPublicidad(Date.now());
+      }, 300);
+    }, 30000);
+  }
 }
 
 function pantallaPorHora() {

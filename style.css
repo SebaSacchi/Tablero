@@ -306,6 +306,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  transition: opacity 0.3s ease;
 }
 
 .footer {
@@ -786,31 +787,92 @@ body {
 }
 
 .pantalla-laminas {
-  padding: 0 !important;
+  padding: 1.5cqh 2cqw !important;
   background:
     radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.06), transparent 32%),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(0deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
     linear-gradient(135deg, #040418, #080840 48%, #020210) !important;
   background-size: auto, 28px 28px, 28px 28px, auto !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  display: grid !important;
+  grid-template-rows: 7cqh minmax(0, 1fr) 5cqh !important;
+  align-items: stretch !important;
+}
+
+.laminas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 0.4cqh solid #ffe600;
+  padding-bottom: 0.5cqh;
+}
+
+.laminas-header h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3.2cqw, 3.4rem);
+  font-weight: 1000;
+  color: #ffe600;
+  text-shadow: 0.35cqh 0.35cqh 0 #000;
+}
+
+.laminas-header span {
+  font-size: clamp(0.9rem, 1.6cqw, 1.8rem);
+  font-weight: 1000;
+  color: #fff;
+  text-shadow: 0.25cqh 0.25cqh 0 #000;
 }
 
 .laminas-contenedor {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2cqw;
+  align-items: center;
+  justify-items: center;
+  padding: 1.5cqh 0;
+}
+
+.laminas-contenedor.laminas-uno {
+  grid-template-columns: 1fr;
+}
+
+.lamina-cuadro {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 0.35cqh solid rgba(255, 255, 255, 0.25);
+  border-radius: 1cqh;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  gap: 4px;
+  box-shadow: 0 0.5cqh 2cqh rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease;
 }
 
 .lamina-img {
   display: block;
+  width: 100%;
   height: 100%;
-  flex: 1;
-  min-width: 0;
   object-fit: contain;
+}
+
+.laminas-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1rem, 1.8cqw, 2rem);
+  font-weight: 1000;
+  color: rgba(255, 255, 255, 0.5);
+  text-shadow: 0.2cqh 0.2cqh 0 #000;
+  letter-spacing: 0.3cqw;
+  border-top: 0.25cqh solid rgba(255, 255, 255, 0.15);
+  padding-top: 0.4cqh;
+}
+
+.lamina-cargando {
+  font-size: clamp(2rem, 4cqw, 4rem);
+  font-weight: 1000;
+  color: #fff200;
+  text-shadow: 0.45cqh 0.45cqh 0 #000;
+  grid-column: span 2;
 }
