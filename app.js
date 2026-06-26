@@ -898,6 +898,15 @@ function getBloquesCabezasConResultados() {
   return bloques.filter(b => b.cabezas.some(c => c.numero !== "----"));
 }
 
+const ABREV_LOTERIAS = {
+  PROVINCIA: "PROV",
+  CIUDAD: "CIUDAD",
+  CORDOBA: "CORD",
+  "SANTA FE": "SFE",
+  "ENTRE RIOS": "E.R.",
+  MONTEVIDEO: "ORO"
+};
+
 function renderCabezasBar() {
   const bar = document.getElementById("laminas-cabezas-bar");
   if (!bar) return;
@@ -907,7 +916,7 @@ function renderCabezasBar() {
 
   const b = bloques[pubCabezasIndex % bloques.length];
   const items = b.cabezas.map(c =>
-    `<span class="laminas-cabezas-item">${c.loteria} <span class="laminas-cabezas-num">${c.numero}</span></span>`
+    `<span class="laminas-cabezas-item">${ABREV_LOTERIAS[c.loteria] || c.loteria} <span class="laminas-cabezas-num">${c.numero}</span></span>`
   ).join('<span class="laminas-cabezas-sep">|</span>');
 
   bar.innerHTML = `
