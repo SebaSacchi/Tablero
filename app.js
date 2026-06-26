@@ -918,17 +918,16 @@ function renderCabezasBar() {
 }
 
 function dibujarPublicidad() {
-  const base = getMediaBase();
   const img1src = pubImagesCargadas[pubIndex] || "";
   const img2src = pubImagesCargadas[pubIndex + 1] || "";
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-laminas">
       <div class="laminas-cuerpo">
-        <div class="lamina-logo"><img src="${base}/logo-izq.png" onerror="this.parentElement.style.display='none'"></div>
+        <div class="lamina-logo"><img src="assets/logo-izq.png" onerror="this.parentElement.style.display='none'"></div>
         ${img1src ? `<div class="lamina-cuadro"><img class="lamina-img" src="${img1src}"></div>` : ""}
         ${img2src ? `<div class="lamina-cuadro"><img class="lamina-img" src="${img2src}"></div>` : ""}
-        <div class="lamina-logo"><img src="${base}/logo-der.png" onerror="this.parentElement.style.display='none'"></div>
+        <div class="lamina-logo"><img src="assets/logo-der.png" onerror="this.parentElement.style.display='none'"></div>
       </div>
       <div class="laminas-cabezas" id="laminas-cabezas-bar"></div>
     </main>
