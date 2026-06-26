@@ -809,18 +809,25 @@ body {
 }
 
 .lamina-logo {
-  height: 60%;
   flex: 0 0 auto;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  padding-top: 3cqh;
 }
 
 .lamina-logo img {
-  height: 100%;
-  max-width: 12cqw;
+  width: 14cqw;
   object-fit: contain;
-  filter: drop-shadow(0 0.3cqh 0.6cqh rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 0.4cqh 0.8cqh rgba(0, 0, 0, 0.7));
+}
+
+.lamina-logo:first-child img {
+  transform: rotate(-8deg);
+}
+
+.lamina-logo:last-child img {
+  transform: rotate(8deg);
 }
 
 .lamina-cuadro {
@@ -859,26 +866,26 @@ body {
 }
 
 .laminas-cabezas-turno {
-  font-size: clamp(0.9rem, 1.5cqw, 1.6rem);
+  font-size: clamp(1.1rem, 1.9cqw, 2rem);
   font-weight: 1000;
   color: #ffe600;
-  text-shadow: 0.22cqh 0.22cqh 0 #000;
+  text-shadow: 0.25cqh 0.25cqh 0 #000;
 }
 
 .laminas-cabezas-item {
-  font-size: clamp(0.8rem, 1.25cqw, 1.35rem);
+  font-size: clamp(1rem, 1.55cqw, 1.7rem);
   font-weight: 900;
   color: #ccc;
-  text-shadow: 0.18cqh 0.18cqh 0 #000;
+  text-shadow: 0.2cqh 0.2cqh 0 #000;
 }
 
 .laminas-cabezas-num {
   color: #fff;
   font-weight: 1000;
-  font-size: clamp(1rem, 1.6cqw, 1.7rem);
+  font-size: clamp(1.2rem, 2cqw, 2.2rem);
 }
 
 .laminas-cabezas-sep {
   color: rgba(255, 255, 255, 0.25);
-  font-size: clamp(0.8rem, 1.2cqw, 1.3rem);
+  font-size: clamp(1rem, 1.5cqw, 1.6rem);
 }
