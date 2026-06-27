@@ -428,7 +428,7 @@ function estadoTurno(turno, fecha = new Date()) {
   if (minutos >= inicio && minutos <= fin) {
     return {
       clase: "estado-vivo",
-      etiqueta: "VIVO",
+      etiqueta: "SORTEANDO",
       detalle: `EN SORTEO · INICIÓ ${horario.inicio}`,
       fechaResultados: fecha
     };
@@ -1159,7 +1159,38 @@ document.addEventListener("keydown", (e) => {
 
 renderTurno(pantallaPorHora());
 
+let turnoVivoAnterior = null;
+
+function detectarInicioTurno() {
+  const ahora = new Date();
+  const minutos = ahora.getHours() * 60 + ahora.getMinutes();
+
+  let turnoVivo = null;
+  for (const turno of ordenTurnos) {
+    const horario = horariosTurnos[turno];
+    const inicio = horaAMinutos(horario.inicio);
+    const fin = horaAMinutos(horario.fin);
+    if (minutos >= inicio && minutos <= fin) {
+      turnoVivo = turno;
+      break;
+    }
+  }
+
+  if (turnoVivo && turnoVivo !== turnoVivoAnterior) {
+    const key = cacheKeyResultados(turnoVivo, ahora);
+    delete resultadosSupabaseCache[key];
+    delete resultadosCacheTiempo[key];
+    ultimasCabezasCache = [];
+    ultimasCabezasCacheTiempo = 0;
+    renderTurno(turnoVivo);
+  }
+
+  turnoVivoAnterior = turnoVivo;
+}
+
 setInterval(() => {
+  detectarInicioTurno();
+
   if (ordenTurnos.includes(pantallaActual)) {
     renderTurno(pantallaActual);
   }

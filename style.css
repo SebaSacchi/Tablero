@@ -53,9 +53,9 @@ body {
 }
 
 .pantalla.estado-vivo {
-  --base-oscura: #0a1040;
-  --base-media: #1a2a80;
-  --base-clara: #2040c0;
+  --base-oscura: #0a4010;
+  --base-media: #1a6a20;
+  --base-clara: #28a030;
 }
 
 .pantalla.estado-finalizado {
