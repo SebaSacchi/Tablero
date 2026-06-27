@@ -226,14 +226,14 @@ body {
   white-space: nowrap;
 }
 
+.bloque-cabezas.hoy {
+  background: #fff;
+}
+
 .bloque-cabezas.hoy h3 {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent),
     #50BE00;
-}
-
-.bloque-cabezas.hoy .cabeza-linea {
-  background: rgba(255, 255, 255, 0.92);
 }
 
 .bloque-cabezas.hoy .cabeza-loteria {
