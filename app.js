@@ -895,9 +895,9 @@ async function renderHistorial({ mostrarCarga = true } = {}) {
     const turnoClass = turno.toLowerCase();
     const filasTurno = loteriasTurno.map((loteria, index) => `
       ${index === 0 ? `<div class="historial-celda historial-turno ${turnoClass}" style="grid-row: span ${loteriasTurno.length};">${turno}</div>` : ""}
-      <div class="historial-celda historial-loteria turno-${turnoClass}">${loteria}</div>
+      <div class="historial-celda historial-loteria turno-${turnoClass}${index === 0 ? " historial-turno-inicio" : ""}">${loteria}</div>
       ${fechas.map(fecha => `
-        <div class="historial-celda historial-numero turno-${turnoClass} ${fechaISO(fecha) === hoyTxt ? "hoy" : ""}">
+        <div class="historial-celda historial-numero turno-${turnoClass} ${fechaISO(fecha) === hoyTxt ? "hoy" : ""}${index === 0 ? " historial-turno-inicio" : ""}">
           ${cabezaHistorial(datos, fecha, turno, loteria)}
         </div>
       `).join("")}

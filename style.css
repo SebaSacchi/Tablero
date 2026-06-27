@@ -662,6 +662,7 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border-right: 0.18cqw solid rgba(255, 255, 255, 0.25);
 }
 
 .historial-esquina {
@@ -671,6 +672,7 @@ body {
   font-size: clamp(0.7rem, 1.25cqw, 1.35rem);
   font-weight: 1000;
   text-shadow: 0.22cqh 0.22cqh 0 #000;
+  border-bottom: 0.3cqh solid #ffd400;
 }
 
 .historial-dia {
@@ -679,6 +681,7 @@ body {
   font-size: clamp(1rem, 2cqw, 2.1rem);
   font-weight: 1000;
   text-shadow: 0.22cqh 0.22cqh 0 #000;
+  border-bottom: 0.3cqh solid #ffd400;
 }
 
 .historial-dia.hoy {
@@ -694,6 +697,11 @@ body {
   text-shadow: 0.18cqh 0.18cqh 0 #000;
   letter-spacing: 0;
   border-right: 0.15cqw solid rgba(0, 0, 0, 0.3);
+  border-top: 0.3cqh solid #ffd400;
+}
+
+.historial-turno-inicio {
+  border-top: 0.3cqh solid #ffd400;
 }
 
 .historial-turno.previa,
@@ -715,21 +723,8 @@ body {
   font-weight: 1000;
   text-align: right;
   white-space: nowrap;
-}
-
-.historial-loteria.turno-previa,
-.historial-loteria.turno-matutina,
-.historial-loteria.turno-nocturna {
-  background: #cc0000;
-  color: #fff;
+  background: #111;
   text-shadow: 0.16cqh 0.16cqh 0 rgba(0, 0, 0, 0.5);
-}
-
-.historial-loteria.turno-primera,
-.historial-loteria.turno-vespertina {
-  background: #fff;
-  color: #000;
-  text-shadow: none;
 }
 
 .historial-numero {
