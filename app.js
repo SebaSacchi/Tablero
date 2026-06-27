@@ -1026,6 +1026,25 @@ function renderCabezasBar() {
   `;
 }
 
+function cambiarPublicidad(dir) {
+  if (pubImagesCargadas.length <= 2) return;
+  pubIndex = pubIndex + dir * 2;
+  if (pubIndex < 0) pubIndex = pubImagesCargadas.length - 2 + (pubImagesCargadas.length % 2);
+  if (pubIndex >= pubImagesCargadas.length) pubIndex = 0;
+  const cuadros = document.querySelectorAll(".lamina-cuadro");
+  cuadros.forEach(c => c.style.opacity = "0");
+  setTimeout(() => dibujarPublicidad(), 300);
+  limpiarPubInterval();
+  pubInterval = setInterval(() => {
+    if (pantallaActual !== "PUBLICIDAD") { limpiarPubInterval(); return; }
+    pubIndex = pubIndex + 2;
+    if (pubIndex >= pubImagesCargadas.length) pubIndex = 0;
+    const cuadros = document.querySelectorAll(".lamina-cuadro");
+    cuadros.forEach(c => c.style.opacity = "0");
+    setTimeout(() => dibujarPublicidad(), 300);
+  }, 30000);
+}
+
 function dibujarPublicidad() {
   const img1src = pubImagesCargadas[pubIndex] || "";
   const img2src = pubImagesCargadas[pubIndex + 1] || "";
@@ -1154,6 +1173,11 @@ document.addEventListener("keydown", (e) => {
   if (ordenTurnos.includes(pantallaActual)) {
     if (tecla === "ArrowUp" || e.keyCode === 19) cambiarLatImagen(-1);
     if (tecla === "ArrowDown" || e.keyCode === 20) cambiarLatImagen(1);
+  }
+
+  if (pantallaActual === "PUBLICIDAD") {
+    if (tecla === "ArrowUp" || e.keyCode === 19) cambiarPublicidad(-1);
+    if (tecla === "ArrowDown" || e.keyCode === 20) cambiarPublicidad(1);
   }
 });
 
