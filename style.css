@@ -971,17 +971,23 @@ body {
     radial-gradient(circle at 78% 75%, rgba(0, 0, 0, 0.32), transparent 30%),
     linear-gradient(145deg, #04102e, #1640a8 46%, #0b2870);
   background-size: 26px 26px, 26px 26px, auto, auto, auto;
-  padding: 24px;
+  padding: 14px 12px;
   font-family: Arial, Helvetica, sans-serif;
   color: #fff;
 }
 
+.captura-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  position: relative;
+  padding: 8px 0 10px;
+}
+
 .captura-titulo {
-  text-align: center;
-  font-size: 52px;
+  font-size: 56px;
   font-weight: 1000;
   text-shadow: 3px 3px 0 #000, 0 0 8px rgba(0, 0, 0, 0.85);
-  padding: 16px 0 8px;
   letter-spacing: 2px;
 }
 
@@ -990,19 +996,19 @@ body {
   margin-left: 16px;
 }
 
-.captura-subtitulo {
-  text-align: center;
-  font-size: 22px;
+.captura-fecha {
+  position: absolute;
+  right: 12px;
+  font-size: 26px;
   font-weight: 900;
   color: #ccc;
   text-shadow: 2px 2px 0 #000;
-  padding-bottom: 16px;
 }
 
 .captura-grilla {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .captura-columna {
@@ -1018,7 +1024,7 @@ body {
   margin: 0;
   padding: 10px 4px;
   text-align: center;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 1000;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.2)),
@@ -1030,14 +1036,14 @@ body {
 
 .captura-fila {
   display: grid;
-  grid-template-columns: 42px 1fr;
+  grid-template-columns: 48px 1fr;
   align-items: center;
   gap: 4px;
-  padding: 3px 8px;
+  padding: 4px 10px;
 }
 
 .captura-pos {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 900;
   text-align: right;
   opacity: 0.9;
@@ -1045,7 +1051,7 @@ body {
 }
 
 .captura-num {
-  font-size: 36px;
+  font-size: 42px;
   font-weight: 1000;
   color: #fff;
   text-shadow: 3px 3px 0 #000, 1px 1px 0 #000, 0 0 8px rgba(0, 0, 0, 0.95);
@@ -1053,15 +1059,6 @@ body {
 }
 
 .captura-fila:first-of-type .captura-num {
-  font-size: 52px;
+  font-size: 58px;
   color: #fff200;
-}
-
-.captura-pie {
-  text-align: center;
-  font-size: 18px;
-  font-weight: 900;
-  color: rgba(255, 255, 255, 0.6);
-  text-shadow: 1px 1px 0 #000;
-  padding: 12px 0 4px;
 }

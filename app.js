@@ -1256,10 +1256,11 @@ async function capturarTurno(turno) {
   const contenedor = document.createElement("div");
   contenedor.className = "captura-contenedor";
   contenedor.innerHTML = `
-    <div class="captura-titulo">${turno} <strong>${etiqueta}</strong></div>
-    <div class="captura-subtitulo">${fechaTxt}</div>
+    <div class="captura-header">
+      <div class="captura-titulo">${turno} <strong>${etiqueta}</strong></div>
+      <div class="captura-fecha">${fechaTxt}</div>
+    </div>
     <div class="captura-grilla">${columnas}</div>
-    <div class="captura-pie">AGENCIA EL GRILLO</div>
   `;
   document.body.appendChild(contenedor);
 
