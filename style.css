@@ -370,8 +370,8 @@ body {
   border-radius: 6px;
   background: #fff;
   transition: opacity 0.3s ease;
-  border: 0.85cqh solid #7cd84a;
-  box-shadow: 0 0 0.8cqh rgba(124, 216, 74, 0.3);
+  border: 0.85cqh solid #ffd400;
+  box-shadow: 0 0 0.8cqh rgba(255, 212, 0, 0.3);
 }
 
 .footer {
