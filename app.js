@@ -1260,7 +1260,7 @@ async function capturarTurno(turno) {
   contenedor.className = "captura-contenedor";
   contenedor.innerHTML = `
     <div class="captura-header">
-      <div class="captura-titulo">${turno} <strong>${etiqueta}</strong></div>
+      <div class="captura-titulo">${turno}</div>
       <div class="captura-fecha">${fechaCompleta}</div>
     </div>
     <div class="captura-grilla captura-cols-${loteriasDelTurno.length}">${columnas}</div>
