@@ -999,7 +999,7 @@ body {
 .captura-fecha {
   position: absolute;
   right: 12px;
-  font-size: 26px;
+  font-size: 34px;
   font-weight: 900;
   color: #ccc;
   text-shadow: 2px 2px 0 #000;
@@ -1042,7 +1042,7 @@ body {
   display: grid;
   grid-template-columns: 48px 1fr;
   align-items: center;
-  gap: 4px;
+  gap: 12px;
   padding: 4px 10px;
 }
 
