@@ -1240,15 +1240,18 @@ async function capturarTurno(turno) {
   const resultadosRealesTurno = getResultadosRealesTurno(turno, fecha);
   const resultadosTurno = resultadosRealesTurno || (supabaseConfigurado() ? {} : resultados[turno]);
 
-  const loteriasDelTurno = loteriasBase;
+  const loteriasDelTurno = getLoteriasTurno(turno, fecha);
   const fechaTxt = fechaCortaTexto(fecha);
+  const diaSemana = fecha.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase();
+  const fechaCompleta = `${diaSemana}, ${fechaTxt.replace(/-/g, "/")}`;
   const etiqueta = estado.etiqueta;
 
   const columnas = loteriasDelTurno.map(loteria => {
     const numeros = resultadosTurno[loteria] || [];
     const filas = Array.from({ length: 20 }, (_, i) => {
       const num = numeros[i] || "----";
-      return `<div class="captura-fila"><span class="captura-pos">${String(i + 1).padStart(2, "0")}.</span><span class="captura-num">${num}</span></div>`;
+      const sep = (i === 5 || i === 10 || i === 15) ? " captura-sep" : "";
+      return `<div class="captura-fila${sep}"><span class="captura-pos">${String(i + 1).padStart(2, "0")}.</span><span class="captura-num">${num}</span></div>`;
     }).join("");
     return `<div class="captura-columna"><h2>${loteria}</h2>${filas}</div>`;
   }).join("");
@@ -1258,9 +1261,9 @@ async function capturarTurno(turno) {
   contenedor.innerHTML = `
     <div class="captura-header">
       <div class="captura-titulo">${turno} <strong>${etiqueta}</strong></div>
-      <div class="captura-fecha">${fechaTxt}</div>
+      <div class="captura-fecha">${fechaCompleta}</div>
     </div>
-    <div class="captura-grilla">${columnas}</div>
+    <div class="captura-grilla captura-cols-${loteriasDelTurno.length}">${columnas}</div>
   `;
   document.body.appendChild(contenedor);
 

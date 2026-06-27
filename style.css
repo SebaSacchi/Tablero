@@ -1011,6 +1011,10 @@ body {
   gap: 6px;
 }
 
+.captura-cols-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
+
 .captura-columna {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.05), transparent 18%, rgba(0, 0, 0, 0.18)),
@@ -1042,6 +1046,10 @@ body {
   padding: 4px 10px;
 }
 
+.captura-sep {
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
 .captura-pos {
   font-size: 18px;
   font-weight: 900;
@@ -1051,14 +1059,16 @@ body {
 }
 
 .captura-num {
-  font-size: 42px;
+  font-size: 44px;
   font-weight: 1000;
   color: #fff;
   text-shadow: 3px 3px 0 #000, 1px 1px 0 #000, 0 0 8px rgba(0, 0, 0, 0.95);
   line-height: 1.15;
+  letter-spacing: 2px;
 }
 
 .captura-fila:first-of-type .captura-num {
-  font-size: 58px;
+  font-size: 60px;
   color: #fff200;
+  letter-spacing: 3px;
 }
