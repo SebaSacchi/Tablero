@@ -1179,6 +1179,8 @@ document.addEventListener("keydown", (e) => {
     if (tecla === "ArrowUp" || e.keyCode === 19) cambiarPublicidad(-1);
     if (tecla === "ArrowDown" || e.keyCode === 20) cambiarPublicidad(1);
   }
+
+  if (tecla === "c" || tecla === "C") capturarTurno();
 });
 
 renderTurno(pantallaPorHora());
@@ -1225,3 +1227,52 @@ setInterval(() => {
     renderHistorial({ mostrarCarga: false });
   }
 }, 10000);
+
+async function capturarTurno(turno) {
+  if (!turno) {
+    turno = ordenTurnos.includes(pantallaActual) ? pantallaActual : pantallaPorHora();
+  }
+
+  const estado = estadoTurno(turno);
+  const fecha = estado.fechaResultados;
+
+  await cargarResultadosSupabase(turno, fecha);
+  const resultadosRealesTurno = getResultadosRealesTurno(turno, fecha);
+  const resultadosTurno = resultadosRealesTurno || (supabaseConfigurado() ? {} : resultados[turno]);
+
+  const loteriasDelTurno = loteriasBase;
+  const fechaTxt = fechaCortaTexto(fecha);
+  const etiqueta = estado.etiqueta;
+
+  const columnas = loteriasDelTurno.map(loteria => {
+    const numeros = resultadosTurno[loteria] || [];
+    const filas = Array.from({ length: 20 }, (_, i) => {
+      const num = numeros[i] || "----";
+      return `<div class="captura-fila"><span class="captura-pos">${String(i + 1).padStart(2, "0")}.</span><span class="captura-num">${num}</span></div>`;
+    }).join("");
+    return `<div class="captura-columna"><h2>${loteria}</h2>${filas}</div>`;
+  }).join("");
+
+  const contenedor = document.createElement("div");
+  contenedor.className = "captura-contenedor";
+  contenedor.innerHTML = `
+    <div class="captura-titulo">${turno} <strong>${etiqueta}</strong></div>
+    <div class="captura-subtitulo">${fechaTxt}</div>
+    <div class="captura-grilla">${columnas}</div>
+    <div class="captura-pie">AGENCIA EL GRILLO</div>
+  `;
+  document.body.appendChild(contenedor);
+
+  try {
+    const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
+    const link = document.createElement("a");
+    link.download = `${turno}_${fechaTxt.replace(/\//g, "-")}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    console.error("Error al capturar:", err);
+    alert("Error al generar la captura");
+  } finally {
+    document.body.removeChild(contenedor);
+  }
+}
