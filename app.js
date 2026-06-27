@@ -179,6 +179,21 @@ function latImagenActual() {
   return latImagesCargadas[latIndex % latImagesCargadas.length];
 }
 
+function cambiarLatImagen(dir) {
+  if (latImagesCargadas.length <= 1) return;
+  latIndex = (latIndex + dir + latImagesCargadas.length) % latImagesCargadas.length;
+  const img = document.querySelector(".promo-lateral img");
+  if (img) {
+    img.style.opacity = "0";
+    setTimeout(() => {
+      img.src = latImagesCargadas[latIndex];
+      img.style.opacity = "1";
+    }, 300);
+  }
+  limpiarLatInterval();
+  iniciarLatRotacion();
+}
+
 function fechaTexto() {
   const ahora = new Date();
   const fecha = ahora.toLocaleDateString("es-AR", {
@@ -1135,6 +1150,11 @@ document.addEventListener("keydown", (e) => {
 
   if (tecla === "ArrowRight" || e.keyCode === 22 || e.keyCode === 166) navegarPantalla(1);
   if (tecla === "ArrowLeft" || e.keyCode === 21 || e.keyCode === 167) navegarPantalla(-1);
+
+  if (ordenTurnos.includes(pantallaActual)) {
+    if (tecla === "ArrowUp" || e.keyCode === 19) cambiarLatImagen(-1);
+    if (tecla === "ArrowDown" || e.keyCode === 20) cambiarLatImagen(1);
+  }
 });
 
 renderTurno(pantallaPorHora());
