@@ -40,7 +40,7 @@ body {
   --base-media: #0b2870;
   --base-clara: #1640a8;
   display: grid;
-  grid-template-rows: 8.2cqh minmax(0, 1fr);
+  grid-template-rows: 8.2cqh minmax(0, 1fr) auto;
   padding: 0.75cqh;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
@@ -1071,4 +1071,89 @@ body {
   font-size: 64px;
   color: #fff200;
   letter-spacing: 3px;
+}
+
+.barra-plus {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.6cqw;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.3)),
+    #0a0a0a;
+  border-top: 0.25cqh solid rgba(255, 212, 0, 0.5);
+  padding: 0.15cqh 0.5cqw;
+  min-height: 0;
+}
+
+.plus-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(180deg, #ff3333, #cc0000);
+  color: #ffe600;
+  padding: 0.15cqh 0.6cqw;
+  border-radius: 4px;
+  text-align: center;
+  line-height: 1;
+  text-shadow: 0.15cqh 0.15cqh 0 rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0.15cqh 0.4cqh rgba(0, 0, 0, 0.4);
+}
+
+.plus-logo span {
+  font-size: clamp(0.45rem, 0.65cqw, 0.7rem);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.plus-logo strong {
+  font-size: clamp(0.6rem, 0.95cqw, 1rem);
+  font-weight: 1000;
+  color: #fff;
+}
+
+.plus-contenido {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+}
+
+.plus-linea {
+  display: flex;
+  align-items: center;
+  gap: 0.5cqw;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 0.05cqh 0;
+}
+
+.plus-juego {
+  font-size: clamp(0.55rem, 0.8cqw, 0.85rem);
+  font-weight: 1000;
+  color: #ffe600;
+  text-shadow: 0.12cqh 0.12cqh 0 #000;
+  min-width: 5.5cqw;
+}
+
+.plus-info {
+  font-size: clamp(0.5rem, 0.75cqw, 0.8rem);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0.12cqh 0.12cqh 0 #000;
+}
+
+.plus-sep {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: clamp(0.5rem, 0.75cqw, 0.8rem);
+}
+
+.plus-numeros {
+  font-size: clamp(0.5rem, 0.75cqw, 0.8rem);
+  font-weight: 900;
+  color: #ccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
