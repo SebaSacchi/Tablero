@@ -320,6 +320,15 @@ function fechaAyer(fecha = new Date()) {
   return ayer;
 }
 
+function ultimoDiaSorteo(fecha = new Date()) {
+  const d = new Date(fecha);
+  d.setDate(d.getDate() - 1);
+  while (d.getDay() === 0) {
+    d.setDate(d.getDate() - 1);
+  }
+  return d;
+}
+
 function supabaseConfigurado() {
   return (
     SUPABASE_URL &&
@@ -411,17 +420,29 @@ async function cargarResultadosSupabase(turno, fecha) {
 }
 
 function estadoTurno(turno, fecha = new Date()) {
+  if (fecha.getDay() === 0) {
+    return {
+      clase: "estado-finalizado",
+      etiqueta: "SÁBADO",
+      detalle: "SIN SORTEO · PRÓXIMO LUNES",
+      fechaResultados: ultimoDiaSorteo(fecha)
+    };
+  }
+
   const horario = horariosTurnos[turno];
   const minutos = fecha.getHours() * 60 + fecha.getMinutes();
   const inicio = horaAMinutos(horario.inicio);
   const fin = horaAMinutos(horario.fin);
 
   if (minutos < inicio) {
+    const fechaRes = ultimoDiaSorteo(fecha);
+    const diffDias = Math.round((fecha - fechaRes) / (1000 * 60 * 60 * 24));
+    const etiqueta = diffDias > 1 ? "SÁBADO" : "AYER";
     return {
       clase: "estado-pendiente",
-      etiqueta: "AYER",
+      etiqueta,
       detalle: `PRÓXIMO HOY · INICIA ${horario.inicio}`,
-      fechaResultados: fechaAyer(fecha)
+      fechaResultados: fechaRes
     };
   }
 
@@ -472,7 +493,7 @@ async function cargarUltimasCabezasSupabase() {
   }
 
   const hoy = new Date();
-  const ayer = fechaAyer(hoy);
+  const ayer = ultimoDiaSorteo(hoy);
 
   const bloques = await Promise.all(ordenTurnos.map(async (turno) => {
     const resultadoHoy = await cargarResultadosSupabase(turno, hoy);
@@ -671,7 +692,7 @@ function loteriasHistorialTurno(turno, fechas, datos) {
 
 function getBloquesCabezasFallback() {
   return ordenTurnos.map((turno) => {
-    const fecha = fechaAyer();
+    const fecha = ultimoDiaSorteo();
     return {
       turno,
       etiqueta: "AYER",
@@ -793,9 +814,10 @@ async function renderTurno(turno) {
 
 function fechaCabezasPantalla() {
   const ahora = new Date();
+  if (ahora.getDay() === 0) return ultimoDiaSorteo(ahora);
   const minutos = ahora.getHours() * 60 + ahora.getMinutes();
   if (minutos < horaAMinutos(horariosTurnos.PREVIA.inicio)) {
-    return fechaAyer(ahora);
+    return ultimoDiaSorteo(ahora);
   }
   return ahora;
 }
@@ -1189,6 +1211,7 @@ let turnoVivoAnterior = null;
 
 function detectarInicioTurno() {
   const ahora = new Date();
+  if (ahora.getDay() === 0) return;
   const minutos = ahora.getHours() * 60 + ahora.getMinutes();
 
   let turnoVivo = null;

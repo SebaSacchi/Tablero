@@ -63,6 +63,21 @@
       -webkit-tap-highlight-color: transparent;
     }
     .btn-elegir.selected { background: #06913c; }
+    .btn-borrar {
+      display: none;
+      width: 100%;
+      padding: 12px;
+      background: #8a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-borrar.visible { display: block; }
     #btn-subir {
       display: block;
       width: 100%;
@@ -113,6 +128,23 @@
     const estado = document.getElementById("estado");
     const inputs = [];
 
+    async function deleteFile(name) {
+      const res = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/media/${name}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            "apikey": SUPABASE_ANON_KEY
+          }
+        }
+      );
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt);
+      }
+    }
+
     function crearCards(contenedorId, archivos, prefijo) {
       const contenedor = document.getElementById(contenedorId);
       archivos.forEach((archivo, i) => {
@@ -123,6 +155,7 @@
           <h3>IMAGEN ${i + 1}</h3>
           <img class="preview" id="preview_${idx}">
           <button class="btn-elegir" id="btn_${idx}">ELEGIR IMAGEN</button>
+          <button class="btn-borrar" id="del_${idx}">BORRAR IMAGEN</button>
           <input type="file" id="file_${idx}" accept="image/*">
         `;
         contenedor.appendChild(card);
@@ -130,6 +163,7 @@
         const fileInput = card.querySelector(`#file_${idx}`);
         const preview = card.querySelector(`#preview_${idx}`);
         const btn = card.querySelector(`#btn_${idx}`);
+        const btnDel = card.querySelector(`#del_${idx}`);
 
         btn.addEventListener("click", () => fileInput.click());
         fileInput.addEventListener("change", () => {
@@ -139,11 +173,36 @@
             preview.classList.add("visible");
             btn.textContent = "CAMBIAR IMAGEN";
             btn.classList.add("selected");
+            btnDel.classList.add("visible");
             checkReady();
           }
         });
 
-        inputs.push({ fileInput, archivo });
+        btnDel.addEventListener("click", async () => {
+          if (!confirm("¿Borrar esta imagen?")) return;
+          btnDel.textContent = "BORRANDO...";
+          btnDel.disabled = true;
+          try {
+            await deleteFile(archivo);
+            preview.src = "";
+            preview.classList.remove("visible");
+            btn.textContent = "ELEGIR IMAGEN";
+            btn.classList.remove("selected");
+            btnDel.classList.remove("visible");
+            btnDel.textContent = "BORRAR IMAGEN";
+            btnDel.disabled = false;
+            fileInput.value = "";
+            estado.className = "ok";
+            estado.textContent = "Imagen borrada correctamente";
+          } catch (err) {
+            estado.className = "err";
+            estado.textContent = "Error al borrar: " + err.message;
+            btnDel.textContent = "BORRAR IMAGEN";
+            btnDel.disabled = false;
+          }
+        });
+
+        inputs.push({ fileInput, archivo, btnDel });
       });
     }
 
@@ -153,7 +212,7 @@
     function cargarExistentes() {
       const base = `${SUPABASE_URL}/storage/v1/object/public/media`;
       const cache = Date.now();
-      inputs.forEach(({ archivo }, i) => {
+      inputs.forEach(({ archivo, btnDel }, i) => {
         const img = new Image();
         const preview = document.getElementById(`preview_${i < 8 ? "pub" : "lat"}${i < 8 ? i : i - 8}`);
         img.onload = () => {
@@ -161,6 +220,7 @@
             preview.src = `${base}/${archivo}?v=${cache}`;
             preview.classList.add("visible");
           }
+          if (btnDel) btnDel.classList.add("visible");
         };
         img.src = `${base}/${archivo}?v=${cache}`;
       });
