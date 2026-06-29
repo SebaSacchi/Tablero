@@ -132,7 +132,10 @@ function preloadImages(files) {
   return Promise.all(
     files.map(file => new Promise((resolve) => {
       const img = new Image();
-      img.onload = () => resolve(`${base}/${file}`);
+      img.onload = () => {
+        if (img.naturalWidth <= 1 && img.naturalHeight <= 1) resolve(null);
+        else resolve(`${base}/${file}`);
+      };
       img.onerror = () => resolve(null);
       img.src = `${base}/${file}?v=${cache}`;
     }))

@@ -128,15 +128,26 @@
     const estado = document.getElementById("estado");
     const inputs = [];
 
+    function crearPixelTransparente() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1;
+      canvas.height = 1;
+      return new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    }
+
     async function deleteFile(name) {
+      const blob = await crearPixelTransparente();
       const res = await fetch(
         `${SUPABASE_URL}/storage/v1/object/media/${name}`,
         {
-          method: "DELETE",
+          method: "POST",
           headers: {
             "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-            "apikey": SUPABASE_ANON_KEY
-          }
+            "apikey": SUPABASE_ANON_KEY,
+            "Content-Type": "image/png",
+            "x-upsert": "true"
+          },
+          body: blob
         }
       );
       if (!res.ok) {
