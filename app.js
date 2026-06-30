@@ -108,11 +108,6 @@ const resultadosCacheTiempo = {};
 let ultimasCabezasCache = [];
 let ultimasCabezasCacheTiempo = 0;
 
-let resultadosPlusCache = null;
-let resultadosPlusCacheKey = "";
-let resultadosPlusCacheTiempo = 0;
-const ORDEN_PLUS = { PLUS: 0, SUPER: 1, CHANCE: 2 };
-
 const PUB_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg", "pub4.jpg", "pub5.jpg", "pub6.jpg", "pub7.jpg", "pub8.jpg"];
 const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg"];
 
@@ -427,71 +422,6 @@ async function cargarResultadosSupabase(turno, fecha) {
   }
 }
 
-async function cargarResultadosPlus(fecha) {
-  if (!supabaseConfigurado()) return null;
-
-  const fechaTxt = fechaISO(fecha);
-
-  if (resultadosPlusCacheKey === fechaTxt && (Date.now() - resultadosPlusCacheTiempo) < 30000) {
-    return resultadosPlusCache;
-  }
-
-  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
-  const params = new URLSearchParams({
-    select: "juego,ganadores,premio,numeros",
-    fecha: `eq.${fechaTxt}`
-  });
-
-  try {
-    const respuesta = await fetch(`${baseUrl}/rest/v1/resultados_plus?${params.toString()}`, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-      }
-    });
-
-    if (!respuesta.ok) return null;
-
-    const filas = await respuesta.json();
-
-    if (!Array.isArray(filas) || filas.length === 0) {
-      resultadosPlusCache = null;
-      resultadosPlusCacheKey = fechaTxt;
-      resultadosPlusCacheTiempo = Date.now();
-      return null;
-    }
-
-    filas.sort((a, b) => (ORDEN_PLUS[a.juego] ?? 99) - (ORDEN_PLUS[b.juego] ?? 99));
-    resultadosPlusCache = filas;
-    resultadosPlusCacheKey = fechaTxt;
-    resultadosPlusCacheTiempo = Date.now();
-    return filas;
-  } catch (error) {
-    console.warn("Error cargando resultados plus", error);
-    return null;
-  }
-}
-
-function barraPlus() {
-  if (!resultadosPlusCache || resultadosPlusCache.length === 0) return "";
-
-  const lineas = resultadosPlusCache.map(d => `
-    <div class="plus-linea">
-      <span class="plus-juego">${d.juego}</span>
-      <span class="plus-info">${d.ganadores} - ${d.premio}</span>
-      <span class="plus-sep">|</span>
-      <span class="plus-numeros">${d.numeros}</span>
-    </div>
-  `).join("");
-
-  return `
-    <footer class="barra-plus">
-      <div class="plus-logo"><span>QUINIELA</span><strong>PLUS</strong></div>
-      <div class="plus-contenido">${lineas}</div>
-    </footer>
-  `;
-}
-
 function estadoTurno(turno, fecha = new Date()) {
   if (fecha.getDay() === 0) {
     return {
@@ -798,8 +728,7 @@ const lineas = b.cabezas.map(cabeza => `
 async function cargarDatosPantalla(turno, estado) {
   const pedidos = [
     cargarResultadosSupabase(turno, estado.fechaResultados),
-    cargarUltimasCabezasSupabase(),
-    cargarResultadosPlus(estado.fechaResultados)
+    cargarUltimasCabezasSupabase()
   ];
 
   await Promise.all(pedidos);
@@ -860,7 +789,6 @@ function dibujarTurno(turno) {
           ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
         </aside>
       </section>
-      ${barraPlus()}
     </main>
   `;
 }
