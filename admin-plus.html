@@ -275,63 +275,34 @@
       }).join("\n");
     }
 
-    // Agrupa items en filas por proximidad de Y (misma lógica que reconstruirTexto,
-    // pero devolviendo los items en vez de un string).
-    function agruparPorFila(items, tolY = 2.5) {
-      const filas = [];
-      items.forEach(it => {
-        let fila = filas.find(f => Math.abs(f.y - it.y) <= tolY);
-        if (!fila) { fila = { y: it.y, items: [] }; filas.push(fila); }
-        fila.items.push(it);
-      });
-      filas.sort((a, b) => b.y - a.y);
-      filas.forEach(f => f.items.sort((a, b) => a.x - b.x));
-      return filas;
-    }
-
-    // Parsea la grilla de 20 números por juego usando la posición (x,y) de cada item
-    // del PDF en vez de reconstruir líneas de texto. Esto evita depender de que las
-    // 3 tablas (PLUS/SUPER/CHANCE) tengan exactamente el mismo Y por fila: cada tabla
-    // se procesa por separado, agrupando sus propias filas según su propio Y.
-    function parsearGridPorPosicion(items) {
+    // Parsea la grilla de 20 números por juego a partir del orden NATURAL en que el
+    // PDF dibuja el texto (no el orden visual por posición). Cada tabla se genera de
+    // corrido como pares "indice valor" (1 01 2 07 3 08 ... 20 96) antes de pasar a la
+    // siguiente tabla, así que buscamos esa secuencia estricta 1..20 en vez de confiar
+    // en coordenadas x/y, que no siempre coinciden entre las 3 tablas.
+    function parsearGridPorSecuencia(tokens) {
       const claves = ["PLUS", "SUPER", "CHANCE"];
       const resultado = { PLUS: [], SUPER: [], CHANCE: [] };
+      let pos = 0;
 
-      const provincia = items.filter(it => /PROVINCIA/i.test(it.str));
-      if (provincia.length < 3) return resultado;
-
-      const pagina = provincia[0].page;
-      const itemsPagina = items.filter(it => it.page === pagina);
-      const provinciaPagina = provincia.filter(it => it.page === pagina);
-
-      const ganadores = itemsPagina.filter(it => /^Ganadores$/i.test(it.str.trim()));
-
-      const yTop = Math.min(...provinciaPagina.map(it => it.y)) - 1;
-      const yBottom = ganadores.length ? Math.max(...ganadores.map(it => it.y)) + 1 : -Infinity;
-
-      const xsHeader = provinciaPagina.map(it => it.x).sort((a, b) => a - b);
-      const limites = [-Infinity, (xsHeader[0] + xsHeader[1]) / 2, (xsHeader[1] + xsHeader[2]) / 2, Infinity];
-
-      const candidatos = itemsPagina.filter(it =>
-        /^\d{1,2}$/.test(it.str.trim()) && it.y < yTop && it.y > yBottom
-      );
-
-      for (let t = 0; t < 3; t++) {
-        const bandItems = candidatos.filter(it => it.x >= limites[t] && it.x < limites[t + 1]);
-        const filas = agruparPorFila(bandItems);
-        const numeros = [];
-        filas.forEach(f => {
-          const vals = f.items;
-          if (vals.length === 4) {
-            numeros.push(vals[1].str, vals[3].str);
-          } else if (vals.length === 2) {
-            numeros.push(vals[1].str);
+      claves.forEach(clave => {
+        let inicio = -1;
+        for (let i = pos; i + 39 < tokens.length; i++) {
+          let ok = true;
+          for (let k = 0; k < 20; k++) {
+            if (tokens[i + k * 2] !== String(k + 1)) { ok = false; break; }
           }
-        });
-        resultado[claves[t]] = numeros
-          .map(n => n.trim().padStart(2, "0"))
+          if (ok) { inicio = i; break; }
+        }
+        if (inicio === -1) return;
+
+        const valores = [];
+        for (let k = 0; k < 20; k++) valores.push(tokens[inicio + k * 2 + 1]);
+        resultado[clave] = valores
+          .map(v => v.padStart(2, "0"))
           .sort((a, b) => Number(a) - Number(b));
-      }
+        pos = inicio + 40;
+      });
 
       return resultado;
     }
@@ -371,7 +342,7 @@
       const buf = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
       let textoCompleto = "";
-      const todosLosItems = [];
+      const tokensNaturales = [];
 
       for (let p = 1; p <= pdf.numPages; p++) {
         const page = await pdf.getPage(p);
@@ -383,10 +354,12 @@
             x: it.transform[4],
             y: it.transform[5],
             width: it.width || 0,
-            fontSize: Math.abs(it.transform[3]) || Math.abs(it.transform[0]) || 10,
-            page: p
+            fontSize: Math.abs(it.transform[3]) || Math.abs(it.transform[0]) || 10
           }));
-        todosLosItems.push(...items);
+        items.forEach(it => {
+          const t = it.str.trim();
+          if (/^\d{1,2}$/.test(t)) tokensNaturales.push(t);
+        });
         textoCompleto += reconstruirTexto(items) + "\n";
       }
 
@@ -396,7 +369,7 @@
       const sorteoMatch = textoCompleto.match(/\b(\d{5})\b/);
       const sorteo = sorteoMatch ? sorteoMatch[1] : "";
 
-      const grid = parsearGridPorPosicion(todosLosItems);
+      const grid = parsearGridPorSecuencia(tokensNaturales);
       const financiero = parsearFinanciero(textoCompleto);
 
       const juegos = {};
