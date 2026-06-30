@@ -432,13 +432,13 @@ async function cargarResultadosPlus(fecha) {
 
   const fechaTxt = fechaISO(fecha);
 
-  if (resultadosPlusCacheKey === fechaTxt && (Date.now() - resultadosPlusCacheTiempo) < 300000) {
+  if (resultadosPlusCacheKey === fechaTxt && (Date.now() - resultadosPlusCacheTiempo) < 30000) {
     return resultadosPlusCache;
   }
 
   const baseUrl = SUPABASE_URL.replace(/\/$/, "");
   const params = new URLSearchParams({
-    select: "juego,ganadores,premio,numeros,premios_detalle",
+    select: "juego,ganadores,premio,numeros",
     fecha: `eq.${fechaTxt}`
   });
 
@@ -490,114 +490,6 @@ function barraPlus() {
       <div class="plus-contenido">${lineas}</div>
     </footer>
   `;
-}
-
-function dibujarQuinielaPlus() {
-  const estado = estadoTurno("NOCTURNA");
-  const datos = resultadosPlusCache || [];
-
-  const columnas = datos.length > 0 ? datos.map(d => {
-    const nums = (d.numeros || "").split(/\s*-\s*/).filter(Boolean);
-    const nombre = d.juego === "PLUS" ? "QUINIELA PLUS" :
-                   d.juego === "SUPER" ? "SUPER PLUS" :
-                   d.juego === "CHANCE" ? "CHANCE PLUS" : d.juego;
-
-    const filas = Array.from({ length: 10 }, (_, i) => {
-      const num1 = nums[i] || "--";
-      const num2 = nums[i + 10] || "--";
-      return `
-        <div class="fila-qplus">
-          <div class="qplus-pos">${String(i + 1).padStart(2, "0")}.</div>
-          <div class="qplus-num">${num1}</div>
-          <div class="qplus-pos">${String(i + 11).padStart(2, "0")}.</div>
-          <div class="qplus-num">${num2}</div>
-        </div>
-      `;
-    }).join("");
-
-    let premiosHTML = "";
-    if (d.premios_detalle) {
-      try {
-        const premios = typeof d.premios_detalle === "string"
-          ? JSON.parse(d.premios_detalle)
-          : d.premios_detalle;
-        premiosHTML = premios.map(p => `
-          <div class="qplus-premio-fila">
-            <span class="qplus-premio-nivel">${p.nivel}</span>
-            <span class="qplus-premio-ganadores">${p.ganadores}</span>
-            <span class="qplus-premio-importe">${p.importe}</span>
-          </div>
-        `).join("");
-      } catch (e) {}
-    }
-
-    return `
-      <div class="columna-qplus">
-        <h2>${nombre}</h2>
-        <div class="qplus-pozo">
-          <span class="qplus-pozo-label">POZO</span>
-          <span class="qplus-pozo-monto">${d.premio || "--"}</span>
-        </div>
-        ${filas}
-        ${premiosHTML ? `<div class="qplus-premios">${premiosHTML}</div>` : ""}
-      </div>
-    `;
-  }).join("") : `<div class="qplus-sin-datos">SIN DATOS DE QUINIELA PLUS</div>`;
-
-  app.innerHTML = `
-    <main class="pantalla ${estado.clase}">
-      <header class="topbar">
-        <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
-        <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
-        <div class="titulo-turno">
-          <div class="linea-titulo">
-            <span>QUINIELA</span>
-            <strong>PLUS</strong>
-          </div>
-          <small>NOCTURNA · PROVINCIA</small>
-        </div>
-        <div class="topbar-cierre" id="topbar-cierre"></div>
-        <div class="fecha">${soloFechaTexto()}</div>
-      </header>
-
-      <section class="zona-vivo">
-        <aside class="panel-izquierdo">
-          ${bloqueIzquierdo("QUINIELA_PLUS")}
-        </aside>
-
-        <section class="tabla-qplus">
-          ${columnas}
-        </section>
-
-        <aside class="promo-lateral">
-          ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
-        </aside>
-      </section>
-    </main>
-  `;
-}
-
-async function renderQuinielaPlus() {
-  pantallaActual = "QUINIELA_PLUS";
-  limpiarPubInterval();
-  limpiarPubCabezasInterval();
-  const idRender = ++renderTurnoId;
-
-  dibujarQuinielaPlus();
-  iniciarCierreInterval("NOCTURNA");
-
-  const estado = estadoTurno("NOCTURNA");
-  await Promise.all([
-    cargarResultadosPlus(estado.fechaResultados),
-    cargarUltimasCabezasSupabase(),
-    cargarLatImages()
-  ]);
-
-  if (pantallaActual === "QUINIELA_PLUS" && idRender === renderTurnoId) {
-    dibujarQuinielaPlus();
-    iniciarCierreInterval("NOCTURNA");
-    iniciarLatRotacion();
-  }
 }
 
 function estadoTurno(turno, fecha = new Date()) {
@@ -1348,14 +1240,14 @@ const pantallasOrden = [
   { key: "4", fn: () => renderTurno("VESPERTINA") },
   { key: "5", fn: () => renderTurno("NOCTURNA") },
   { key: "6", fn: () => renderCabezas() },
-  { key: "7", fn: () => pantallaActual === "HISTORIAL" ? renderQuinielaPlus() : renderHistorial() },
+  { key: "7", fn: () => renderHistorial() },
   { key: "8", fn: () => renderAleatorio() },
   { key: "9", fn: () => renderQuini() },
   { key: "0", fn: () => renderPublicidad() }
 ];
 
 function indicePantallaActual() {
-  const mapa = { PREVIA: 0, PRIMERA: 1, MATUTINA: 2, VESPERTINA: 3, NOCTURNA: 4, CABEZAS: 5, HISTORIAL: 6, QUINIELA_PLUS: 6, ALEATORIO: 7, QUINI: 8, PUBLICIDAD: 9 };
+  const mapa = { PREVIA: 0, PRIMERA: 1, MATUTINA: 2, VESPERTINA: 3, NOCTURNA: 4, CABEZAS: 5, HISTORIAL: 6, ALEATORIO: 7, QUINI: 8, PUBLICIDAD: 9 };
   return mapa[pantallaActual] ?? 0;
 }
 
@@ -1431,9 +1323,6 @@ setInterval(() => {
   }
   if (pantallaActual === "HISTORIAL") {
     renderHistorial({ mostrarCarga: false });
-  }
-  if (pantallaActual === "QUINIELA_PLUS") {
-    renderQuinielaPlus();
   }
 }, 10000);
 
