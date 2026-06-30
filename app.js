@@ -107,6 +107,8 @@ const resultadosSupabaseCache = {};
 const resultadosCacheTiempo = {};
 let ultimasCabezasCache = [];
 let ultimasCabezasCacheTiempo = 0;
+let resultadosPlusCache = null;
+let resultadosPlusCacheTiempo = 0;
 
 const PUB_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg", "pub4.jpg", "pub5.jpg", "pub6.jpg", "pub7.jpg", "pub8.jpg"];
 const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg"];
@@ -230,6 +232,12 @@ function soloHoraTexto() {
     second: "2-digit",
     hour12: false
   });
+}
+
+function formatoPesos(monto) {
+  const n = Number(monto);
+  if (!Number.isFinite(n)) return "$ --";
+  return "$ " + n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 const cierreTurnos = {
@@ -418,6 +426,74 @@ async function cargarResultadosSupabase(turno, fecha) {
     return agrupado;
   } catch (error) {
     console.warn("Error cargando resultados desde Supabase", error);
+    return null;
+  }
+}
+
+function nombreJuegoPlus(juego) {
+  return juego === "PLUS" ? "QUINIELA PLUS" :
+         juego === "SUPER" ? "SUPER PLUS" :
+         juego === "CHANCE" ? "CHANCE PLUS" : juego;
+}
+
+async function cargarResultadosPlus() {
+  if (!supabaseConfigurado()) {
+    return null;
+  }
+
+  if (resultadosPlusCache && (Date.now() - resultadosPlusCacheTiempo) < 60000) {
+    return resultadosPlusCache;
+  }
+
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const params = new URLSearchParams({
+    select: "juego,fecha,sorteo,numeros,pozo,premios_detalle",
+    order: "fecha.desc"
+  });
+
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/resultados_plus?${params.toString()}`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+
+    if (!respuesta.ok) {
+      console.warn("No se pudieron cargar resultados de Quiniela Plus", respuesta.status);
+      return null;
+    }
+
+    const filas = await respuesta.json();
+
+    if (!Array.isArray(filas) || filas.length === 0) {
+      resultadosPlusCache = null;
+      resultadosPlusCacheTiempo = Date.now();
+      return null;
+    }
+
+    const fechaMax = filas[0].fecha;
+    const filasDia = filas.filter(f => f.fecha === fechaMax);
+
+    const juegos = {};
+    filasDia.forEach(f => {
+      const numeros = (f.numeros || "")
+        .split(/[\s-]+/)
+        .filter(Boolean)
+        .sort((a, b) => Number(a) - Number(b));
+
+      juegos[f.juego] = {
+        numeros,
+        pozo: Number(f.pozo) || 0,
+        premios: Array.isArray(f.premios_detalle) ? f.premios_detalle : []
+      };
+    });
+
+    resultadosPlusCache = { fecha: fechaMax, sorteo: filasDia[0].sorteo || "", juegos };
+    resultadosPlusCacheTiempo = Date.now();
+    return resultadosPlusCache;
+  } catch (error) {
+    console.warn("Error cargando resultados de Quiniela Plus", error);
     return null;
   }
 }
@@ -815,6 +891,122 @@ async function renderTurno(turno) {
   }
 }
 
+function dibujarQuinielaPlus() {
+  const datos = resultadosPlusCache;
+  const juegosOrden = ["PLUS", "SUPER", "CHANCE"];
+
+  let subtitulo = "SIN SORTEOS CARGADOS";
+  let pozoTotalHTML = "";
+  let columnas = `<div class="qplus-sin-datos">SIN DATOS DE QUINIELA PLUS</div>`;
+
+  if (datos && datos.juegos) {
+    const fechaFmt = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR", {
+      day: "2-digit", month: "2-digit", year: "numeric"
+    });
+    subtitulo = `SORTEO ${datos.sorteo || "--"} · ${fechaFmt}`;
+
+    const pozoTotal = juegosOrden.reduce((acc, j) => acc + (datos.juegos[j]?.pozo || 0), 0);
+    pozoTotalHTML = `
+      <div class="qplus-pozo-total">
+        <span>POZO APROX</span>
+        <strong>${formatoPesos(pozoTotal)}</strong>
+      </div>
+    `;
+
+    columnas = juegosOrden.map(juego => {
+      const d = datos.juegos[juego];
+      if (!d) {
+        return `
+          <div class="columna-qplus">
+            <h2>${nombreJuegoPlus(juego)}</h2>
+            <div class="qplus-sin-datos">SIN DATOS</div>
+          </div>
+        `;
+      }
+
+      const numerosHTML = d.numeros.map(n => `<div class="qplus-num">${n}</div>`).join("");
+
+      const premiosHTML = d.premios.map(p => `
+        <div class="qplus-premio-fila">
+          <span class="qplus-premio-nivel">${p.nivel}</span>
+          <span class="qplus-premio-ganadores">${p.ganadores}</span>
+          <span class="qplus-premio-importe">${p.importe}</span>
+        </div>
+      `).join("");
+
+      return `
+        <div class="columna-qplus">
+          <h2>${nombreJuegoPlus(juego)}</h2>
+          <div class="qplus-pozo">
+            <span class="qplus-pozo-label">POZO APROX</span>
+            <span class="qplus-pozo-monto">${formatoPesos(d.pozo)}</span>
+          </div>
+          <div class="qplus-numeros">${numerosHTML}</div>
+          <div class="qplus-premios">
+            <div class="qplus-premio-fila qplus-premio-header">
+              <span>NIVEL</span><span>GANADORES</span><span>IMPORTE</span>
+            </div>
+            ${premiosHTML}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  app.innerHTML = `
+    <main class="pantalla estado-finalizado">
+      <header class="topbar">
+        <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
+        <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
+        <div class="titulo-turno">
+          <div class="linea-titulo">
+            <span>QUINIELA</span>
+            <strong>PLUS</strong>
+          </div>
+          <small>${subtitulo}</small>
+        </div>
+        <div class="topbar-cierre">${pozoTotalHTML}</div>
+        <div class="fecha">${soloFechaTexto()}</div>
+      </header>
+
+      <section class="zona-vivo">
+        <aside class="panel-izquierdo">
+          ${bloqueIzquierdo("QUINIELA_PLUS")}
+        </aside>
+
+        <section class="tabla-qplus">
+          ${columnas}
+        </section>
+
+        <aside class="promo-lateral">
+          ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
+        </aside>
+      </section>
+    </main>
+  `;
+}
+
+async function renderQuinielaPlus() {
+  pantallaActual = "QUINIELA_PLUS";
+  limpiarPubInterval();
+  limpiarPubCabezasInterval();
+  limpiarCierreInterval();
+  const idRender = ++renderTurnoId;
+
+  dibujarQuinielaPlus();
+
+  await Promise.all([
+    cargarResultadosPlus(),
+    cargarUltimasCabezasSupabase(),
+    cargarLatImages()
+  ]);
+
+  if (pantallaActual === "QUINIELA_PLUS" && idRender === renderTurnoId) {
+    dibujarQuinielaPlus();
+    iniciarLatRotacion();
+  }
+}
+
 function fechaCabezasPantalla() {
   const ahora = new Date();
   if (ahora.getDay() === 0) return ultimoDiaSorteo(ahora);
@@ -1168,14 +1360,14 @@ const pantallasOrden = [
   { key: "4", fn: () => renderTurno("VESPERTINA") },
   { key: "5", fn: () => renderTurno("NOCTURNA") },
   { key: "6", fn: () => renderCabezas() },
-  { key: "7", fn: () => renderHistorial() },
+  { key: "7", fn: () => pantallaActual === "HISTORIAL" ? renderQuinielaPlus() : renderHistorial() },
   { key: "8", fn: () => renderAleatorio() },
   { key: "9", fn: () => renderQuini() },
   { key: "0", fn: () => renderPublicidad() }
 ];
 
 function indicePantallaActual() {
-  const mapa = { PREVIA: 0, PRIMERA: 1, MATUTINA: 2, VESPERTINA: 3, NOCTURNA: 4, CABEZAS: 5, HISTORIAL: 6, ALEATORIO: 7, QUINI: 8, PUBLICIDAD: 9 };
+  const mapa = { PREVIA: 0, PRIMERA: 1, MATUTINA: 2, VESPERTINA: 3, NOCTURNA: 4, CABEZAS: 5, HISTORIAL: 6, QUINIELA_PLUS: 6, ALEATORIO: 7, QUINI: 8, PUBLICIDAD: 9 };
   return mapa[pantallaActual] ?? 0;
 }
 
@@ -1251,6 +1443,9 @@ setInterval(() => {
   }
   if (pantallaActual === "HISTORIAL") {
     renderHistorial({ mostrarCarga: false });
+  }
+  if (pantallaActual === "QUINIELA_PLUS") {
+    renderQuinielaPlus();
   }
 }, 10000);
 

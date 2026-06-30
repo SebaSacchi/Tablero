@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Cargar Quiniela Plus</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a2e;
+      color: #fff;
+      min-height: 100dvh;
+      padding: 20px;
+      padding-bottom: 60px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #ffe600;
+    }
+    h2.seccion {
+      font-size: 1.1rem;
+      color: #ffe600;
+      margin: 24px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .card h3 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: #ffe600;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: #ccc;
+      margin: 10px 0 4px;
+    }
+    input[type="text"], input[type="date"], textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(0,0,0,0.3);
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    textarea { resize: vertical; }
+    .conteo {
+      font-size: 0.75rem;
+      margin-top: 4px;
+      color: #999;
+    }
+    .conteo.ok { color: #4cff4c; }
+    .conteo.bad { color: #ff8c4c; }
+    input[type="file"] {
+      width: 100%;
+      padding: 10px 0;
+      color: #ccc;
+      font-size: 0.85rem;
+    }
+    .premio-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.8fr) minmax(0, 1fr) auto;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .premio-row input {
+      padding: 8px;
+      font-size: 0.85rem;
+    }
+    .btn-quitar {
+      background: #8a1a1a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-secundario {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      background: #1a3a8a;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #btn-parsear-pdf {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      background: #1a3a8a;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #btn-parsear-pdf:disabled { opacity: 0.4; }
+    #btn-guardar {
+      display: block;
+      width: 100%;
+      padding: 18px;
+      background: #ffe600;
+      color: #000;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.3rem;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 16px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #btn-guardar:disabled { opacity: 0.35; }
+    .estado {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      min-height: 1.4em;
+      white-space: pre-line;
+    }
+    .ok { color: #4cff4c; }
+    .err { color: #ff4c4c; }
+    .cargando { color: #ffe600; }
+  </style>
+</head>
+<body>
+  <h1>CARGAR RESULTADOS QUINIELA PLUS</h1>
+
+  <h2 class="seccion">DATOS DEL SORTEO</h2>
+  <div class="card">
+    <label>Fecha del sorteo</label>
+    <input type="date" id="fecha">
+    <label>Número de sorteo</label>
+    <input type="text" id="sorteo" placeholder="12797" inputmode="numeric">
+  </div>
+
+  <h2 class="seccion">CARGAR DESDE PDF (opcional)</h2>
+  <div class="card">
+    <input type="file" id="archivoPdf" accept="application/pdf">
+    <button id="btn-parsear-pdf" disabled>LEER PDF Y COMPLETAR FORMULARIO</button>
+    <div class="estado" id="estadoPdf"></div>
+  </div>
+
+  <h2 class="seccion">JUEGOS</h2>
+  <div id="juegos"></div>
+
+  <button id="btn-guardar">GUARDAR EN EL TABLERO</button>
+  <div class="estado" id="estadoGuardar"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    const SUPABASE_URL = "https://ldjwkwfkiqqfypftdeqa.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_birytOVhIQ0AoBY6f0yT-g_HpV01OhE";
+
+    const JUEGOS_CONFIG = {
+      PLUS: { nombre: "QUINIELA PLUS", niveles: ["8 ACIERTOS", "7 ACIERTOS", "6 ACIERTOS", "5 ACIERTOS"] },
+      SUPER: { nombre: "SUPER PLUS", niveles: ["8 ACIERTOS"] },
+      CHANCE: { nombre: "CHANCE PLUS", niveles: ["8 ACIERTOS", "7 ACIERTOS", "6 ACIERTOS", "5 ACIERTOS"] }
+    };
+
+    const contenedorJuegos = document.getElementById("juegos");
+
+    function crearFilaPremio(juego, nivel = "", ganadores = "", importe = "") {
+      const fila = document.createElement("div");
+      fila.className = "premio-row";
+      fila.innerHTML = `
+        <input type="text" class="premio-nivel" placeholder="Nivel (ej: 8 ACIERTOS)" value="${nivel}">
+        <input type="text" class="premio-ganadores" placeholder="Ganadores" value="${ganadores}">
+        <input type="text" class="premio-importe" placeholder="Importe" value="${importe}">
+        <button type="button" class="btn-quitar">X</button>
+      `;
+      fila.querySelector(".btn-quitar").addEventListener("click", () => fila.remove());
+      document.getElementById(`premios_${juego}`).appendChild(fila);
+    }
+
+    Object.entries(JUEGOS_CONFIG).forEach(([juego, cfg]) => {
+      const card = document.createElement("div");
+      card.className = "card juego-card";
+      card.innerHTML = `
+        <h3>${cfg.nombre}</h3>
+        <label>20 números (separados por espacio o guion)</label>
+        <textarea id="numeros_${juego}" rows="3" placeholder="01 07 08 15 28 ..."></textarea>
+        <div class="conteo" id="conteo_${juego}">0 números cargados</div>
+        <label>Pozo aprox</label>
+        <input type="text" id="pozo_${juego}" placeholder="204.879.690,78" inputmode="decimal">
+        <label>Ganadores</label>
+        <div id="premios_${juego}"></div>
+        <button type="button" class="btn-secundario" data-add-premio="${juego}">+ AGREGAR NIVEL</button>
+      `;
+      contenedorJuegos.appendChild(card);
+
+      cfg.niveles.forEach(nivel => crearFilaPremio(juego, nivel));
+
+      card.querySelector("[data-add-premio]").addEventListener("click", () => crearFilaPremio(juego));
+
+      const textarea = document.getElementById(`numeros_${juego}`);
+      const conteo = document.getElementById(`conteo_${juego}`);
+      textarea.addEventListener("input", () => {
+        const n = leerNumeros(textarea.value).length;
+        conteo.textContent = `${n} número${n === 1 ? "" : "s"} cargado${n === 1 ? "" : "s"}`;
+        conteo.className = "conteo " + (n === 20 ? "ok" : "bad");
+      });
+    });
+
+    function leerNumeros(valor) {
+      return valor
+        .split(/[\s,;-]+/)
+        .map(s => s.trim())
+        .filter(Boolean)
+        .map(s => s.padStart(2, "0"))
+        .filter(s => /^\d{2}$/.test(s))
+        .sort((a, b) => Number(a) - Number(b));
+    }
+
+    function parsePesosAR(str) {
+      if (!str) return 0;
+      const limpio = String(str).replace(/[^\d,.\-]/g, "").replace(/\./g, "").replace(",", ".");
+      const n = parseFloat(limpio);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function formatoNumeroAR(n) {
+      return Number(n).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // --- Parseo de PDF ---
+
+    function reconstruirTexto(items) {
+      const filtrados = items.filter(it => it.str && it.str.trim() !== "");
+      filtrados.sort((a, b) => b.y - a.y || a.x - b.x);
+
+      const filas = [];
+      const TOL_Y = 2.5;
+      filtrados.forEach(it => {
+        let fila = filas.find(f => Math.abs(f.y - it.y) <= TOL_Y);
+        if (!fila) { fila = { y: it.y, items: [] }; filas.push(fila); }
+        fila.items.push(it);
+      });
+
+      filas.sort((a, b) => b.y - a.y);
+      filas.forEach(f => f.items.sort((a, b) => a.x - b.x));
+
+      return filas.map(f => {
+        let linea = "";
+        let finAnterior = null;
+        f.items.forEach(it => {
+          if (finAnterior !== null && (it.x - finAnterior) > it.fontSize * 0.28) {
+            linea += " ";
+          }
+          linea += it.str;
+          finAnterior = it.x + it.width;
+        });
+        return linea.replace(/\s+/g, " ").trim();
+      }).join("\n");
+    }
+
+    function parsearGrid(filasGrid) {
+      const plus = [], superp = [], chance = [];
+      filasGrid.forEach(linea => {
+        const tokens = linea.trim().split(/\s+/);
+        const chunks = [];
+        for (let i = 0; i + 3 < tokens.length; i += 4) {
+          chunks.push([tokens[i], tokens[i + 1], tokens[i + 2], tokens[i + 3]]);
+        }
+        if (chunks.length === 1) {
+          if (plus.length === 0) plus.push(chunks[0][1], chunks[0][3]);
+        } else if (chunks.length === 2) {
+          superp.push(chunks[0][1], chunks[0][3]);
+          chance.push(chunks[1][1], chunks[1][3]);
+        } else if (chunks.length >= 3) {
+          plus.push(chunks[0][1], chunks[0][3]);
+          superp.push(chunks[1][1], chunks[1][3]);
+          chance.push(chunks[2][1], chunks[2][3]);
+        }
+      });
+      const norm = arr => arr.map(n => n.padStart(2, "0")).sort((a, b) => Number(a) - Number(b));
+      return { PLUS: norm(plus), SUPER: norm(superp), CHANCE: norm(chance) };
+    }
+
+    function parsearFinanciero(texto) {
+      const pozoRegex = /POZO\s+(?:1er\.?\s*PREMIO|SUPER\s+PLUS)[^$]{0,15}\$?\s*([\d.,]+)/gi;
+      const matches = [...texto.matchAll(pozoRegex)];
+      const cortes = matches.map(m => m.index);
+
+      const finRegex = /Bonificaci|PAGO DE PREMIOS|CADUCIDAD/i;
+      const desdeUltimoPozo = texto.slice(cortes[2] ?? texto.length);
+      const offsetFin = desdeUltimoPozo.search(finRegex);
+      const finTexto = offsetFin === -1 ? texto.length : (cortes[2] ?? texto.length) + offsetFin;
+
+      const bloques = [
+        texto.slice(cortes[0] ?? 0, cortes[1] ?? texto.length),
+        texto.slice(cortes[1] ?? texto.length, cortes[2] ?? texto.length),
+        texto.slice(cortes[2] ?? texto.length, finTexto)
+      ];
+
+      const claves = ["PLUS", "SUPER", "CHANCE"];
+      const resultado = {};
+
+      bloques.forEach((bloque, i) => {
+        const montos = [...bloque.matchAll(/\$\s*([\d.,]+)/g)].map(m => m[1]);
+        const pozo = montos.shift() || "";
+        const niveles = [...bloque.matchAll(/(\d)\s*ACIERTOS\s+(Vacante|\d+)/gi)]
+          .map(m => ({ nivel: `${m[1]} ACIERTOS`, ganadores: m[2] }));
+        niveles.forEach((n, idx) => { n.importe = montos[idx] ? `$ ${montos[idx]}` : ""; });
+        resultado[claves[i]] = { pozo: parsePesosAR(pozo), premios: niveles };
+      });
+
+      return resultado;
+    }
+
+    async function extraerDatosPDF(file) {
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      let textoCompleto = "";
+
+      for (let p = 1; p <= pdf.numPages; p++) {
+        const page = await pdf.getPage(p);
+        const content = await page.getTextContent();
+        const items = content.items
+          .filter(it => it.str && it.str.trim() !== "")
+          .map(it => ({
+            str: it.str,
+            x: it.transform[4],
+            y: it.transform[5],
+            width: it.width || 0,
+            fontSize: Math.abs(it.transform[3]) || Math.abs(it.transform[0]) || 10
+          }));
+        textoCompleto += reconstruirTexto(items) + "\n";
+      }
+
+      const fechaMatch = textoCompleto.match(/DEL\s*DIA\s*(\d{2})\/(\d{2})\/(\d{4})/i);
+      const fechaISOExtraida = fechaMatch ? `${fechaMatch[3]}-${fechaMatch[2]}-${fechaMatch[1]}` : "";
+
+      const sorteoMatch = textoCompleto.match(/\b(\d{5})\b/);
+      const sorteo = sorteoMatch ? sorteoMatch[1] : "";
+
+      const lineas = textoCompleto.split("\n");
+      const inicioGrid = lineas.findIndex(l => /^\d{1,2}(\s+\d{1,2}){3}/.test(l.trim()));
+      const finGridIdx = lineas.findIndex((l, i) => i > inicioGrid && /Ganadores/i.test(l));
+      const filasGrid = inicioGrid === -1 ? [] :
+        lineas.slice(inicioGrid, finGridIdx === -1 ? lineas.length : finGridIdx).filter(l => l.trim() !== "");
+
+      const grid = parsearGrid(filasGrid);
+      const financiero = parsearFinanciero(textoCompleto);
+
+      const juegos = {};
+      ["PLUS", "SUPER", "CHANCE"].forEach(j => {
+        juegos[j] = {
+          numeros: grid[j] || [],
+          pozo: financiero[j]?.pozo || 0,
+          premios: financiero[j]?.premios || []
+        };
+      });
+
+      return { fecha: fechaISOExtraida, sorteo, juegos };
+    }
+
+    function rellenarFormulario(datos) {
+      if (datos.fecha) document.getElementById("fecha").value = datos.fecha;
+      if (datos.sorteo) document.getElementById("sorteo").value = datos.sorteo;
+
+      Object.keys(JUEGOS_CONFIG).forEach(juego => {
+        const d = datos.juegos[juego];
+        if (!d) return;
+
+        if (d.numeros.length > 0) {
+          document.getElementById(`numeros_${juego}`).value = d.numeros.join(" - ");
+          document.getElementById(`numeros_${juego}`).dispatchEvent(new Event("input"));
+        }
+        if (d.pozo) {
+          document.getElementById(`pozo_${juego}`).value = formatoNumeroAR(d.pozo);
+        }
+        if (d.premios.length > 0) {
+          const contenedor = document.getElementById(`premios_${juego}`);
+          contenedor.innerHTML = "";
+          d.premios.forEach(p => crearFilaPremio(juego, p.nivel, p.ganadores, p.importe));
+        }
+      });
+    }
+
+    const inputPdf = document.getElementById("archivoPdf");
+    const btnParsear = document.getElementById("btn-parsear-pdf");
+    const estadoPdf = document.getElementById("estadoPdf");
+
+    inputPdf.addEventListener("change", () => {
+      btnParsear.disabled = !inputPdf.files[0];
+    });
+
+    btnParsear.addEventListener("click", async () => {
+      const file = inputPdf.files[0];
+      if (!file) return;
+
+      btnParsear.disabled = true;
+      estadoPdf.className = "estado cargando";
+      estadoPdf.textContent = "Leyendo PDF...";
+
+      try {
+        const datos = await extraerDatosPDF(file);
+        rellenarFormulario(datos);
+
+        const faltantes = Object.keys(JUEGOS_CONFIG).filter(j => (datos.juegos[j]?.numeros.length || 0) !== 20);
+        if (faltantes.length > 0) {
+          estadoPdf.className = "estado err";
+          estadoPdf.textContent = `Revisá los números de: ${faltantes.join(", ")} (no se detectaron los 20). El resto del formulario se completó, corregí a mano lo que falte antes de guardar.`;
+        } else {
+          estadoPdf.className = "estado ok";
+          estadoPdf.textContent = "PDF leído. Revisá los datos abajo antes de guardar.";
+        }
+      } catch (error) {
+        estadoPdf.className = "estado err";
+        estadoPdf.textContent = "No se pudo leer el PDF: " + error.message + ". Cargá los datos a mano.";
+      } finally {
+        btnParsear.disabled = false;
+      }
+    });
+
+    // --- Guardado ---
+
+    const btnGuardar = document.getElementById("btn-guardar");
+    const estadoGuardar = document.getElementById("estadoGuardar");
+
+    btnGuardar.addEventListener("click", async () => {
+      const fecha = document.getElementById("fecha").value;
+      const sorteo = document.getElementById("sorteo").value.trim();
+      const errores = [];
+
+      if (!fecha) errores.push("Falta la fecha del sorteo.");
+
+      const filas = [];
+
+      Object.entries(JUEGOS_CONFIG).forEach(([juego, cfg]) => {
+        const numeros = leerNumeros(document.getElementById(`numeros_${juego}`).value);
+        if (numeros.length !== 20) {
+          errores.push(`${cfg.nombre}: se esperaban 20 números, hay ${numeros.length}.`);
+        }
+
+        const pozo = parsePesosAR(document.getElementById(`pozo_${juego}`).value);
+        if (!pozo) {
+          errores.push(`${cfg.nombre}: falta el pozo.`);
+        }
+
+        const premios = [...document.querySelectorAll(`#premios_${juego} .premio-row`)]
+          .map(fila => ({
+            nivel: fila.querySelector(".premio-nivel").value.trim(),
+            ganadores: fila.querySelector(".premio-ganadores").value.trim(),
+            importe: fila.querySelector(".premio-importe").value.trim()
+          }))
+          .filter(p => p.nivel !== "");
+
+        if (premios.length === 0) {
+          errores.push(`${cfg.nombre}: cargá al menos un nivel de ganadores.`);
+        }
+
+        filas.push({ juego, fecha, sorteo, numeros: numeros.join("-"), pozo, premios_detalle: premios });
+      });
+
+      if (errores.length > 0) {
+        estadoGuardar.className = "estado err";
+        estadoGuardar.textContent = errores.join("\n");
+        return;
+      }
+
+      btnGuardar.disabled = true;
+      estadoGuardar.className = "estado cargando";
+      estadoGuardar.textContent = "Guardando...";
+
+      try {
+        const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+        const res = await fetch(`${baseUrl}/rest/v1/resultados_plus?on_conflict=juego,fecha`, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates,return=minimal"
+          },
+          body: JSON.stringify(filas)
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(txt);
+        }
+
+        estadoGuardar.className = "estado ok";
+        estadoGuardar.textContent = "Resultados guardados. Ya se van a ver en el tablero.";
+      } catch (error) {
+        estadoGuardar.className = "estado err";
+        estadoGuardar.textContent = "Error al guardar: " + error.message;
+      } finally {
+        btnGuardar.disabled = false;
+      }
+    });
+
+    document.getElementById("fecha").valueAsDate = new Date();
+  </script>
+</body>
+</html>
