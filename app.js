@@ -456,8 +456,8 @@ async function cargarResultadosPlus(fecha) {
 
     if (!Array.isArray(filas) || filas.length === 0) {
       resultadosPlusCache = null;
-      resultadosPlusCacheKey = "";
-      resultadosPlusCacheTiempo = 0;
+      resultadosPlusCacheKey = fechaTxt;
+      resultadosPlusCacheTiempo = Date.now();
       return null;
     }
 
