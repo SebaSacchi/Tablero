@@ -907,8 +907,8 @@ function dibujarQuinielaPlus() {
   const juegosOrden = ["PLUS", "SUPER", "CHANCE"];
 
   let subtitulo = "SIN SORTEOS CARGADOS";
-  let pozoTotalHTML = "";
   let columnas = `<div class="qplus-sin-datos">SIN DATOS DE QUINIELA PLUS</div>`;
+  let posterHTML = "";
 
   if (datos && datos.juegos) {
     const fechaFmt = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR", {
@@ -916,13 +916,13 @@ function dibujarQuinielaPlus() {
     });
     subtitulo = `SORTEO ${datos.sorteo || "--"} · ${fechaFmt}`;
 
-    const pozoTotal = juegosOrden.reduce((acc, j) => acc + (datos.juegos[j]?.pozo || 0), 0);
-    pozoTotalHTML = `
-      <div class="qplus-pozo-total">
-        <span>POZO APROX</span>
-        <strong>${formatoPesos(pozoTotal)}</strong>
-      </div>
-    `;
+    const proximoSorteo = new Date(fechaDesdeISO(datos.fecha));
+    proximoSorteo.setDate(proximoSorteo.getDate() + 1);
+    const proximoSorteoTexto = proximoSorteo.toLocaleDateString("es-AR", {
+      weekday: "long", day: "2-digit", month: "2-digit"
+    }).toUpperCase();
+
+    let pozoEstimadoTotal = 0;
 
     columnas = juegosOrden.map(juego => {
       const d = datos.juegos[juego];
@@ -946,6 +946,7 @@ function dibujarQuinielaPlus() {
       `).join("");
 
       const pozoEstimado = calcularPozoEstimado(juego, d.pozo, d.premios);
+      pozoEstimadoTotal += pozoEstimado;
 
       return `
         <div class="columna-qplus">
@@ -969,6 +970,20 @@ function dibujarQuinielaPlus() {
         </div>
       `;
     }).join("");
+
+    posterHTML = `
+      <div class="qplus-poster">
+        <div class="qplus-poster-logo">
+          <img src="assets/logo-plus.png" alt="Quiniela Plus">
+        </div>
+        <div class="qplus-poster-sorteo">
+          <span>PRÓXIMO SORTEO</span>
+          <strong>${proximoSorteoTexto}</strong>
+        </div>
+        <div class="qplus-poster-banner">POZO ESTIMADO</div>
+        <div class="qplus-poster-monto">${formatoPesos(pozoEstimadoTotal)}</div>
+      </div>
+    `;
   }
 
   app.innerHTML = `
@@ -977,12 +992,13 @@ function dibujarQuinielaPlus() {
         <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
         <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
         <div class="titulo-turno">
-          <div class="logo-plus-chip">
-            <img src="assets/logo-plus.png" alt="Quiniela Plus" onerror="this.replaceWith(document.createTextNode('QUINIELA PLUS'))">
+          <div class="linea-titulo">
+            <span>QUINIELA</span>
+            <strong>PLUS</strong>
           </div>
           <small>${subtitulo}</small>
         </div>
-        <div class="topbar-cierre">${pozoTotalHTML}</div>
+        <div class="topbar-cierre"></div>
         <div class="fecha">${soloFechaTexto()}</div>
       </header>
 
@@ -995,8 +1011,8 @@ function dibujarQuinielaPlus() {
           ${columnas}
         </section>
 
-        <aside class="promo-lateral">
-          ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
+        <aside class="promo-lateral promo-lateral-plus">
+          ${posterHTML}
         </aside>
       </section>
     </main>
