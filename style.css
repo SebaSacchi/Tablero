@@ -619,6 +619,37 @@ body {
   white-space: nowrap;
 }
 
+.qplus-banner-promo {
+  flex: 0 0 auto;
+  width: clamp(4.6rem, 13.5cqh, 8.6rem);
+  height: clamp(4.6rem, 13.5cqh, 8.6rem);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.05cqh;
+  background: radial-gradient(circle at 35% 30%, #fff9c4, #ffcf1e 55%, #ff8a00 100%);
+  border: 0.16cqh dashed #900000;
+  box-shadow: 0 0.3cqh 0.6cqh rgba(0, 0, 0, 0.45);
+  transform: rotate(-9deg);
+  text-align: center;
+  line-height: 1.05;
+}
+
+.qplus-banner-promo-etiqueta {
+  font-size: clamp(0.5rem, 1.3cqh, 0.95rem);
+  font-weight: 900;
+  color: #7a0000;
+  letter-spacing: 0.02em;
+}
+
+.qplus-banner-promo-monto {
+  font-size: clamp(0.95rem, 2.6cqh, 1.9rem);
+  font-weight: 1000;
+  color: #a00000;
+}
+
 .qplus-banner-pozo {
   display: flex;
   align-items: stretch;

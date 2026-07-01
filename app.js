@@ -991,6 +991,10 @@ function dibujarQuinielaPlus() {
             <span class="qplus-banner-sorteo-etiqueta">PRÓXIMO SORTEO</span>
             <span class="qplus-banner-sorteo-valor">${proximoSorteoTexto}</span>
           </div>
+          <div class="qplus-banner-promo">
+            <span class="qplus-banner-promo-etiqueta">SOLO POR</span>
+            <span class="qplus-banner-promo-monto">$ 1.000.-</span>
+          </div>
         </div>
         <div class="qplus-banner-pozo">
           <span class="qplus-banner-etiqueta">POZO ESTIMADO</span>
