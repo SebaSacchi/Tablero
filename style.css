@@ -441,8 +441,8 @@ body {
 
 .qplus-numeros {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.35cqh 0.3cqw;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6cqh 0.3cqw;
   padding: 0.3cqh 0.4cqw 0.6cqh;
 }
 

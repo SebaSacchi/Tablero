@@ -958,7 +958,7 @@ function dibujarQuinielaPlus() {
           </div>
           <div class="qplus-premios">
             <div class="qplus-premio-fila qplus-premio-header">
-              <span>NIVEL</span><span>GANADORES</span><span>IMPORTE</span>
+              <span>ACIERTOS</span><span>GANADORES</span><span>IMPORTE</span>
             </div>
             ${premiosHTML}
           </div>
