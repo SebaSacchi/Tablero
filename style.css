@@ -356,15 +356,15 @@ body {
 .tabla-qplus {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 0.4cqh;
   min-width: 0;
   min-height: 0;
 }
 
 .columna-qplus {
-  flex: 1 1 0;
+  flex: 0 0 auto;
   min-width: 0;
-  min-height: 0;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 18%, rgba(0, 0, 0, 0.18)),
     rgba(0, 0, 0, 0.24);
@@ -377,11 +377,29 @@ body {
 }
 
 .qplus-fila-contenido {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: row;
   align-items: stretch;
+}
+
+.qplus-titulo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-width: 6.5cqw;
+  padding: 0.4cqh 0.6cqw;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(0, 0, 0, 0.25)),
+    #101010;
+  color: #fff;
+  font-size: clamp(0.7rem, 1.2cqw, 1.3rem);
+  font-weight: 1000;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  text-shadow: 0.18cqh 0.18cqh 0 #000;
+  border-right: 0.2cqh solid rgba(255, 255, 255, 0.25);
 }
 
 .qplus-numeros-bloque {
@@ -412,8 +430,8 @@ body {
 
 .qplus-numeros-label {
   text-align: center;
-  padding: 0.35cqh 0.2cqw 0.1cqh;
-  font-size: clamp(0.5rem, 0.85cqw, 0.9rem);
+  padding: 0.2cqh 0.2cqw 0.08cqh;
+  font-size: clamp(0.42rem, 0.7cqw, 0.75rem);
   font-weight: 1000;
   letter-spacing: 0.05em;
   color: #cfd8ff;
@@ -422,9 +440,9 @@ body {
 .qplus-numeros {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
-  gap: 0.7cqh 0.25cqw;
-  margin: 0.2cqh 0.6cqw 0.5cqh;
-  padding: 0.6cqh 0.4cqw;
+  gap: 0.4cqh 0.2cqw;
+  margin: 0.1cqh 0.6cqw 0.3cqh;
+  padding: 0.35cqh 0.4cqw;
   background: rgba(0, 0, 0, 0.32);
   border: 0.12cqh solid rgba(255, 255, 255, 0.25);
   border-radius: 0.5cqh;
@@ -434,7 +452,7 @@ body {
 .qplus-num {
   min-width: 0;
   text-align: center;
-  font-size: clamp(0.85rem, 1.6cqw, 1.7rem);
+  font-size: clamp(0.72rem, 1.35cqw, 1.4rem);
   font-weight: 1000;
   color: #fff;
   line-height: 1.1;
@@ -449,8 +467,8 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 0.2cqh 0.5cqw 0.5cqh 0;
-  padding: 0.15cqh 0;
+  margin: 0.1cqh 0.5cqw 0.3cqh 0;
+  padding: 0.1cqh 0;
   background: rgba(10, 14, 28, 0.4);
   border: 0.12cqh solid rgba(255, 255, 255, 0.16);
   border-radius: 0.5cqh;
@@ -461,8 +479,8 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 0.85fr) minmax(0, 1.15fr);
   gap: 0.3cqw;
-  padding: 0.3cqh 0.5cqw;
-  font-size: clamp(0.5rem, 0.8cqw, 0.84rem);
+  padding: 0.2cqh 0.5cqw;
+  font-size: clamp(0.46rem, 0.75cqw, 0.8rem);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
@@ -492,6 +510,36 @@ body {
 
 .qplus-premio-importe {
   text-align: right;
+}
+
+.qplus-vacante {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15cqh;
+  padding: 0.3cqh 0.9cqw;
+  background: linear-gradient(180deg, #ff2b2b, #8a0000);
+  border-left: 0.2cqh solid rgba(255, 255, 255, 0.3);
+}
+
+.qplus-vacante-etiqueta {
+  font-size: clamp(0.4rem, 0.62cqw, 0.66rem);
+  font-weight: 1000;
+  letter-spacing: 0.05em;
+  color: #ffe6e6;
+  text-shadow: 0.12cqh 0.12cqh 0 rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+.qplus-vacante-monto {
+  font-size: clamp(0.7rem, 1.3cqw, 1.4rem);
+  font-weight: 1000;
+  color: #fff;
+  text-shadow: 0.16cqh 0.16cqh 0 rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
 }
 
 .qplus-sin-datos {
@@ -539,7 +587,7 @@ body {
 }
 
 .qplus-banner-logo img {
-  height: clamp(4.6rem, 10cqw, 11rem);
+  height: clamp(5.2rem, 11cqw, 12.5rem);
   object-fit: contain;
   display: block;
 }
@@ -555,32 +603,26 @@ body {
 
 .qplus-banner-sorteo {
   display: flex;
-  align-items: stretch;
+  align-items: baseline;
+  gap: 0.6cqw;
+  padding-bottom: 0.35cqh;
+  border-bottom: 0.09cqh solid rgba(0, 0, 0, 0.18);
 }
 
 .qplus-banner-sorteo-etiqueta {
-  display: flex;
-  align-items: center;
-  background: linear-gradient(180deg, #333, #000);
-  color: #fff;
-  font-weight: 1000;
-  font-size: clamp(0.65rem, 1.15cqw, 1.3rem);
-  padding: 0.35cqh 1cqw;
-  border-radius: 0.35cqh 0 0 0.35cqh;
-  letter-spacing: 0.02em;
+  color: #1a1a1a;
+  font-weight: 600;
+  font-size: clamp(0.6rem, 1.05cqw, 1.15rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
 .qplus-banner-sorteo-valor {
-  display: flex;
-  align-items: center;
-  background: #c00000;
-  color: #fff;
-  font-weight: 1000;
-  font-size: clamp(0.7rem, 1.3cqw, 1.45rem);
-  padding: 0.35cqh 1.1cqw;
-  border-radius: 0 0.35cqh 0.35cqh 0;
-  letter-spacing: 0.02em;
+  color: #000;
+  font-weight: 800;
+  font-size: clamp(0.75rem, 1.4cqw, 1.55rem);
+  letter-spacing: 0.03em;
   white-space: nowrap;
 }
 
@@ -595,9 +637,9 @@ body {
   background: linear-gradient(180deg, #ff2b2b, #8a0000);
   color: #fff;
   font-weight: 1000;
-  font-size: clamp(0.8rem, 1.5cqw, 1.65rem);
-  padding: 0.5cqh 1.2cqw;
-  border-radius: 0.4cqh 0 0 0.4cqh;
+  font-size: clamp(0.95rem, 1.75cqw, 1.9rem);
+  padding: 0.6cqh 1.3cqw;
+  border-radius: 0.45cqh 0 0 0.45cqh;
   text-shadow: 0.14cqh 0.14cqh 0 rgba(0, 0, 0, 0.5);
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -607,11 +649,12 @@ body {
   display: flex;
   align-items: center;
   background: #0a0a0a;
-  color: #fff;
+  color: #fff200;
   font-weight: 1000;
-  font-size: clamp(1.2rem, 2.5cqw, 2.75rem);
-  padding: 0.5cqh 1.4cqw;
-  border-radius: 0 0.4cqh 0.4cqh 0;
+  font-size: clamp(1.6rem, 3.3cqw, 3.7rem);
+  padding: 0.6cqh 1.6cqw;
+  border-radius: 0 0.45cqh 0.45cqh 0;
+  text-shadow: 0.16cqh 0.16cqh 0 rgba(0, 0, 0, 0.7);
   white-space: nowrap;
 }
 
