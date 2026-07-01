@@ -362,9 +362,8 @@ body {
 }
 
 .columna-qplus {
-  flex: 1;
+  flex: 0 0 auto;
   min-width: 0;
-  min-height: 0;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 18%, rgba(0, 0, 0, 0.18)),
     rgba(0, 0, 0, 0.24);
@@ -377,8 +376,6 @@ body {
 }
 
 .qplus-fila-contenido {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -422,8 +419,13 @@ body {
 .qplus-numeros {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
-  gap: 1cqh 0.25cqw;
-  padding: 0.4cqh 0.5cqw 0.6cqh;
+  gap: 0.7cqh 0.25cqw;
+  margin: 0.2cqh 0.6cqw 0.5cqh;
+  padding: 0.6cqh 0.4cqw;
+  background: rgba(0, 0, 0, 0.32);
+  border: 0.12cqh solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.5cqh;
+  box-shadow: inset 0 0 1cqh rgba(0, 0, 0, 0.4);
 }
 
 .qplus-num {
@@ -433,6 +435,7 @@ body {
   font-weight: 1000;
   color: #fff;
   line-height: 1.1;
+  text-shadow: 0.22cqh 0.22cqh 0 #000, 0 0 0.5cqh rgba(0, 0, 0, 0.9);
 }
 
 .qplus-chip {
@@ -521,84 +524,48 @@ body {
   box-shadow: 0 0 0.8cqh rgba(255, 212, 0, 0.3);
 }
 
-.promo-lateral-plus {
-  align-items: stretch;
-}
-
-.qplus-poster {
-  width: 100%;
-  min-height: 0;
+.qplus-header-pozo {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.4cqh;
-  padding: 2.2cqh 1.4cqw;
-  background:
-    radial-gradient(circle at 28% 15%, rgba(255, 255, 255, 0.16), transparent 55%),
-    linear-gradient(135deg, #d40000, #8a0000 55%, #4a0000);
+  gap: 0.6cqw;
 }
 
-.qplus-poster-logo {
+.qplus-header-logo {
   background: #fff;
-  border-radius: 1cqh;
-  padding: 1cqh 1.2cqw;
-  box-shadow: 0 0.4cqh 0 rgba(0, 0, 0, 0.4), 0 0 1.6cqh rgba(0, 0, 0, 0.45);
+  border-radius: 0.5cqh;
+  padding: 0.2cqh 0.5cqw;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 0.2cqh 0 rgba(0, 0, 0, 0.4);
 }
 
-.qplus-poster-logo img {
-  width: 100%;
-  max-width: 16cqw;
-  display: block;
+.qplus-header-logo img {
+  height: clamp(1.6rem, 3.2cqw, 3.2rem);
   object-fit: contain;
+  display: block;
 }
 
-.qplus-poster-sorteo {
-  background: #fff;
-  border-radius: 3cqh;
-  padding: 0.7cqh 1.4cqw;
+.qplus-header-estimado {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2cqh;
-  box-shadow: 0 0.3cqh 0 rgba(0, 0, 0, 0.35);
+  line-height: 1;
+  gap: 0.12cqh;
 }
 
-.qplus-poster-sorteo span {
-  font-size: clamp(0.5rem, 0.9cqw, 0.95rem);
+.qplus-header-estimado span {
+  font-size: clamp(0.5rem, 0.85cqw, 0.95rem);
   font-weight: 1000;
-  color: #8a0000;
-  letter-spacing: 0.05em;
-}
-
-.qplus-poster-sorteo strong {
-  font-size: clamp(0.85rem, 1.55cqw, 1.65rem);
-  font-weight: 1000;
-  color: #d40000;
-  white-space: nowrap;
-}
-
-.qplus-poster-banner {
-  background: linear-gradient(180deg, #ff2b2b, #8a0000);
   color: #fff;
-  font-weight: 1000;
-  font-size: clamp(0.95rem, 1.8cqw, 1.95rem);
-  padding: 0.65cqh 1.6cqw;
-  border-radius: 0.4cqh;
-  text-shadow: 0.16cqh 0.16cqh 0 rgba(0, 0, 0, 0.5);
-  box-shadow: 0 0.3cqh 0 rgba(0, 0, 0, 0.45), inset 0 0 0 0.15cqh rgba(255, 255, 255, 0.25);
-  letter-spacing: 0.03em;
-  white-space: nowrap;
+  text-shadow: 0.18cqh 0.18cqh 0 #000;
 }
 
-.qplus-poster-monto {
-  background: #0a0a0a;
-  color: #fff;
+.qplus-header-estimado strong {
+  font-size: clamp(0.85rem, 1.7cqw, 1.85rem);
   font-weight: 1000;
-  font-size: clamp(1.35rem, 2.7cqw, 3rem);
-  padding: 0.75cqh 1.1cqw;
-  border-radius: 0.4cqh;
-  box-shadow: 0 0.35cqh 0 rgba(0, 0, 0, 0.55), inset 0 0 0 0.15cqh rgba(255, 255, 255, 0.12);
+  color: #7cff9e;
+  text-shadow: 0.26cqh 0.26cqh 0 #000, 0 0 0.6cqh rgba(0, 0, 0, 0.9);
   white-space: nowrap;
 }
 
