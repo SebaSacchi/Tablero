@@ -382,8 +382,17 @@ body {
   align-items: stretch;
 }
 
+.qplus-titulo-fila {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 0.2cqh solid rgba(255, 255, 255, 0.18);
+}
+
 .qplus-titulo {
-  flex: 0 0 auto;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
   margin: 0;
   padding: 0.4cqh 0.8cqw;
   text-align: left;
@@ -398,6 +407,9 @@ body {
   line-height: 1;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.columna-qplus > .qplus-titulo {
   border-bottom: 0.2cqh solid rgba(255, 255, 255, 0.18);
 }
 
@@ -498,26 +510,26 @@ body {
   flex: 0 0 auto;
   min-width: 0;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 0.15cqh;
-  padding: 0.3cqh 0.9cqw;
+  gap: 0.5cqw;
+  padding: 0.4cqh 0.9cqw;
   background: linear-gradient(180deg, #2bd94a, #0a6e1f);
   border-left: 0.2cqh solid rgba(255, 255, 255, 0.3);
 }
 
 .qplus-vacante-etiqueta {
-  font-size: clamp(0.4rem, 0.62cqw, 0.66rem);
+  font-size: clamp(0.42rem, 0.65cqw, 0.7rem);
   font-weight: 1000;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: #e6ffe9;
   text-shadow: 0.12cqh 0.12cqh 0 rgba(0, 0, 0, 0.6);
   white-space: nowrap;
 }
 
 .qplus-vacante-monto {
-  font-size: clamp(0.7rem, 1.3cqw, 1.4rem);
+  font-size: clamp(0.75rem, 1.3cqw, 1.4rem);
   font-weight: 1000;
   color: #fff;
   text-shadow: 0.16cqh 0.16cqh 0 rgba(0, 0, 0, 0.7);

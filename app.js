@@ -958,7 +958,13 @@ function dibujarQuinielaPlus() {
 
       return `
         <div class="columna-qplus">
-          <div class="qplus-titulo">${nombreJuegoPlus(juego)}</div>
+          <div class="qplus-titulo-fila">
+            <div class="qplus-titulo">${nombreJuegoPlus(juego)}</div>
+            <div class="qplus-vacante">
+              <span class="qplus-vacante-etiqueta">POZO VACANTE</span>
+              <span class="qplus-vacante-monto">${formatoPesos(pozoEstimado)}</span>
+            </div>
+          </div>
           <div class="qplus-fila-contenido">
             <div class="qplus-numeros-bloque">
               <div class="qplus-numeros-label">NÚMEROS SORTEADOS</div>
@@ -969,10 +975,6 @@ function dibujarQuinielaPlus() {
                 <span class="qplus-premio-nivel">ACIERTOS</span><span class="qplus-premio-ganadores">GANADORES</span><span class="qplus-premio-importe">IMPORTE</span>
               </div>
               ${premiosHTML}
-            </div>
-            <div class="qplus-vacante">
-              <span class="qplus-vacante-etiqueta">POZO VACANTE</span>
-              <span class="qplus-vacante-monto">${formatoPesos(pozoEstimado)}</span>
             </div>
           </div>
         </div>
