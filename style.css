@@ -357,7 +357,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 0.32cqh;
+  gap: 0.24cqh;
   min-width: 0;
   min-height: 0;
 }
@@ -567,11 +567,11 @@ body {
 .qplus-banner {
   display: flex;
   flex-direction: column;
-  gap: 0.45cqh;
+  gap: 0.3cqh;
   background: linear-gradient(180deg, #ffffff, #f2f4f8);
   border-radius: 0.7cqh;
-  padding: 0.8cqh 1.8cqw;
-  margin-bottom: 0.5cqh;
+  padding: 0.5cqh 1.8cqw;
+  margin-bottom: 0.35cqh;
   box-shadow: 0 0.3cqh 0.5cqh rgba(0, 0, 0, 0.3);
 }
 
@@ -579,12 +579,12 @@ body {
   display: flex;
   align-items: center;
   gap: 1.6cqw;
-  padding-bottom: 0.35cqh;
+  padding-bottom: 0.2cqh;
   border-bottom: 0.07cqh solid rgba(10, 30, 60, 0.15);
 }
 
 .qplus-banner-logo img {
-  height: clamp(5.4rem, 10.2cqw, 11.4rem);
+  height: clamp(5.9rem, 11cqw, 12.2rem);
   object-fit: contain;
   display: block;
 }
