@@ -956,19 +956,11 @@ function dibujarQuinielaPlus() {
               <div class="qplus-numeros-label">NÚMEROS SORTEADOS</div>
               <div class="qplus-numeros">${numerosHTML}</div>
             </div>
-            <div class="qplus-pozo">
-              <span class="qplus-pozo-label">POZO ACTUAL</span>
-              <span class="qplus-pozo-monto">${formatoPesos(d.pozo)}</span>
-            </div>
             <div class="qplus-premios">
               <div class="qplus-premio-fila qplus-premio-header">
                 <span>ACIERTOS</span><span>GANADORES</span><span>IMPORTE</span>
               </div>
               ${premiosHTML}
-            </div>
-            <div class="qplus-estimado">
-              <span class="qplus-estimado-label">PRÓXIMO POZO ESTIMADO</span>
-              <span class="qplus-estimado-monto">${formatoPesos(pozoEstimado)}</span>
             </div>
           </div>
         </div>

@@ -385,7 +385,7 @@ body {
 }
 
 .qplus-numeros-bloque {
-  flex: 1.3;
+  flex: 1.7;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -421,15 +421,15 @@ body {
 
 .qplus-numeros {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.6cqh 0.3cqw;
-  padding: 0.3cqh 0.5cqw 0.5cqh;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 1cqh 0.25cqw;
+  padding: 0.4cqh 0.5cqw 0.6cqh;
 }
 
 .qplus-num {
   min-width: 0;
   text-align: center;
-  font-size: clamp(0.7rem, 1.3cqw, 1.35rem);
+  font-size: clamp(0.85rem, 1.6cqw, 1.7rem);
   font-weight: 1000;
   color: #fff;
   line-height: 1.1;
@@ -440,81 +440,19 @@ body {
   background: rgba(0, 0, 0, 0.55);
   border: 0.1cqh solid rgba(255, 255, 255, 0.25);
   border-radius: 0.4cqh;
-  padding: 0.35cqh 0.2cqw;
+  padding: 0.4cqh 0.15cqw;
   min-width: 1.9em;
   box-shadow: 0 0.15cqh 0 rgba(0, 0, 0, 0.45);
 }
 
-.qplus-pozo {
-  flex: 0 0 auto;
-  width: 15cqw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3cqh;
-  padding: 0.5cqh 0.5cqw;
-  text-align: center;
-  background: linear-gradient(180deg, #ffe600, #ffb700);
-  border-left: 0.18cqh solid rgba(0, 0, 0, 0.4);
-  border-right: 0.18cqh solid rgba(0, 0, 0, 0.4);
-}
-
-.qplus-pozo-label {
-  font-size: clamp(0.6rem, 0.95cqw, 1rem);
-  font-weight: 1000;
-  color: #1a1a1a;
-}
-
-.qplus-pozo-monto {
-  font-size: clamp(0.85rem, 1.5cqw, 1.6rem);
-  font-weight: 1000;
-  color: #1a1a1a;
-  white-space: normal;
-  word-break: break-word;
-  line-height: 1.15;
-}
-
 .qplus-premios {
-  flex: 1.9;
+  flex: 1;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-
-.qplus-estimado {
-  flex: 0 0 auto;
-  width: 15cqw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3cqh;
-  padding: 0.5cqh 0.5cqw;
-  text-align: center;
-  background: linear-gradient(180deg, rgba(0, 200, 90, 0.32), rgba(0, 120, 55, 0.42));
-  border-left: 0.2cqh solid rgba(255, 255, 255, 0.3);
-}
-
-.qplus-estimado-label {
-  font-size: clamp(0.48rem, 0.72cqw, 0.78rem);
-  font-weight: 1000;
-  color: #fff;
-  text-shadow: 0.14cqh 0.14cqh 0 #000;
-  line-height: 1.1;
-}
-
-.qplus-estimado-monto {
-  font-size: clamp(0.78rem, 1.3cqw, 1.35rem);
-  font-weight: 1000;
-  color: #7cff9e;
-  text-shadow: 0.18cqh 0.18cqh 0 #000, 0 0 0.5cqh rgba(0, 0, 0, 0.9);
-  white-space: normal;
-  word-break: break-word;
-  line-height: 1.15;
 }
 
 .qplus-premio-fila {
