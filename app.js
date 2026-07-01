@@ -983,18 +983,18 @@ function dibujarQuinielaPlus() {
 
     bannerHTML = `
       <div class="qplus-banner">
-        <div class="qplus-banner-logo">
-          <img src="assets/logo-plus.png" alt="Quiniela Plus">
-        </div>
-        <div class="qplus-banner-info">
+        <div class="qplus-banner-top">
+          <div class="qplus-banner-logo">
+            <img src="assets/logo-plus.png" alt="Quiniela Plus">
+          </div>
           <div class="qplus-banner-sorteo">
             <span class="qplus-banner-sorteo-etiqueta">PRÓXIMO SORTEO</span>
             <span class="qplus-banner-sorteo-valor">${proximoSorteoTexto}</span>
           </div>
-          <div class="qplus-banner-pozo">
-            <span class="qplus-banner-etiqueta">POZO ESTIMADO</span>
-            <span class="qplus-banner-monto">${formatoPesos(pozoEstimadoTotal)}</span>
-          </div>
+        </div>
+        <div class="qplus-banner-pozo">
+          <span class="qplus-banner-etiqueta">POZO ESTIMADO</span>
+          <span class="qplus-banner-monto">${formatoPesos(pozoEstimadoTotal)}</span>
         </div>
       </div>
     `;

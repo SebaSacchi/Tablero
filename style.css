@@ -568,42 +568,42 @@ body {
 
 .qplus-banner {
   display: flex;
-  align-items: center;
-  gap: 1.6cqw;
+  flex-direction: column;
+  gap: 0.55cqh;
   background: #fff;
   border-radius: 0.7cqh;
-  padding: 1.2cqh 1.8cqw;
+  padding: 0.9cqh 1.6cqw;
   margin-bottom: 0.5cqh;
   box-shadow: 0 0.3cqh 0 rgba(0, 0, 0, 0.4);
 }
 
+.qplus-banner-top {
+  display: flex;
+  align-items: center;
+  gap: 1.4cqw;
+  padding-bottom: 0.45cqh;
+  border-bottom: 0.09cqh solid rgba(0, 0, 0, 0.18);
+}
+
 .qplus-banner-logo img {
-  height: clamp(5.2rem, 11cqw, 12.5rem);
+  height: clamp(4rem, 7.6cqw, 8.4rem);
   object-fit: contain;
   display: block;
 }
 
-.qplus-banner-info {
+.qplus-banner-sorteo {
   flex: 1;
   min-width: 0;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.6cqh;
-}
-
-.qplus-banner-sorteo {
-  display: flex;
   align-items: baseline;
-  gap: 0.6cqw;
-  padding-bottom: 0.35cqh;
-  border-bottom: 0.09cqh solid rgba(0, 0, 0, 0.18);
+  flex-wrap: wrap;
+  gap: 0.5cqw 0.8cqw;
 }
 
 .qplus-banner-sorteo-etiqueta {
   color: #1a1a1a;
-  font-weight: 600;
-  font-size: clamp(0.6rem, 1.05cqw, 1.15rem);
+  font-weight: 700;
+  font-size: clamp(0.75rem, 1.3cqw, 1.5rem);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -611,8 +611,8 @@ body {
 
 .qplus-banner-sorteo-valor {
   color: #000;
-  font-weight: 800;
-  font-size: clamp(0.75rem, 1.4cqw, 1.55rem);
+  font-weight: 900;
+  font-size: clamp(0.95rem, 1.75cqw, 2rem);
   letter-spacing: 0.03em;
   white-space: nowrap;
 }
@@ -620,16 +620,19 @@ body {
 .qplus-banner-pozo {
   display: flex;
   align-items: stretch;
+  justify-content: center;
+  min-width: 0;
 }
 
 .qplus-banner-etiqueta {
   display: flex;
   align-items: center;
+  min-width: 0;
   background: linear-gradient(180deg, #ff2b2b, #8a0000);
   color: #fff;
   font-weight: 1000;
-  font-size: clamp(0.95rem, 1.75cqw, 1.9rem);
-  padding: 0.6cqh 1.3cqw;
+  font-size: clamp(1rem, 1.9cqw, 2.1rem);
+  padding: 0.55cqh 1.4cqw;
   border-radius: 0.45cqh 0 0 0.45cqh;
   text-shadow: 0.14cqh 0.14cqh 0 rgba(0, 0, 0, 0.5);
   letter-spacing: 0.02em;
@@ -639,14 +642,17 @@ body {
 .qplus-banner-monto {
   display: flex;
   align-items: center;
+  min-width: 0;
   background: #0a0a0a;
   color: #fff200;
   font-weight: 1000;
-  font-size: clamp(1.6rem, 3.3cqw, 3.7rem);
-  padding: 0.6cqh 1.6cqw;
+  font-size: clamp(1.5rem, 3cqw, 3.4rem);
+  padding: 0.55cqh 1.6cqw;
   border-radius: 0 0.45cqh 0.45cqh 0;
   text-shadow: 0.16cqh 0.16cqh 0 rgba(0, 0, 0, 0.7);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .footer {
