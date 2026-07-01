@@ -620,33 +620,18 @@ body {
 
 .qplus-banner-promo {
   flex: 0 0 auto;
-  width: clamp(5.6rem, 15.5cqh, 9.8rem);
-  height: clamp(5.6rem, 15.5cqh, 9.8rem);
+  height: clamp(4.6rem, 13cqh, 8.6rem);
+  aspect-ratio: 3 / 2;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.15cqh;
-  background: radial-gradient(circle at 38% 32%, #e13030, #8a0000 78%);
-  border: 0.3cqh solid #ffd23f;
-  clip-path: polygon(50.0% 0.0%, 60.9% 9.4%, 75.0% 6.7%, 79.7% 20.3%, 93.3% 25.0%, 90.6% 39.1%, 100.0% 50.0%, 90.6% 60.9%, 93.3% 75.0%, 79.7% 79.7%, 75.0% 93.3%, 60.9% 90.6%, 50.0% 100.0%, 39.1% 90.6%, 25.0% 93.3%, 20.3% 79.7%, 6.7% 75.0%, 9.4% 60.9%, 0.0% 50.0%, 9.4% 39.1%, 6.7% 25.0%, 20.3% 20.3%, 25.0% 6.7%, 39.1% 9.4%);
-  box-shadow: 0 0.3cqh 0.7cqh rgba(0, 0, 0, 0.4);
-  text-align: center;
-  line-height: 1.05;
 }
 
-.qplus-banner-promo-etiqueta {
-  font-size: clamp(0.5rem, 1.35cqh, 1rem);
-  font-weight: 900;
-  color: #ffe9b0;
-  letter-spacing: 0.05em;
-}
-
-.qplus-banner-promo-monto {
-  font-size: clamp(1.05rem, 2.9cqh, 2.1rem);
-  font-weight: 1000;
-  color: #fff;
-  text-shadow: 0.08cqh 0.08cqh 0 rgba(0, 0, 0, 0.5);
+.qplus-banner-promo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .qplus-banner-pozo {
