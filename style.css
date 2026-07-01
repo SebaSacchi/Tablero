@@ -356,8 +356,8 @@ body {
 .tabla-qplus {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 0.4cqh;
+  justify-content: flex-start;
+  gap: 0.5cqh;
   min-width: 0;
   min-height: 0;
 }
@@ -398,12 +398,9 @@ body {
   text-align: left;
   font-size: clamp(0.8rem, 1.4cqw, 1.4rem);
   font-weight: 1000;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.2)),
-    #101010;
-  color: #fff;
+  background: linear-gradient(180deg, #fdfdfd, #dcdcdc);
+  color: #111;
   letter-spacing: 0.03em;
-  text-shadow: 0.2cqh 0.2cqh 0 #000;
   line-height: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -424,19 +421,19 @@ body {
 
 .qplus-numeros-label {
   text-align: center;
-  padding: 0.2cqh 0.2cqw 0.08cqh;
-  font-size: clamp(0.42rem, 0.7cqw, 0.75rem);
+  padding: 0.25cqh 0.2cqw 0.1cqh;
+  font-size: clamp(0.5rem, 0.82cqw, 0.88rem);
   font-weight: 1000;
-  letter-spacing: 0.05em;
-  color: #cfd8ff;
+  letter-spacing: 0.06em;
+  color: #e4e9ff;
 }
 
 .qplus-numeros {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
-  gap: 0.4cqh 0.2cqw;
-  margin: 0.1cqh 0.6cqw 0.3cqh;
-  padding: 0.35cqh 0.4cqw;
+  gap: 0.45cqh 0.2cqw;
+  margin: 0.1cqh 0.6cqw 0.35cqh;
+  padding: 0.4cqh 0.4cqw;
   background: rgba(0, 0, 0, 0.32);
   border: 0.12cqh solid rgba(255, 255, 255, 0.25);
   border-radius: 0.5cqh;
@@ -446,11 +443,11 @@ body {
 .qplus-num {
   min-width: 0;
   text-align: center;
-  font-size: clamp(0.72rem, 1.35cqw, 1.4rem);
+  font-size: clamp(0.95rem, 1.75cqw, 1.85rem);
   font-weight: 1000;
   color: #fff;
   line-height: 1.1;
-  text-shadow: 0.22cqh 0.22cqh 0 #000, 0 0 0.5cqh rgba(0, 0, 0, 0.9);
+  text-shadow: 0.24cqh 0.24cqh 0 #000, 0 0 0.5cqh rgba(0, 0, 0, 0.9);
 }
 
 .qplus-premios {
