@@ -570,7 +570,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.55cqh;
-  background: #fff;
+  background:
+    repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.035) 0, rgba(0, 0, 0, 0.035) 1px, transparent 1px, transparent 7px),
+    linear-gradient(160deg, #ffffff, #f0f0f0 55%, #e6e6e6);
   border-radius: 0.7cqh;
   padding: 0.9cqh 1.6cqw;
   margin-bottom: 0.5cqh;
@@ -586,7 +588,7 @@ body {
 }
 
 .qplus-banner-logo img {
-  height: clamp(4rem, 7.6cqw, 8.4rem);
+  height: clamp(5.4rem, 10.2cqw, 11.4rem);
   object-fit: contain;
   display: block;
 }
@@ -603,7 +605,7 @@ body {
 .qplus-banner-sorteo-etiqueta {
   color: #1a1a1a;
   font-weight: 700;
-  font-size: clamp(0.75rem, 1.3cqw, 1.5rem);
+  font-size: clamp(0.9rem, 1.6cqw, 1.85rem);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -612,7 +614,7 @@ body {
 .qplus-banner-sorteo-valor {
   color: #000;
   font-weight: 900;
-  font-size: clamp(0.95rem, 1.75cqw, 2rem);
+  font-size: clamp(1.15rem, 2.15cqw, 2.45rem);
   letter-spacing: 0.03em;
   white-space: nowrap;
 }
@@ -622,20 +624,33 @@ body {
   align-items: stretch;
   justify-content: center;
   min-width: 0;
+  border-radius: 0.5cqh;
+  animation: qplus-pozo-glow 1.8s ease-in-out infinite;
+}
+
+@keyframes qplus-pozo-glow {
+  0%, 100% {
+    box-shadow: 0 0.35cqh 0.6cqh rgba(0, 0, 0, 0.4), 0 0 1cqh rgba(255, 214, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0.35cqh 0.6cqh rgba(0, 0, 0, 0.4), 0 0 2.6cqh rgba(255, 214, 0, 0.95);
+  }
 }
 
 .qplus-banner-etiqueta {
   display: flex;
   align-items: center;
   min-width: 0;
-  background: linear-gradient(180deg, #ff2b2b, #8a0000);
+  background: linear-gradient(180deg, #ff3b3b, #900000);
   color: #fff;
   font-weight: 1000;
-  font-size: clamp(1rem, 1.9cqw, 2.1rem);
-  padding: 0.55cqh 1.4cqw;
-  border-radius: 0.45cqh 0 0 0.45cqh;
+  font-size: clamp(1.2rem, 2.2cqw, 2.5rem);
+  padding: 0.65cqh 1.5cqw;
+  border-radius: 0.5cqh 0 0 0.5cqh;
+  border: 0.09cqh solid rgba(255, 255, 255, 0.5);
+  border-right: none;
   text-shadow: 0.14cqh 0.14cqh 0 rgba(0, 0, 0, 0.5);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   white-space: nowrap;
 }
 
@@ -643,13 +658,15 @@ body {
   display: flex;
   align-items: center;
   min-width: 0;
-  background: #0a0a0a;
-  color: #fff200;
+  background: #050505;
+  color: #ffe600;
   font-weight: 1000;
-  font-size: clamp(1.5rem, 3cqw, 3.4rem);
-  padding: 0.55cqh 1.6cqw;
-  border-radius: 0 0.45cqh 0.45cqh 0;
-  text-shadow: 0.16cqh 0.16cqh 0 rgba(0, 0, 0, 0.7);
+  font-size: clamp(1.85rem, 3.6cqw, 4.1rem);
+  padding: 0.65cqh 1.8cqw;
+  border-radius: 0 0.5cqh 0.5cqh 0;
+  border: 0.09cqh solid rgba(255, 230, 0, 0.6);
+  border-left: none;
+  text-shadow: 0.18cqh 0.18cqh 0 rgba(0, 0, 0, 0.8), 0 0 0.7cqh rgba(255, 214, 0, 0.6);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
