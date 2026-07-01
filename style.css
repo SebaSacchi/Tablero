@@ -357,7 +357,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 0.7cqh;
+  gap: 0.32cqh;
   min-width: 0;
   min-height: 0;
 }
@@ -392,7 +392,7 @@ body {
   display: flex;
   align-items: center;
   margin: 0;
-  padding: 0.5cqh 1cqw;
+  padding: 0.3cqh 1cqw;
   text-align: left;
   font-size: clamp(0.9rem, 1.5cqw, 1.55rem);
   font-weight: 1000;
@@ -429,9 +429,9 @@ body {
 .qplus-numeros {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
-  gap: 0.65cqh 0.55cqw;
-  margin: 0.15cqh 0.8cqw 0.5cqh;
-  padding: 0.2cqh 0.2cqw;
+  gap: 0.35cqh 0.4cqw;
+  margin: 0.08cqh 0.7cqw 0.2cqh;
+  padding: 0.1cqh 0.2cqw;
 }
 
 .qplus-num {
@@ -465,7 +465,7 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.9fr) minmax(0, 1.1fr);
   gap: 0.4cqw;
-  padding: 0.34cqh 0.2cqw;
+  padding: 0.14cqh 0.2cqw;
   font-size: clamp(0.5rem, 0.8cqw, 0.86rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -511,7 +511,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.6cqw;
-  padding: 0.5cqh 1cqw;
+  padding: 0.3cqh 1cqw;
   background: linear-gradient(180deg, #2bd94a, #0a6e1f);
   border-left: 0.09cqh solid rgba(255, 255, 255, 0.3);
 }
@@ -567,10 +567,10 @@ body {
 .qplus-banner {
   display: flex;
   flex-direction: column;
-  gap: 0.7cqh;
+  gap: 0.45cqh;
   background: linear-gradient(180deg, #ffffff, #f2f4f8);
   border-radius: 0.7cqh;
-  padding: 1.1cqh 1.8cqw;
+  padding: 0.8cqh 1.8cqw;
   margin-bottom: 0.5cqh;
   box-shadow: 0 0.3cqh 0.5cqh rgba(0, 0, 0, 0.3);
 }
@@ -579,7 +579,7 @@ body {
   display: flex;
   align-items: center;
   gap: 1.6cqw;
-  padding-bottom: 0.5cqh;
+  padding-bottom: 0.35cqh;
   border-bottom: 0.07cqh solid rgba(10, 30, 60, 0.15);
 }
 
