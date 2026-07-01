@@ -530,16 +530,16 @@ body {
 .qplus-banner {
   display: flex;
   align-items: center;
-  gap: 1.4cqw;
+  gap: 1.6cqw;
   background: #fff;
-  border-radius: 0.6cqh;
-  padding: 0.7cqh 1.4cqw;
-  margin-bottom: 0.4cqh;
+  border-radius: 0.7cqh;
+  padding: 1.2cqh 1.8cqw;
+  margin-bottom: 0.5cqh;
   box-shadow: 0 0.3cqh 0 rgba(0, 0, 0, 0.4);
 }
 
 .qplus-banner-logo img {
-  height: clamp(3.4rem, 7.4cqw, 8rem);
+  height: clamp(4.6rem, 10cqw, 11rem);
   object-fit: contain;
   display: block;
 }
@@ -550,7 +550,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.4cqh;
+  gap: 0.6cqh;
 }
 
 .qplus-banner-sorteo {
@@ -564,9 +564,9 @@ body {
   background: linear-gradient(180deg, #333, #000);
   color: #fff;
   font-weight: 1000;
-  font-size: clamp(0.5rem, 0.9cqw, 1rem);
-  padding: 0.3cqh 0.9cqw;
-  border-radius: 0.3cqh 0 0 0.3cqh;
+  font-size: clamp(0.65rem, 1.15cqw, 1.3rem);
+  padding: 0.35cqh 1cqw;
+  border-radius: 0.35cqh 0 0 0.35cqh;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
@@ -577,9 +577,9 @@ body {
   background: #c00000;
   color: #fff;
   font-weight: 1000;
-  font-size: clamp(0.55rem, 1cqw, 1.1rem);
-  padding: 0.3cqh 1cqw;
-  border-radius: 0 0.3cqh 0.3cqh 0;
+  font-size: clamp(0.7rem, 1.3cqw, 1.45rem);
+  padding: 0.35cqh 1.1cqw;
+  border-radius: 0 0.35cqh 0.35cqh 0;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
@@ -595,9 +595,9 @@ body {
   background: linear-gradient(180deg, #ff2b2b, #8a0000);
   color: #fff;
   font-weight: 1000;
-  font-size: clamp(0.6rem, 1.1cqw, 1.2rem);
-  padding: 0.4cqh 1cqw;
-  border-radius: 0.35cqh 0 0 0.35cqh;
+  font-size: clamp(0.8rem, 1.5cqw, 1.65rem);
+  padding: 0.5cqh 1.2cqw;
+  border-radius: 0.4cqh 0 0 0.4cqh;
   text-shadow: 0.14cqh 0.14cqh 0 rgba(0, 0, 0, 0.5);
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -609,9 +609,9 @@ body {
   background: #0a0a0a;
   color: #fff;
   font-weight: 1000;
-  font-size: clamp(0.85rem, 1.7cqw, 1.85rem);
-  padding: 0.4cqh 1.1cqw;
-  border-radius: 0 0.35cqh 0.35cqh 0;
+  font-size: clamp(1.2rem, 2.5cqw, 2.75rem);
+  padding: 0.5cqh 1.4cqw;
+  border-radius: 0 0.4cqh 0.4cqh 0;
   white-space: nowrap;
 }
 

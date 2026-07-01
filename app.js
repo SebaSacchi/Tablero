@@ -237,7 +237,11 @@ function soloHoraTexto() {
 function formatoPesos(monto) {
   const n = Number(monto);
   if (!Number.isFinite(n)) return "$ --";
-  return "$ " + n.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return "$ " + n.toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function quitarDecimales(importe) {
+  return String(importe ?? "").replace(/,\d+$/, "");
 }
 
 const cierreTurnos = {
@@ -942,7 +946,7 @@ function dibujarQuinielaPlus() {
 
       const premiosHTML = d.premios.map((p, i) => {
         const esVacante = /vacante/i.test(p.ganadores || "");
-        const importe = (i === 0 && esVacante) ? formatoPesos(pozoEstimado) : p.importe;
+        const importe = (i === 0 && esVacante) ? formatoPesos(pozoEstimado) : quitarDecimales(p.importe);
         return `
           <div class="qplus-premio-fila">
             <span class="qplus-premio-nivel">${p.nivel}</span>
