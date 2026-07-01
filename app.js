@@ -941,12 +941,14 @@ function dibujarQuinielaPlus() {
 
       const numerosHTML = d.numeros.map(n => `<div class="qplus-num">${n}</div>`).join("");
 
+      const primerPremio = d.premios[0];
+      const esVacanteJuego = !!primerPremio && /vacante/i.test(primerPremio.ganadores || "");
+
       const pozoEstimado = calcularPozoEstimado(juego, d.pozo, d.premios);
       pozoEstimadoTotal += pozoEstimado;
 
       const premiosHTML = d.premios.map((p, i) => {
-        const esVacante = /vacante/i.test(p.ganadores || "");
-        const importe = (i === 0 && esVacante) ? formatoPesos(pozoEstimado) : quitarDecimales(p.importe);
+        const importe = (i === 0 && esVacanteJuego) ? formatoPesos(pozoEstimado) : quitarDecimales(p.importe);
         return `
           <div class="qplus-premio-fila">
             <span class="qplus-premio-nivel">${p.nivel}</span>
@@ -961,7 +963,7 @@ function dibujarQuinielaPlus() {
           <div class="qplus-titulo-fila">
             <div class="qplus-titulo">${nombreJuegoPlus(juego)}</div>
             <div class="qplus-vacante">
-              <span class="qplus-vacante-etiqueta">POZO VACANTE</span>
+              <span class="qplus-vacante-etiqueta">${esVacanteJuego ? "POZO VACANTE" : "POZO"}</span>
               <span class="qplus-vacante-monto">${formatoPesos(pozoEstimado)}</span>
             </div>
           </div>

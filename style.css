@@ -357,7 +357,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 0.5cqh;
+  gap: 0.7cqh;
   min-width: 0;
   min-height: 0;
 }
@@ -365,14 +365,12 @@ body {
 .columna-qplus {
   flex: 0 0 auto;
   min-width: 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 18%, rgba(0, 0, 0, 0.18)),
-    rgba(0, 0, 0, 0.24);
-  border-top: 0.2cqh solid rgba(255, 255, 255, 0.35);
-  border-bottom: 0.22cqh solid rgba(0, 0, 0, 0.45);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 22%), #123166;
+  border: 0.09cqh solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.55cqh;
   display: flex;
   flex-direction: column;
-  box-shadow: inset 0 0 1.3cqh rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0.3cqh 0.6cqh rgba(0, 0, 0, 0.35);
   overflow: hidden;
 }
 
@@ -385,7 +383,7 @@ body {
 .qplus-titulo-fila {
   display: flex;
   align-items: stretch;
-  border-bottom: 0.2cqh solid rgba(255, 255, 255, 0.18);
+  border-bottom: 0.09cqh solid rgba(255, 255, 255, 0.2);
 }
 
 .qplus-titulo {
@@ -394,20 +392,20 @@ body {
   display: flex;
   align-items: center;
   margin: 0;
-  padding: 0.4cqh 0.8cqw;
+  padding: 0.5cqh 1cqw;
   text-align: left;
-  font-size: clamp(0.8rem, 1.4cqw, 1.4rem);
+  font-size: clamp(0.9rem, 1.5cqw, 1.55rem);
   font-weight: 1000;
-  background: linear-gradient(180deg, #fdfdfd, #dcdcdc);
-  color: #111;
-  letter-spacing: 0.03em;
+  background: #0a2049;
+  color: #fff;
+  letter-spacing: 0.05em;
   line-height: 1;
   white-space: nowrap;
   overflow: hidden;
 }
 
 .columna-qplus > .qplus-titulo {
-  border-bottom: 0.2cqh solid rgba(255, 255, 255, 0.18);
+  border-bottom: 0.09cqh solid rgba(255, 255, 255, 0.2);
 }
 
 .qplus-numeros-bloque {
@@ -416,68 +414,68 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-right: 0.18cqh solid rgba(255, 255, 255, 0.18);
+  border-right: 0.09cqh solid rgba(255, 255, 255, 0.16);
 }
 
 .qplus-numeros-label {
   text-align: center;
-  padding: 0.25cqh 0.2cqw 0.1cqh;
+  padding: 0.3cqh 0.2cqw 0.15cqh;
   font-size: clamp(0.5rem, 0.82cqw, 0.88rem);
   font-weight: 1000;
-  letter-spacing: 0.06em;
-  color: #e4e9ff;
+  letter-spacing: 0.08em;
+  color: #a9c0f5;
 }
 
 .qplus-numeros {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
-  gap: 0.45cqh 0.2cqw;
-  margin: 0.1cqh 0.6cqw 0.35cqh;
-  padding: 0.4cqh 0.4cqw;
-  background: rgba(0, 0, 0, 0.32);
-  border: 0.12cqh solid rgba(255, 255, 255, 0.25);
-  border-radius: 0.5cqh;
-  box-shadow: inset 0 0 1cqh rgba(0, 0, 0, 0.4);
+  gap: 0.65cqh 0.55cqw;
+  margin: 0.15cqh 0.8cqw 0.5cqh;
+  padding: 0.2cqh 0.2cqw;
 }
 
 .qplus-num {
   min-width: 0;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #ffffff, #dce4f5 88%);
   text-align: center;
-  font-size: clamp(0.95rem, 1.75cqw, 1.85rem);
+  font-size: clamp(1.05rem, 1.95cqw, 2.1rem);
   font-weight: 1000;
-  color: #fff;
-  line-height: 1.1;
-  text-shadow: 0.24cqh 0.24cqh 0 #000, 0 0 0.5cqh rgba(0, 0, 0, 0.9);
+  color: #0d2c5c;
+  line-height: 1;
+  box-shadow: 0 0.16cqh 0.3cqh rgba(0, 0, 0, 0.4), inset 0 -0.08cqh 0.16cqh rgba(0, 0, 0, 0.15);
 }
 
 .qplus-premios {
-  flex: 0.88;
+  flex: 0.95;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 0.1cqh 0.5cqw 0.3cqh 0;
-  padding: 0.1cqh 0;
-  background: rgba(10, 14, 28, 0.4);
-  border: 0.12cqh solid rgba(255, 255, 255, 0.16);
-  border-radius: 0.5cqh;
-  box-shadow: inset 0 0 1cqh rgba(0, 0, 0, 0.4);
+  padding: 0.15cqh 0.7cqw 0.15cqh 0.8cqw;
 }
 
 .qplus-premio-fila {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 0.85fr) minmax(0, 1.15fr);
-  gap: 0.3cqw;
-  padding: 0.2cqh 0.5cqw;
-  font-size: clamp(0.46rem, 0.75cqw, 0.8rem);
-  font-weight: 800;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 0.4cqw;
+  padding: 0.34cqh 0.2cqw;
+  font-size: clamp(0.5rem, 0.8cqw, 0.86rem);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
-  color: #fff;
-  text-shadow: 0.14cqh 0.14cqh 0 #000;
-  border-bottom: 0.1cqh solid rgba(255, 255, 255, 0.08);
+  color: #eef2ff;
+  border-bottom: 0.07cqh solid rgba(255, 255, 255, 0.12);
+}
+
+.qplus-premio-fila:last-child {
+  border-bottom: none;
 }
 
 .qplus-premio-fila > span {
@@ -488,11 +486,11 @@ body {
 }
 
 .qplus-premio-header {
-  background: rgba(0, 0, 0, 0.4);
-  color: #ffe600;
+  color: #bcd0ff;
   font-weight: 1000;
-  font-size: clamp(0.44rem, 0.68cqw, 0.72rem);
-  letter-spacing: 0.06em;
+  font-size: clamp(0.42rem, 0.64cqw, 0.7rem);
+  letter-spacing: 0.08em;
+  border-bottom: 0.11cqh solid rgba(255, 255, 255, 0.3);
 }
 
 .qplus-premio-ganadores {
@@ -501,6 +499,8 @@ body {
 
 .qplus-premio-importe {
   text-align: right;
+  color: #ffd23f;
+  font-weight: 900;
 }
 
 .qplus-vacante {
@@ -510,26 +510,24 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 0.5cqw;
-  padding: 0.4cqh 0.9cqw;
+  gap: 0.6cqw;
+  padding: 0.5cqh 1cqw;
   background: linear-gradient(180deg, #2bd94a, #0a6e1f);
-  border-left: 0.2cqh solid rgba(255, 255, 255, 0.3);
+  border-left: 0.09cqh solid rgba(255, 255, 255, 0.3);
 }
 
 .qplus-vacante-etiqueta {
-  font-size: clamp(0.42rem, 0.65cqw, 0.7rem);
+  font-size: clamp(0.46rem, 0.68cqw, 0.74rem);
   font-weight: 1000;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: #e6ffe9;
-  text-shadow: 0.12cqh 0.12cqh 0 rgba(0, 0, 0, 0.6);
   white-space: nowrap;
 }
 
 .qplus-vacante-monto {
-  font-size: clamp(0.75rem, 1.3cqw, 1.4rem);
+  font-size: clamp(0.8rem, 1.35cqw, 1.45rem);
   font-weight: 1000;
   color: #fff;
-  text-shadow: 0.16cqh 0.16cqh 0 rgba(0, 0, 0, 0.7);
   white-space: nowrap;
 }
 
@@ -569,22 +567,20 @@ body {
 .qplus-banner {
   display: flex;
   flex-direction: column;
-  gap: 0.55cqh;
-  background:
-    repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.035) 0, rgba(0, 0, 0, 0.035) 1px, transparent 1px, transparent 7px),
-    linear-gradient(160deg, #ffffff, #f0f0f0 55%, #e6e6e6);
+  gap: 0.7cqh;
+  background: linear-gradient(180deg, #ffffff, #f2f4f8);
   border-radius: 0.7cqh;
-  padding: 0.9cqh 1.6cqw;
+  padding: 1.1cqh 1.8cqw;
   margin-bottom: 0.5cqh;
-  box-shadow: 0 0.3cqh 0 rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0.3cqh 0.5cqh rgba(0, 0, 0, 0.3);
 }
 
 .qplus-banner-top {
   display: flex;
   align-items: center;
-  gap: 1.4cqw;
-  padding-bottom: 0.45cqh;
-  border-bottom: 0.09cqh solid rgba(0, 0, 0, 0.18);
+  gap: 1.6cqw;
+  padding-bottom: 0.5cqh;
+  border-bottom: 0.07cqh solid rgba(10, 30, 60, 0.15);
 }
 
 .qplus-banner-logo img {
@@ -598,21 +594,23 @@ body {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   gap: 0.3cqh;
+  text-align: center;
 }
 
 .qplus-banner-sorteo-etiqueta {
-  color: #1a1a1a;
+  color: #123166;
   font-weight: 700;
   font-size: clamp(1rem, 1.75cqw, 2rem);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .qplus-banner-sorteo-valor {
-  color: #000;
+  color: #0a1830;
   font-weight: 900;
   font-size: clamp(1.5rem, 2.7cqw, 3.1rem);
   letter-spacing: 0.03em;
@@ -621,33 +619,33 @@ body {
 
 .qplus-banner-promo {
   flex: 0 0 auto;
-  width: clamp(4.6rem, 13.5cqh, 8.6rem);
-  height: clamp(4.6rem, 13.5cqh, 8.6rem);
-  border-radius: 50%;
+  width: clamp(5.6rem, 15.5cqh, 9.8rem);
+  height: clamp(5.6rem, 15.5cqh, 9.8rem);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.05cqh;
-  background: radial-gradient(circle at 35% 30%, #fff9c4, #ffcf1e 55%, #ff8a00 100%);
-  border: 0.16cqh dashed #900000;
-  box-shadow: 0 0.3cqh 0.6cqh rgba(0, 0, 0, 0.45);
-  transform: rotate(-9deg);
+  gap: 0.15cqh;
+  background: radial-gradient(circle at 38% 32%, #e13030, #8a0000 78%);
+  border: 0.3cqh solid #ffd23f;
+  clip-path: polygon(50.0% 0.0%, 60.9% 9.4%, 75.0% 6.7%, 79.7% 20.3%, 93.3% 25.0%, 90.6% 39.1%, 100.0% 50.0%, 90.6% 60.9%, 93.3% 75.0%, 79.7% 79.7%, 75.0% 93.3%, 60.9% 90.6%, 50.0% 100.0%, 39.1% 90.6%, 25.0% 93.3%, 20.3% 79.7%, 6.7% 75.0%, 9.4% 60.9%, 0.0% 50.0%, 9.4% 39.1%, 6.7% 25.0%, 20.3% 20.3%, 25.0% 6.7%, 39.1% 9.4%);
+  box-shadow: 0 0.3cqh 0.7cqh rgba(0, 0, 0, 0.4);
   text-align: center;
   line-height: 1.05;
 }
 
 .qplus-banner-promo-etiqueta {
-  font-size: clamp(0.5rem, 1.3cqh, 0.95rem);
+  font-size: clamp(0.5rem, 1.35cqh, 1rem);
   font-weight: 900;
-  color: #7a0000;
-  letter-spacing: 0.02em;
+  color: #ffe9b0;
+  letter-spacing: 0.05em;
 }
 
 .qplus-banner-promo-monto {
-  font-size: clamp(0.95rem, 2.6cqh, 1.9rem);
+  font-size: clamp(1.05rem, 2.9cqh, 2.1rem);
   font-weight: 1000;
-  color: #a00000;
+  color: #fff;
+  text-shadow: 0.08cqh 0.08cqh 0 rgba(0, 0, 0, 0.5);
 }
 
 .qplus-banner-pozo {
@@ -656,31 +654,19 @@ body {
   justify-content: center;
   min-width: 0;
   border-radius: 0.5cqh;
-  animation: qplus-pozo-glow 1.8s ease-in-out infinite;
-}
-
-@keyframes qplus-pozo-glow {
-  0%, 100% {
-    box-shadow: 0 0.35cqh 0.6cqh rgba(0, 0, 0, 0.4), 0 0 1cqh rgba(255, 214, 0, 0.4);
-  }
-  50% {
-    box-shadow: 0 0.35cqh 0.6cqh rgba(0, 0, 0, 0.4), 0 0 2.6cqh rgba(255, 214, 0, 0.95);
-  }
+  overflow: hidden;
+  box-shadow: 0 0.25cqh 0.5cqh rgba(0, 0, 0, 0.35);
 }
 
 .qplus-banner-etiqueta {
   display: flex;
   align-items: center;
   min-width: 0;
-  background: linear-gradient(180deg, #ff3b3b, #900000);
+  background: linear-gradient(135deg, #b71c1c, #7a0e0e);
   color: #fff;
   font-weight: 1000;
   font-size: clamp(1.2rem, 2.2cqw, 2.5rem);
-  padding: 0.65cqh 1.5cqw;
-  border-radius: 0.5cqh 0 0 0.5cqh;
-  border: 0.09cqh solid rgba(255, 255, 255, 0.5);
-  border-right: none;
-  text-shadow: 0.14cqh 0.14cqh 0 rgba(0, 0, 0, 0.5);
+  padding: 0.6cqh 1.5cqw;
   letter-spacing: 0.03em;
   white-space: nowrap;
 }
@@ -689,15 +675,11 @@ body {
   display: flex;
   align-items: center;
   min-width: 0;
-  background: #050505;
-  color: #ffe600;
+  background: linear-gradient(135deg, #132a52, #0a1830);
+  color: #ffd23f;
   font-weight: 1000;
   font-size: clamp(1.85rem, 3.6cqw, 4.1rem);
-  padding: 0.65cqh 1.8cqw;
-  border-radius: 0 0.5cqh 0.5cqh 0;
-  border: 0.09cqh solid rgba(255, 230, 0, 0.6);
-  border-left: none;
-  text-shadow: 0.18cqh 0.18cqh 0 rgba(0, 0, 0, 0.8), 0 0 0.7cqh rgba(255, 214, 0, 0.6);
+  padding: 0.6cqh 1.8cqw;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
