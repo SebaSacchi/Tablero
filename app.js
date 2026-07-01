@@ -933,7 +933,7 @@ function dibujarQuinielaPlus() {
       if (!d) {
         return `
           <div class="columna-qplus">
-            <h2>${nombreJuegoPlus(juego)}</h2>
+            <div class="qplus-titulo">${nombreJuegoPlus(juego)}</div>
             <div class="qplus-sin-datos">SIN DATOS</div>
           </div>
         `;
@@ -958,8 +958,8 @@ function dibujarQuinielaPlus() {
 
       return `
         <div class="columna-qplus">
+          <div class="qplus-titulo">${nombreJuegoPlus(juego)}</div>
           <div class="qplus-fila-contenido">
-            <div class="qplus-titulo">${nombreJuegoPlus(juego)}</div>
             <div class="qplus-numeros-bloque">
               <div class="qplus-numeros-label">NÚMEROS SORTEADOS</div>
               <div class="qplus-numeros">${numerosHTML}</div>
