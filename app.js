@@ -908,13 +908,19 @@ function dibujarQuinielaPlus() {
 
   let subtitulo = "SIN SORTEOS CARGADOS";
   let columnas = `<div class="qplus-sin-datos">SIN DATOS DE QUINIELA PLUS</div>`;
-  let pozoEstimadoHeaderHTML = "";
+  let bannerHTML = "";
 
   if (datos && datos.juegos) {
     const fechaFmt = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR", {
       day: "2-digit", month: "2-digit", year: "numeric"
     });
     subtitulo = `SORTEO ${datos.sorteo || "--"} · ${fechaFmt}`;
+
+    const proximoSorteo = new Date(fechaDesdeISO(datos.fecha));
+    proximoSorteo.setDate(proximoSorteo.getDate() + 1);
+    const proximoSorteoTexto = proximoSorteo.toLocaleDateString("es-AR", {
+      weekday: "long", day: "2-digit", month: "2-digit"
+    }).toUpperCase();
 
     let pozoEstimadoTotal = 0;
 
@@ -934,8 +940,8 @@ function dibujarQuinielaPlus() {
       const premiosHTML = d.premios.map(p => `
         <div class="qplus-premio-fila">
           <span class="qplus-premio-nivel">${p.nivel}</span>
-          <span class="qplus-premio-ganadores"><span class="qplus-chip">${p.ganadores}</span></span>
-          <span class="qplus-premio-importe"><span class="qplus-chip">${p.importe}</span></span>
+          <span class="qplus-premio-ganadores">${p.ganadores}</span>
+          <span class="qplus-premio-importe">${p.importe}</span>
         </div>
       `).join("");
 
@@ -961,13 +967,18 @@ function dibujarQuinielaPlus() {
       `;
     }).join("");
 
-    pozoEstimadoHeaderHTML = `
-      <div class="qplus-header-logo">
-        <img src="assets/logo-plus.png" alt="Quiniela Plus">
-      </div>
-      <div class="qplus-header-estimado">
-        <span>POZO ESTIMADO</span>
-        <strong>${formatoPesos(pozoEstimadoTotal)}</strong>
+    bannerHTML = `
+      <div class="qplus-banner">
+        <div class="qplus-banner-logo">
+          <img src="assets/logo-plus.png" alt="Quiniela Plus">
+        </div>
+        <div class="qplus-banner-info">
+          <div class="qplus-banner-sorteo">PRÓXIMO SORTEO: <strong>${proximoSorteoTexto}</strong></div>
+          <div class="qplus-banner-pozo">
+            <span class="qplus-banner-etiqueta">POZO ESTIMADO</span>
+            <span class="qplus-banner-monto">${formatoPesos(pozoEstimadoTotal)}</span>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -984,7 +995,7 @@ function dibujarQuinielaPlus() {
           </div>
           <small>${subtitulo}</small>
         </div>
-        <div class="topbar-cierre qplus-header-pozo">${pozoEstimadoHeaderHTML}</div>
+        <div class="topbar-cierre"></div>
         <div class="fecha">${soloFechaTexto()}</div>
       </header>
 
@@ -994,6 +1005,7 @@ function dibujarQuinielaPlus() {
         </aside>
 
         <section class="tabla-qplus">
+          ${bannerHTML}
           ${columnas}
         </section>
 
