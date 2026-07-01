@@ -436,7 +436,7 @@ function nombreJuegoPlus(juego) {
          juego === "CHANCE" ? "CHANCE PLUS" : juego;
 }
 
-const POZO_MINIMO_PLUS = { PLUS: 60000000, SUPER: 40000000, CHANCE: 40000000 };
+const POZO_MINIMO_PLUS = { PLUS: 60000000, SUPER: 10000000, CHANCE: 40000000 };
 
 function calcularPozoEstimado(juego, pozoActual, premios) {
   const primerPremio = Array.isArray(premios) ? premios[0] : null;

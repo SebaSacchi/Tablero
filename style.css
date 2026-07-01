@@ -404,6 +404,8 @@ body {
 .qplus-numeros {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(10, auto);
+  grid-auto-flow: column;
   gap: 0.55cqh 0.4cqw;
   padding: 0.3cqh 0.8cqw 0.6cqh;
 }
