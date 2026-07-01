@@ -436,6 +436,17 @@ function nombreJuegoPlus(juego) {
          juego === "CHANCE" ? "CHANCE PLUS" : juego;
 }
 
+const POZO_MINIMO_PLUS = { PLUS: 60000000, SUPER: 40000000, CHANCE: 40000000 };
+
+function calcularPozoEstimado(juego, pozoActual, premios) {
+  const primerPremio = Array.isArray(premios) ? premios[0] : null;
+  const vacante = !!primerPremio && /vacante/i.test(primerPremio.ganadores || "");
+  if (vacante) {
+    return Math.ceil((pozoActual || 0) / 1000000) * 1000000;
+  }
+  return POZO_MINIMO_PLUS[juego] || 0;
+}
+
 async function cargarResultadosPlus() {
   if (!supabaseConfigurado()) {
     return null;
@@ -934,19 +945,26 @@ function dibujarQuinielaPlus() {
         </div>
       `).join("");
 
+      const pozoEstimado = calcularPozoEstimado(juego, d.pozo, d.premios);
+
       return `
         <div class="columna-qplus">
           <h2>${nombreJuegoPlus(juego)}</h2>
+          <div class="qplus-numeros-label">NÚMEROS SORTEADOS</div>
+          <div class="qplus-numeros">${numerosHTML}</div>
           <div class="qplus-pozo">
-            <span class="qplus-pozo-label">POZO APROX</span>
+            <span class="qplus-pozo-label">POZO ACTUAL</span>
             <span class="qplus-pozo-monto">${formatoPesos(d.pozo)}</span>
           </div>
-          <div class="qplus-numeros">${numerosHTML}</div>
           <div class="qplus-premios">
             <div class="qplus-premio-fila qplus-premio-header">
               <span>NIVEL</span><span>GANADORES</span><span>IMPORTE</span>
             </div>
             ${premiosHTML}
+          </div>
+          <div class="qplus-estimado">
+            <span class="qplus-estimado-label">PRÓXIMO POZO ESTIMADO</span>
+            <span class="qplus-estimado-monto">${formatoPesos(pozoEstimado)}</span>
           </div>
         </div>
       `;
@@ -959,9 +977,8 @@ function dibujarQuinielaPlus() {
         <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
         <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
         <div class="titulo-turno">
-          <div class="linea-titulo">
-            <span>QUINIELA</span>
-            <strong>PLUS</strong>
+          <div class="logo-plus-chip">
+            <img src="assets/logo-plus.png" alt="Quiniela Plus" onerror="this.replaceWith(document.createTextNode('QUINIELA PLUS'))">
           </div>
           <small>${subtitulo}</small>
         </div>

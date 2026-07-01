@@ -153,6 +153,21 @@ body {
   text-overflow: clip;
 }
 
+.logo-plus-chip {
+  background: #fff;
+  border-radius: 0.6cqh;
+  padding: 0.2cqh 0.7cqw;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 0.25cqh 0 rgba(0, 0, 0, 0.45), inset 0 0 0 0.12cqh rgba(0, 0, 0, 0.1);
+}
+
+.logo-plus-chip img {
+  height: clamp(1.9rem, 4.2cqw, 4.2rem);
+  object-fit: contain;
+  display: block;
+}
+
 .topbar-hora {
   font-size: clamp(1.4rem, 2.5cqw, 2.8rem);
   font-weight: 1000;
@@ -400,9 +415,9 @@ body {
 
 .columna-qplus h2 {
   margin: 0;
-  padding: 0.45cqh 0.15cqw;
+  padding: 0.55cqh 0.15cqw;
   text-align: center;
-  font-size: clamp(0.62rem, 1cqw, 0.95rem);
+  font-size: clamp(0.85rem, 1.5cqw, 1.5rem);
   font-weight: 1000;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.2)),
@@ -415,52 +430,88 @@ body {
   border-bottom: 0.2cqh solid rgba(255, 255, 255, 0.18);
 }
 
-.qplus-pozo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.3cqw;
-  padding: 0.3cqh 0.4cqw;
-  background: linear-gradient(180deg, #ffe600, #ffb700);
-  border-bottom: 0.18cqh solid rgba(0, 0, 0, 0.4);
-}
-
-.qplus-pozo-label {
-  font-size: clamp(0.5rem, 0.78cqw, 0.78rem);
+.qplus-numeros-label {
+  text-align: center;
+  padding: 0.35cqh 0.2cqw 0.1cqh;
+  font-size: clamp(0.5rem, 0.85cqw, 0.9rem);
   font-weight: 1000;
-  color: #1a1a1a;
-}
-
-.qplus-pozo-monto {
-  font-size: clamp(0.66rem, 1.05cqw, 1.05rem);
-  font-weight: 1000;
-  color: #1a1a1a;
-  white-space: nowrap;
+  letter-spacing: 0.05em;
+  color: #cfd8ff;
 }
 
 .qplus-numeros {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.15cqh 0.2cqw;
-  padding: 0.4cqh 0.3cqw;
+  gap: 0.35cqh 0.3cqw;
+  padding: 0.3cqh 0.4cqw 0.6cqh;
 }
 
 .qplus-num {
   text-align: center;
-  font-size: clamp(0.85rem, 1.55cqw, 1.55rem);
+  font-size: clamp(1.35rem, 2.6cqw, 2.6rem);
   font-weight: 1000;
-  color: #fff200;
+  color: #fff;
   line-height: 1.1;
   text-shadow: 0.3cqh 0.3cqh 0 #000, 0 0 0.6cqh rgba(0, 0, 0, 0.9);
+}
+
+.qplus-pozo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15cqh;
+  padding: 0.5cqh 0.4cqw;
+  background: linear-gradient(180deg, #ffe600, #ffb700);
+  border-top: 0.18cqh solid rgba(0, 0, 0, 0.4);
+  border-bottom: 0.18cqh solid rgba(0, 0, 0, 0.4);
+}
+
+.qplus-pozo-label {
+  font-size: clamp(0.6rem, 0.95cqw, 1rem);
+  font-weight: 1000;
+  color: #1a1a1a;
+}
+
+.qplus-pozo-monto {
+  font-size: clamp(1.15rem, 2.1cqw, 2.2rem);
+  font-weight: 1000;
+  color: #1a1a1a;
+  white-space: nowrap;
 }
 
 .qplus-premios {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  border-top: 0.18cqh solid rgba(255, 255, 255, 0.25);
   display: flex;
   flex-direction: column;
+}
+
+.qplus-estimado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3cqw;
+  padding: 0.4cqh 0.5cqw;
+  background: linear-gradient(180deg, rgba(0, 200, 90, 0.32), rgba(0, 120, 55, 0.42));
+  border-top: 0.2cqh solid rgba(255, 255, 255, 0.3);
+}
+
+.qplus-estimado-label {
+  font-size: clamp(0.48rem, 0.72cqw, 0.78rem);
+  font-weight: 1000;
+  color: #fff;
+  text-shadow: 0.14cqh 0.14cqh 0 #000;
+  line-height: 1.1;
+}
+
+.qplus-estimado-monto {
+  font-size: clamp(0.8rem, 1.3cqw, 1.35rem);
+  font-weight: 1000;
+  color: #7cff9e;
+  text-shadow: 0.18cqh 0.18cqh 0 #000, 0 0 0.5cqh rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
 }
 
 .qplus-premio-fila {
