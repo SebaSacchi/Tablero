@@ -937,16 +937,20 @@ function dibujarQuinielaPlus() {
 
       const numerosHTML = d.numeros.map(n => `<div class="qplus-num">${n}</div>`).join("");
 
-      const premiosHTML = d.premios.map(p => `
-        <div class="qplus-premio-fila">
-          <span class="qplus-premio-nivel">${p.nivel}</span>
-          <span class="qplus-premio-ganadores">${p.ganadores}</span>
-          <span class="qplus-premio-importe">${p.importe}</span>
-        </div>
-      `).join("");
-
       const pozoEstimado = calcularPozoEstimado(juego, d.pozo, d.premios);
       pozoEstimadoTotal += pozoEstimado;
+
+      const premiosHTML = d.premios.map((p, i) => {
+        const esVacante = /vacante/i.test(p.ganadores || "");
+        const importe = (i === 0 && esVacante) ? formatoPesos(pozoEstimado) : p.importe;
+        return `
+          <div class="qplus-premio-fila">
+            <span class="qplus-premio-nivel">${p.nivel}</span>
+            <span class="qplus-premio-ganadores">${p.ganadores}</span>
+            <span class="qplus-premio-importe">${importe}</span>
+          </div>
+        `;
+      }).join("");
 
       return `
         <div class="columna-qplus">
@@ -958,7 +962,7 @@ function dibujarQuinielaPlus() {
             </div>
             <div class="qplus-premios">
               <div class="qplus-premio-fila qplus-premio-header">
-                <span>ACIERTOS</span><span>GANADORES</span><span>IMPORTE</span>
+                <span class="qplus-premio-nivel">ACIERTOS</span><span class="qplus-premio-ganadores">GANADORES</span><span class="qplus-premio-importe">IMPORTE</span>
               </div>
               ${premiosHTML}
             </div>
@@ -973,7 +977,10 @@ function dibujarQuinielaPlus() {
           <img src="assets/logo-plus.png" alt="Quiniela Plus">
         </div>
         <div class="qplus-banner-info">
-          <div class="qplus-banner-sorteo">PRÓXIMO SORTEO: <strong>${proximoSorteoTexto}</strong></div>
+          <div class="qplus-banner-sorteo">
+            <span class="qplus-banner-sorteo-etiqueta">PRÓXIMO SORTEO</span>
+            <span class="qplus-banner-sorteo-valor">${proximoSorteoTexto}</span>
+          </div>
           <div class="qplus-banner-pozo">
             <span class="qplus-banner-etiqueta">POZO ESTIMADO</span>
             <span class="qplus-banner-monto">${formatoPesos(pozoEstimadoTotal)}</span>
