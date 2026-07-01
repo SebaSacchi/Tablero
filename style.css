@@ -597,15 +597,15 @@ body {
   flex: 1;
   min-width: 0;
   display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.5cqw 0.8cqw;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3cqh;
 }
 
 .qplus-banner-sorteo-etiqueta {
   color: #1a1a1a;
   font-weight: 700;
-  font-size: clamp(0.9rem, 1.6cqw, 1.85rem);
+  font-size: clamp(1rem, 1.75cqw, 2rem);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -614,7 +614,7 @@ body {
 .qplus-banner-sorteo-valor {
   color: #000;
   font-weight: 900;
-  font-size: clamp(1.15rem, 2.15cqw, 2.45rem);
+  font-size: clamp(1.5rem, 2.7cqw, 3.1rem);
   letter-spacing: 0.03em;
   white-space: nowrap;
 }
