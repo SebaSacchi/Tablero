@@ -403,20 +403,27 @@ body {
 
 .qplus-numeros {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(10, auto);
-  grid-auto-flow: column;
-  gap: 0.55cqh 0.4cqw;
-  padding: 0.3cqh 0.8cqw 0.6cqh;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 1.4cqh 0.35cqw;
+  padding: 1cqh 0.4cqw 1.4cqh;
 }
 
 .qplus-num {
   text-align: center;
-  font-size: clamp(1.55rem, 3.1cqw, 3.1rem);
+  font-size: clamp(0.68rem, 1.35cqw, 1.4rem);
   font-weight: 1000;
   color: #fff;
   line-height: 1.1;
-  text-shadow: 0.3cqh 0.3cqh 0 #000, 0 0 0.6cqh rgba(0, 0, 0, 0.9);
+}
+
+.qplus-chip {
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.55);
+  border: 0.1cqh solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.4cqh;
+  padding: 0.5cqh 0.1cqw;
+  min-width: 2.1em;
+  box-shadow: 0 0.15cqh 0 rgba(0, 0, 0, 0.45);
 }
 
 .qplus-pozo {

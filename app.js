@@ -935,13 +935,13 @@ function dibujarQuinielaPlus() {
         `;
       }
 
-      const numerosHTML = d.numeros.map(n => `<div class="qplus-num">${n}</div>`).join("");
+      const numerosHTML = d.numeros.map(n => `<div class="qplus-num"><span class="qplus-chip">${n}</span></div>`).join("");
 
       const premiosHTML = d.premios.map(p => `
         <div class="qplus-premio-fila">
           <span class="qplus-premio-nivel">${p.nivel}</span>
-          <span class="qplus-premio-ganadores">${p.ganadores}</span>
-          <span class="qplus-premio-importe">${p.importe}</span>
+          <span class="qplus-premio-ganadores"><span class="qplus-chip">${p.ganadores}</span></span>
+          <span class="qplus-premio-importe"><span class="qplus-chip">${p.importe}</span></span>
         </div>
       `).join("");
 
