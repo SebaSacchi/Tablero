@@ -711,6 +711,34 @@ body {
   gap: 1cqw;
 }
 
+.simple-header-titulos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2cqh;
+}
+
+.boton-descarga {
+  appearance: none;
+  border: none;
+  border-radius: 999px;
+  padding: 0.65cqh 1.15cqw;
+  background: #ffe600;
+  color: #05163e;
+  font-size: clamp(0.9rem, 1.35cqw, 1.15rem);
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 0.45cqh 0.7cqh rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+}
+
+.boton-descarga:hover {
+  transform: translateY(-1px);
+}
+
+.boton-descarga-topbar {
+  padding: 0.55cqh 0.95cqw;
+}
+
 .simple-header h1 {
   margin: 0;
   font-size: clamp(1.5rem, 3cqw, 3rem);
