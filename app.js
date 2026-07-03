@@ -1133,12 +1133,7 @@ async function renderHistorial({ mostrarCarga = true } = {}) {
   if (mostrarCarga) {
     app.innerHTML = `
       <main class="pantalla-simple pantalla-historial">
-        <header class="simple-header historial-header">
-          <div class="simple-header-titulos">
-            <h1>ÚLTIMAS CABEZAS</h1>
-            <h1>${fechaTexto()}</h1>
-          </div>
-        </header>
+        <header class="simple-header historial-header"></header>
         <section class="simple-body">
           <div class="historial-cargando">CARGANDO HISTORIAL</div>
         </section>
@@ -1180,12 +1175,7 @@ async function renderHistorial({ mostrarCarga = true } = {}) {
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-historial">
-      <header class="simple-header historial-header">
-        <div class="simple-header-titulos">
-          <h1>ÚLTIMAS CABEZAS</h1>
-          <h1>${fechaTexto()}</h1>
-        </div>
-      </header>
+      <header class="simple-header historial-header"></header>
       <section class="simple-body">
         <div class="historial-cabezas">${encabezado}${filas}</div>
       </section>

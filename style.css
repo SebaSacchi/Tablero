@@ -967,10 +967,11 @@ body {
 
 .historial-header {
   border-bottom: 0;
-}
-
-.historial-header h1 {
-  font-size: clamp(1.25rem, 2.55cqw, 2.55rem);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  height: 0.4cqh;
+  min-height: 0.4cqh;
 }
 
 .historial-cabezas {
