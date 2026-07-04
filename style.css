@@ -1398,3 +1398,64 @@ body {
   color: #fff200;
   letter-spacing: 3px;
 }
+
+.captura-qplus-pantalla {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 1920px;
+  aspect-ratio: 16 / 9;
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75cqh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #fff;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.18), transparent 22%),
+    radial-gradient(circle at 78% 75%, rgba(0, 0, 0, 0.32), transparent 30%),
+    linear-gradient(145deg, #04102e, #1640a8 46%, #0b2870);
+  background-size: 26px 26px, 26px 26px, auto, auto, auto;
+}
+
+.captura-qplus-header {
+  flex: 0 0 8.2cqh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35cqh;
+}
+
+.captura-qplus-titulo {
+  font-size: clamp(2rem, 4.2cqw, 4.4rem);
+  font-weight: 1000;
+  letter-spacing: 2px;
+  text-shadow: 3px 3px 0 #000, 0 0 8px rgba(0, 0, 0, 0.85);
+}
+
+.captura-qplus-titulo strong {
+  color: #fff200;
+  margin-left: 18px;
+}
+
+.captura-qplus-subtitulo {
+  font-size: clamp(1.1rem, 1.9cqw, 2.1rem);
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.captura-qplus-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  padding-top: 0.75cqh;
+}
+
+.captura-qplus-body .tabla-qplus {
+  width: 58.7cqw;
+}

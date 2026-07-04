@@ -906,8 +906,7 @@ async function renderTurno(turno) {
   }
 }
 
-function dibujarQuinielaPlus() {
-  const datos = resultadosPlusCache;
+function construirVistaQuinielaPlus(datos) {
   const juegosOrden = ["PLUS", "SUPER", "CHANCE"];
 
   let subtitulo = "SIN SORTEOS CARGADOS";
@@ -1004,6 +1003,12 @@ function dibujarQuinielaPlus() {
       </div>
     `;
   }
+
+  return { subtitulo, bannerHTML, columnas };
+}
+
+function dibujarQuinielaPlus() {
+  const { subtitulo, bannerHTML, columnas } = construirVistaQuinielaPlus(resultadosPlusCache);
 
   app.innerHTML = `
     <main class="pantalla estado-finalizado">
@@ -1444,7 +1449,10 @@ document.addEventListener("keydown", (e) => {
     if (tecla === "ArrowDown" || e.keyCode === 20) cambiarPublicidad(1);
   }
 
-  if (tecla === "c" || tecla === "C") capturarTurno();
+  if (tecla === "c" || tecla === "C") {
+    if (pantallaActual === "QUINIELA_PLUS") capturarQuinielaPlus();
+    else capturarTurno();
+  }
 });
 
 renderTurno(pantallaPorHora());
@@ -1539,6 +1547,46 @@ async function capturarTurno(turno) {
     const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
     const link = document.createElement("a");
     link.download = `${turno}_${fechaTxt.replace(/\//g, "-")}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    console.error("Error al capturar:", err);
+    alert("Error al generar la captura");
+  } finally {
+    document.body.removeChild(contenedor);
+  }
+}
+
+async function capturarQuinielaPlus() {
+  const datos = resultadosPlusCache;
+  if (!datos || !datos.juegos) {
+    alert("No hay datos de Quiniela Plus para capturar");
+    return;
+  }
+
+  const { subtitulo, bannerHTML, columnas } = construirVistaQuinielaPlus(datos);
+  const fechaArchivo = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR").replace(/\//g, "-");
+
+  const contenedor = document.createElement("div");
+  contenedor.className = "captura-qplus-pantalla";
+  contenedor.innerHTML = `
+    <header class="captura-qplus-header">
+      <div class="captura-qplus-titulo"><span>QUINIELA</span><strong>PLUS</strong></div>
+      <div class="captura-qplus-subtitulo">${subtitulo}</div>
+    </header>
+    <div class="captura-qplus-body">
+      <div class="tabla-qplus">
+        ${bannerHTML}
+        ${columnas}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(contenedor);
+
+  try {
+    const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
+    const link = document.createElement("a");
+    link.download = `QUINIELA_PLUS_${fechaArchivo}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   } catch (err) {
