@@ -1467,3 +1467,19 @@ body {
   background: #ffffff;
   box-shadow: none;
 }
+
+.captura-qplus-body .qplus-banner-sorteo-etiqueta {
+  font-size: clamp(1.3rem, 2.3cqw, 2.6rem);
+}
+
+.captura-qplus-body .qplus-banner-sorteo-valor {
+  font-size: clamp(2rem, 3.6cqw, 4.2rem);
+}
+
+.captura-qplus-body .qplus-banner-logo img {
+  height: clamp(7.6rem, 14.5cqw, 16rem);
+}
+
+.captura-qplus-body .qplus-banner-promo {
+  height: clamp(6rem, 17cqh, 11.5rem);
+}
