@@ -1567,6 +1567,9 @@ async function capturarQuinielaPlus() {
   const { subtitulo, bannerHTML, columnas } = construirVistaQuinielaPlus(datos);
   const fechaArchivo = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR").replace(/\//g, "-");
 
+  const escala = document.createElement("div");
+  escala.className = "captura-qplus-escala";
+
   const contenedor = document.createElement("div");
   contenedor.className = "captura-qplus-pantalla";
   contenedor.innerHTML = `
@@ -1581,7 +1584,8 @@ async function capturarQuinielaPlus() {
       </div>
     </div>
   `;
-  document.body.appendChild(contenedor);
+  escala.appendChild(contenedor);
+  document.body.appendChild(escala);
 
   try {
     const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
@@ -1593,6 +1597,6 @@ async function capturarQuinielaPlus() {
     console.error("Error al capturar:", err);
     alert("Error al generar la captura");
   } finally {
-    document.body.removeChild(contenedor);
+    document.body.removeChild(escala);
   }
 }

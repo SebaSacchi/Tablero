@@ -1399,16 +1399,22 @@ body {
   letter-spacing: 3px;
 }
 
-.captura-qplus-pantalla {
+.captura-qplus-escala {
   position: fixed;
   left: -9999px;
   top: 0;
   width: 1920px;
   aspect-ratio: 16 / 9;
   container-type: size;
+}
+
+.captura-qplus-pantalla {
+  width: 62cqw;
   display: flex;
   flex-direction: column;
-  padding: 0.75cqh;
+  padding: 1.4cqh 1.4cqw 1.9cqh;
+  border-radius: 14px;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.55);
   font-family: Arial, Helvetica, sans-serif;
   color: #fff;
   background:
@@ -1421,16 +1427,16 @@ body {
 }
 
 .captura-qplus-header {
-  flex: 0 0 8.2cqh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.35cqh;
+  padding-bottom: 1.3cqh;
 }
 
 .captura-qplus-titulo {
-  font-size: clamp(2rem, 4.2cqw, 4.4rem);
+  font-size: clamp(2rem, 4.4cqw, 4.6rem);
   font-weight: 1000;
   letter-spacing: 2px;
   text-shadow: 3px 3px 0 #000, 0 0 8px rgba(0, 0, 0, 0.85);
@@ -1442,20 +1448,17 @@ body {
 }
 
 .captura-qplus-subtitulo {
-  font-size: clamp(1.1rem, 1.9cqw, 2.1rem);
+  font-size: clamp(1.1rem, 2cqw, 2.2rem);
   font-weight: 800;
   color: #fff;
   text-shadow: 2px 2px 0 #000;
 }
 
 .captura-qplus-body {
-  flex: 1;
-  min-height: 0;
   display: flex;
   justify-content: center;
-  padding-top: 0.75cqh;
 }
 
 .captura-qplus-body .tabla-qplus {
-  width: 58.7cqw;
+  width: 100%;
 }
