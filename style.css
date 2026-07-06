@@ -1462,3 +1462,8 @@ body {
 .captura-qplus-body .tabla-qplus {
   width: 100%;
 }
+
+.captura-qplus-body .qplus-num {
+  background: #ffffff;
+  box-shadow: none;
+}
