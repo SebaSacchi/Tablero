@@ -921,6 +921,9 @@ function construirVistaQuinielaPlus(datos) {
 
     const proximoSorteo = new Date(fechaDesdeISO(datos.fecha));
     proximoSorteo.setDate(proximoSorteo.getDate() + 1);
+    while (proximoSorteo.getDay() === 0) {
+      proximoSorteo.setDate(proximoSorteo.getDate() + 1);
+    }
     const proximoSorteoTexto = proximoSorteo.toLocaleDateString("es-AR", {
       weekday: "long", day: "2-digit", month: "2-digit"
     }).toUpperCase();
