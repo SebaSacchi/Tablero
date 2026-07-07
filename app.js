@@ -1206,15 +1206,39 @@ function renderAleatorio() {
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-tragamonedas">
-      <header class="simple-header">
-        <h1>${fechaTexto()}</h1>
+      <header class="simple-header tragamonedas-header">
+        <div class="tragamonedas-titulos">
+          <h1 class="tragamonedas-titulo">TOCÁ Y PROBÁ TU SUERTE</h1>
+          <p class="tragamonedas-subtitulo">Generador aleatorio de 4 cifras</p>
+        </div>
+        <div class="tragamonedas-fecha">${fechaTexto()}</div>
       </header>
       <section class="simple-body">
-        <div class="tragamonedas">${reel.repeat(4)}</div>
+        <div class="tragamonedas-marco">
+          <span class="tragamonedas-chispa tragamonedas-chispa-1"></span>
+          <span class="tragamonedas-chispa tragamonedas-chispa-2"></span>
+          <div class="tragamonedas">${reel.repeat(4)}</div>
+          <span class="tragamonedas-etiqueta">4 CIFRAS</span>
+        </div>
+        <button type="button" class="tragamonedas-boton" id="btn-tirar-numero">TIRAR NÚMERO</button>
+        <p class="tragamonedas-ayuda">Elegí tu número y jugalo en nuestra agencia</p>
       </section>
     </main>
   `;
 
+  const boton = document.getElementById("btn-tirar-numero");
+  if (boton) boton.addEventListener("click", tirarTragamonedas);
+
+  iniciarGiroTragamonedas();
+}
+
+function tirarTragamonedas() {
+  const boton = document.getElementById("btn-tirar-numero");
+  if (boton) {
+    if (boton.disabled) return;
+    boton.disabled = true;
+    setTimeout(() => { boton.disabled = false; }, 2000);
+  }
   iniciarGiroTragamonedas();
 }
 
@@ -1237,7 +1261,7 @@ function iniciarGiroTragamonedas() {
     tira.style.transform = "translateY(0px)";
     void tira.offsetHeight;
 
-    const duracion = (1.3 + i * 0.4).toFixed(2);
+    const duracion = (0.9 + i * 0.3).toFixed(2);
     requestAnimationFrame(() => {
       tira.style.transition = `transform ${duracion}s cubic-bezier(0.12, 0.85, 0.25, 1)`;
       tira.style.transform = `translateY(-${(secuencia.length - 1) * alturaReel}px)`;

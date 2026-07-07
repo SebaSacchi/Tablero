@@ -1111,34 +1111,141 @@ body {
 }
 
 .pantalla-tragamonedas {
-  grid-template-rows: 8cqh minmax(0, 1fr);
+  grid-template-rows: 14cqh minmax(0, 1fr);
 }
 
-.pantalla-tragamonedas .simple-header {
-  justify-content: flex-end;
+.pantalla-tragamonedas .simple-header.tragamonedas-header {
+  align-items: flex-start;
+  justify-content: space-between;
   border-bottom: none;
 }
 
+.tragamonedas-titulos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35cqh;
+  min-width: 0;
+}
+
+.tragamonedas-titulo {
+  margin: 0;
+  font-size: clamp(1.4rem, 3.5cqw, 3.1rem);
+  font-weight: 1000;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0.06em 0.06em 0 #000, 0 0 0.5em rgba(255, 214, 0, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.tragamonedas-subtitulo {
+  margin: 0;
+  font-size: clamp(0.75rem, 1.4cqw, 1.3rem);
+  font-weight: 700;
+  color: #ffe066;
+  letter-spacing: 0.02em;
+  text-shadow: 0.06em 0.06em 0 rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.tragamonedas-fecha {
+  flex: 0 0 auto;
+  padding-top: 0.4cqh;
+  font-size: clamp(0.6rem, 1cqw, 1rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+.pantalla-tragamonedas .simple-body {
+  gap: 2.4cqh;
+}
+
+.tragamonedas-marco {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.3cqh;
+}
+
+.tragamonedas-marco::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  background: radial-gradient(circle, rgba(255, 214, 0, 0.35), transparent 70%);
+  filter: blur(1.4cqh);
+  z-index: 0;
+  animation: tragamonedas-pulso 2.6s ease-in-out infinite;
+}
+
+@keyframes tragamonedas-pulso {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.tragamonedas-chispa {
+  position: absolute;
+  width: clamp(0.9rem, 1.9cqw, 1.7rem);
+  height: clamp(0.9rem, 1.9cqw, 1.7rem);
+  background: radial-gradient(circle, #fff, #ffe066 55%, transparent 75%);
+  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+  filter: drop-shadow(0 0 0.4em rgba(255, 214, 0, 0.9));
+  z-index: 1;
+  animation: tragamonedas-destello 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.tragamonedas-chispa-1 { top: -2%; left: 2%; animation-delay: 0.2s; }
+.tragamonedas-chispa-2 { bottom: 8%; right: 1%; animation-delay: 0.9s; }
+
+@keyframes tragamonedas-destello {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
 .tragamonedas {
+  position: relative;
+  z-index: 1;
   display: flex;
   gap: 1.6cqw;
   padding: 2.4cqh 2.8cqw;
   background: linear-gradient(160deg, #1c2230, #090b11 70%);
   border-radius: 1.4cqh;
-  border: 0.32cqh solid #4a5468;
+  border: 0.26cqh solid #ffd700;
   box-shadow:
-    0 1.2cqh 3cqh rgba(0, 0, 0, 0.65),
-    inset 0 0.25cqh 0.7cqh rgba(255, 255, 255, 0.08);
+    0 0 2.6cqh rgba(255, 214, 0, 0.55),
+    0 1.4cqh 3.2cqh rgba(0, 0, 0, 0.8),
+    inset 0 0.25cqh 0.7cqh rgba(255, 255, 255, 0.1);
+}
+
+.tragamonedas-etiqueta {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(0.6rem, 1cqw, 0.95rem);
+  font-weight: 1000;
+  letter-spacing: 0.2em;
+  color: #ffd700;
+  background: rgba(10, 13, 20, 0.85);
+  border: 0.12cqh solid rgba(255, 214, 0, 0.6);
+  padding: 0.4cqh 1.1cqw;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
 .reel {
   position: relative;
   width: clamp(5.6rem, 12cqw, 12.5rem);
-  height: clamp(8rem, 34cqh, 24rem);
+  height: clamp(8rem, 30cqh, 22rem);
   overflow: hidden;
   border-radius: 0.8cqh;
   background: linear-gradient(180deg, #04060a, #12161f 45%, #04060a);
-  box-shadow: inset 0 0.3cqh 1cqh rgba(0, 0, 0, 0.9);
+  box-shadow:
+    inset 0 0.3cqh 1cqh rgba(0, 0, 0, 0.9),
+    inset 0 0 1.6cqh rgba(255, 214, 0, 0.2);
 }
 
 .reel::before,
@@ -1172,11 +1279,59 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(3.6rem, 20cqh, 10.5rem);
+  font-size: clamp(3.6rem, 18cqh, 10rem);
   font-weight: 1000;
   font-variant-numeric: tabular-nums;
   color: #fff;
-  text-shadow: 0 0 0.5em rgba(255, 214, 0, 0.55), 0.06em 0.06em 0 #000;
+  text-shadow:
+    0 0 0.6em rgba(255, 214, 0, 0.85),
+    0 0 1.1em rgba(255, 180, 0, 0.5),
+    0.06em 0.06em 0 #000;
+}
+
+.tragamonedas-boton {
+  position: relative;
+  z-index: 1;
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  padding: 1.1cqh 3.4cqw;
+  border-radius: 999px;
+  font-size: clamp(1.05rem, 2.1cqw, 2rem);
+  font-weight: 1000;
+  letter-spacing: 0.04em;
+  color: #241a00;
+  background: linear-gradient(180deg, #fff2b0, #ffd700 45%, #e6a700);
+  box-shadow:
+    0 0.5cqh 0 #a67400,
+    0 0.9cqh 1.6cqh rgba(0, 0, 0, 0.5),
+    0 0 2cqh rgba(255, 214, 0, 0.6);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+.tragamonedas-boton:hover {
+  transform: translateY(-0.15cqh);
+}
+
+.tragamonedas-boton:active {
+  transform: translateY(0.3cqh);
+  box-shadow:
+    0 0.2cqh 0 #a67400,
+    0 0.4cqh 1cqh rgba(0, 0, 0, 0.5);
+}
+
+.tragamonedas-boton:disabled {
+  opacity: 0.65;
+  cursor: default;
+  transform: none;
+}
+
+.tragamonedas-ayuda {
+  margin: 0;
+  font-size: clamp(0.6rem, 1.05cqw, 1.05rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  text-align: center;
 }
 
 .quini-bolas {
