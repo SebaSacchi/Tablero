@@ -1203,9 +1203,8 @@ function renderAleatorio() {
   limpiarLatInterval();
 
   const reel = `<div class="reel"><div class="tira"><div class="digito">0</div></div></div>`;
-  const monedas = [1, 2, 3, 4, 5, 6]
-    .map(n => `<span class="tragamonedas-moneda tragamonedas-moneda-${n}"></span>`)
-    .join("");
+  const separador = `<span class="tragamonedas-separador"></span>`;
+  const reels = [reel, separador, reel, separador, reel, separador, reel].join("");
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-tragamonedas">
@@ -1214,22 +1213,30 @@ function renderAleatorio() {
           <h1 class="tragamonedas-titulo">TOCÁ Y PROBÁ TU SUERTE</h1>
           <p class="tragamonedas-subtitulo">Generador aleatorio de 4 cifras</p>
         </div>
-        <div class="tragamonedas-datos">
-          <div class="tragamonedas-fecha">${fechaTexto()}</div>
-          <div class="tragamonedas-marca"><img src="assets/logo-izq.png" alt="Agencia" onerror="this.style.display='none'"></div>
+        <div class="tragamonedas-marca-card">
+          <img class="tragamonedas-marca-logo" src="assets/logo-izq.png" alt="Agencia" onerror="this.remove()">
+          <span class="tragamonedas-marca-fecha">${fechaTexto()}</span>
         </div>
       </header>
       <section class="simple-body">
-        ${monedas}
         <div class="tragamonedas-marco">
           <span class="tragamonedas-chispa tragamonedas-chispa-1"></span>
           <span class="tragamonedas-chispa tragamonedas-chispa-2"></span>
-          <div class="tragamonedas">${reel.repeat(4)}</div>
+          <span class="tragamonedas-chispa tragamonedas-chispa-3"></span>
+          <div class="tragamonedas" id="tragamonedas-panel">${reels}</div>
           <span class="tragamonedas-etiqueta">★ 4 CIFRAS ★</span>
         </div>
-        <button type="button" class="tragamonedas-boton" id="btn-tirar-numero">TIRAR NÚMERO</button>
-        <p class="tragamonedas-ayuda">Elegí tu número y jugalo en nuestra agencia</p>
+        <button type="button" class="tragamonedas-boton" id="btn-tirar-numero">
+          <svg class="tragamonedas-boton-icono" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true">
+            <circle cx="9" cy="15" r="3" fill="currentColor"></circle>
+            <path d="M14 8c1.5 1.5 1.5 6.5 0 8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
+            <path d="M17.3 5c3 3 3 11 0 14" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
+          </svg>
+          TIRAR NÚMERO
+        </button>
+        <p class="tragamonedas-ayuda">Probá tu suerte y jugalo en El Grillo</p>
       </section>
+      <span class="tragamonedas-legal">Jugá responsablemente</span>
     </main>
   `;
 
@@ -1244,14 +1251,16 @@ function tirarTragamonedas() {
   if (boton) {
     if (boton.disabled) return;
     boton.disabled = true;
-    setTimeout(() => { boton.disabled = false; }, 2000);
+    setTimeout(() => { boton.disabled = false; }, 2100);
   }
   iniciarGiroTragamonedas();
 }
 
 function iniciarGiroTragamonedas() {
   const numero = numero4();
+  const panel = document.getElementById("tragamonedas-panel");
   const reels = document.querySelectorAll(".pantalla-tragamonedas .reel");
+  let maxDuracion = 0;
 
   reels.forEach((reel, i) => {
     const tira = reel.querySelector(".tira");
@@ -1266,14 +1275,29 @@ function iniciarGiroTragamonedas() {
     tira.innerHTML = secuencia.map(d => `<div class="digito" style="height:${alturaReel}px">${d}</div>`).join("");
     tira.style.transition = "none";
     tira.style.transform = "translateY(0px)";
+    tira.style.filter = "blur(0px)";
     void tira.offsetHeight;
 
-    const duracion = (0.9 + i * 0.3).toFixed(2);
+    const duracion = 1 + i * 0.32;
+    maxDuracion = Math.max(maxDuracion, duracion);
+
+    tira.style.filter = "blur(3px)";
+    void tira.offsetHeight;
+
     requestAnimationFrame(() => {
-      tira.style.transition = `transform ${duracion}s cubic-bezier(0.12, 0.85, 0.25, 1)`;
+      tira.style.transition = `transform ${duracion}s cubic-bezier(0.12, 0.85, 0.25, 1), filter ${duracion}s cubic-bezier(0.7, 0, 0.84, 0)`;
       tira.style.transform = `translateY(-${(secuencia.length - 1) * alturaReel}px)`;
+      tira.style.filter = "blur(0px)";
     });
   });
+
+  if (panel) {
+    clearTimeout(panel._tOn);
+    clearTimeout(panel._tOff);
+    panel.classList.remove("tragamonedas--resultado");
+    panel._tOn = setTimeout(() => panel.classList.add("tragamonedas--resultado"), maxDuracion * 1000);
+    panel._tOff = setTimeout(() => panel.classList.remove("tragamonedas--resultado"), maxDuracion * 1000 + 1000);
+  }
 }
 
 function randomQuini() {
