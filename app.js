@@ -1219,9 +1219,6 @@ function renderAleatorio() {
       </header>
       <section class="simple-body">
         <div class="tragamonedas-marco">
-          <span class="tragamonedas-chispa tragamonedas-chispa-1"></span>
-          <span class="tragamonedas-chispa tragamonedas-chispa-2"></span>
-          <span class="tragamonedas-chispa tragamonedas-chispa-3"></span>
           <div class="tragamonedas" id="tragamonedas-panel">${reels}</div>
           <span class="tragamonedas-etiqueta">★ 4 CIFRAS ★</span>
         </div>
@@ -1264,7 +1261,7 @@ function iniciarGiroTragamonedas() {
   reels.forEach((reel, i) => {
     const tira = reel.querySelector(".tira");
     const alturaReel = reel.clientHeight;
-    const vueltas = 3 + i;
+    const vueltas = 2 + i;
     const secuencia = [];
     for (let v = 0; v < vueltas; v++) {
       for (let d = 0; d <= 9; d++) secuencia.push(d);
@@ -1274,19 +1271,14 @@ function iniciarGiroTragamonedas() {
     tira.innerHTML = secuencia.map(d => `<div class="digito" style="height:${alturaReel}px">${d}</div>`).join("");
     tira.style.transition = "none";
     tira.style.transform = "translateY(0px)";
-    tira.style.filter = "blur(0px)";
     void tira.offsetHeight;
 
-    const duracion = 1 + i * 0.32;
+    const duracion = 0.7 + i * 0.22;
     maxDuracion = Math.max(maxDuracion, duracion);
 
-    tira.style.filter = "blur(3px)";
-    void tira.offsetHeight;
-
     requestAnimationFrame(() => {
-      tira.style.transition = `transform ${duracion}s cubic-bezier(0.12, 0.85, 0.25, 1), filter ${duracion}s cubic-bezier(0.7, 0, 0.84, 0)`;
+      tira.style.transition = `transform ${duracion}s cubic-bezier(0.2, 0.7, 0.3, 1)`;
       tira.style.transform = `translateY(-${(secuencia.length - 1) * alturaReel}px)`;
-      tira.style.filter = "blur(0px)";
     });
   });
 
