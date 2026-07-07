@@ -1514,8 +1514,19 @@ function navegarPantalla(dir) {
   pantallasOrden[nuevo].fn();
 }
 
+let idleTimeoutId = null;
+
+function reiniciarIdleTimeout() {
+  clearTimeout(idleTimeoutId);
+  idleTimeoutId = setTimeout(() => {
+    renderTurno(pantallaPorHora());
+  }, 30000);
+}
+
 document.addEventListener("keydown", (e) => {
   const tecla = e.key || String.fromCharCode(e.keyCode);
+
+  reiniciarIdleTimeout();
 
   for (const p of pantallasOrden) {
     if (tecla === p.key) { p.fn(); return; }
