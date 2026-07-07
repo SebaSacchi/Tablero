@@ -1203,6 +1203,9 @@ function renderAleatorio() {
   limpiarLatInterval();
 
   const reel = `<div class="reel"><div class="tira"><div class="digito">0</div></div></div>`;
+  const monedas = [1, 2, 3, 4, 5, 6]
+    .map(n => `<span class="tragamonedas-moneda tragamonedas-moneda-${n}"></span>`)
+    .join("");
 
   app.innerHTML = `
     <main class="pantalla-simple pantalla-tragamonedas">
@@ -1211,14 +1214,18 @@ function renderAleatorio() {
           <h1 class="tragamonedas-titulo">TOCÁ Y PROBÁ TU SUERTE</h1>
           <p class="tragamonedas-subtitulo">Generador aleatorio de 4 cifras</p>
         </div>
-        <div class="tragamonedas-fecha">${fechaTexto()}</div>
+        <div class="tragamonedas-datos">
+          <div class="tragamonedas-fecha">${fechaTexto()}</div>
+          <div class="tragamonedas-marca"><img src="assets/logo-izq.png" alt="Agencia" onerror="this.style.display='none'"></div>
+        </div>
       </header>
       <section class="simple-body">
+        ${monedas}
         <div class="tragamonedas-marco">
           <span class="tragamonedas-chispa tragamonedas-chispa-1"></span>
           <span class="tragamonedas-chispa tragamonedas-chispa-2"></span>
           <div class="tragamonedas">${reel.repeat(4)}</div>
-          <span class="tragamonedas-etiqueta">4 CIFRAS</span>
+          <span class="tragamonedas-etiqueta">★ 4 CIFRAS ★</span>
         </div>
         <button type="button" class="tragamonedas-boton" id="btn-tirar-numero">TIRAR NÚMERO</button>
         <p class="tragamonedas-ayuda">Elegí tu número y jugalo en nuestra agencia</p>

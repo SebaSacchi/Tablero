@@ -1151,8 +1151,15 @@ body {
   text-overflow: clip;
 }
 
-.tragamonedas-fecha {
+.tragamonedas-datos {
   flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6cqh;
+}
+
+.tragamonedas-fecha {
   padding-top: 0.4cqh;
   font-size: clamp(0.6rem, 1cqw, 1rem);
   font-weight: 700;
@@ -1160,9 +1167,42 @@ body {
   white-space: nowrap;
 }
 
+.tragamonedas-marca img {
+  height: clamp(2rem, 6cqh, 4.4rem);
+  object-fit: contain;
+  filter: drop-shadow(0 0.2cqh 0.4cqh rgba(0, 0, 0, 0.55));
+}
+
 .pantalla-tragamonedas .simple-body {
+  position: relative;
   gap: 2.4cqh;
 }
+
+.tragamonedas-moneda {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff6cc, #ffd700 45%, #b8860b 85%);
+  box-shadow:
+    inset 0 0 0 0.12em rgba(255, 255, 255, 0.65),
+    inset 0 0 0 0.22em rgba(150, 100, 10, 0.65),
+    0 0.3em 0.5em rgba(0, 0, 0, 0.5);
+  opacity: 0.85;
+  z-index: 0;
+  pointer-events: none;
+  animation: tragamonedas-flotar 6s ease-in-out infinite;
+}
+
+@keyframes tragamonedas-flotar {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-1.6cqh) rotate(14deg); }
+}
+
+.tragamonedas-moneda-1 { top: 10%; left: 5%; width: clamp(1.3rem, 2.6cqw, 2.3rem); height: clamp(1.3rem, 2.6cqw, 2.3rem); animation-duration: 5.5s; }
+.tragamonedas-moneda-2 { top: 64%; left: 7%; width: clamp(1.7rem, 3.2cqw, 3rem); height: clamp(1.7rem, 3.2cqw, 3rem); animation-duration: 7s; animation-delay: 0.8s; }
+.tragamonedas-moneda-3 { top: 18%; right: 6%; width: clamp(1.4rem, 2.8cqw, 2.5rem); height: clamp(1.4rem, 2.8cqw, 2.5rem); animation-duration: 6.2s; animation-delay: 1.4s; }
+.tragamonedas-moneda-4 { top: 68%; right: 8%; width: clamp(1.2rem, 2.3cqw, 2.1rem); height: clamp(1.2rem, 2.3cqw, 2.1rem); animation-duration: 5s; animation-delay: 0.4s; }
+.tragamonedas-moneda-5 { top: 42%; left: 2%; width: clamp(1rem, 1.9cqw, 1.8rem); height: clamp(1rem, 1.9cqw, 1.8rem); animation-duration: 6.6s; animation-delay: 2s; }
+.tragamonedas-moneda-6 { top: 45%; right: 3%; width: clamp(1.1rem, 2.1cqw, 1.9rem); height: clamp(1.1rem, 2.1cqw, 1.9rem); animation-duration: 5.8s; animation-delay: 1.1s; }
 
 .tragamonedas-marco {
   position: relative;
@@ -1215,11 +1255,13 @@ body {
   padding: 2.4cqh 2.8cqw;
   background: linear-gradient(160deg, #1c2230, #090b11 70%);
   border-radius: 1.4cqh;
-  border: 0.26cqh solid #ffd700;
+  border: 0.3cqh solid #ffe066;
   box-shadow:
-    0 0 2.6cqh rgba(255, 214, 0, 0.55),
+    0 0 0 0.16cqh #8a6000,
+    0 0 2.8cqh rgba(255, 214, 0, 0.6),
     0 1.4cqh 3.2cqh rgba(0, 0, 0, 0.8),
-    inset 0 0.25cqh 0.7cqh rgba(255, 255, 255, 0.1);
+    inset 0 0.3cqh 0.8cqh rgba(255, 255, 255, 0.15),
+    inset 0 -0.35cqh 0.7cqh rgba(0, 0, 0, 0.45);
 }
 
 .tragamonedas-etiqueta {
@@ -1324,6 +1366,27 @@ body {
   opacity: 0.65;
   cursor: default;
   transform: none;
+}
+
+.tragamonedas-boton:disabled::after {
+  animation-play-state: paused;
+  opacity: 0;
+}
+
+.tragamonedas-boton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 0 rgba(255, 214, 0, 0.55);
+  animation: tragamonedas-tap 2.2s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes tragamonedas-tap {
+  0% { box-shadow: 0 0 0 0 rgba(255, 214, 0, 0.55); }
+  70% { box-shadow: 0 0 0 1.4cqh rgba(255, 214, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 214, 0, 0); }
 }
 
 .tragamonedas-ayuda {
