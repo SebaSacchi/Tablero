@@ -1202,19 +1202,47 @@ function renderAleatorio() {
   limpiarCierreInterval();
   limpiarLatInterval();
 
+  const reel = `<div class="reel"><div class="tira"><div class="digito">0</div></div></div>`;
+
   app.innerHTML = `
-    <main class="pantalla-simple">
+    <main class="pantalla-simple pantalla-tragamonedas">
       <header class="simple-header">
-        <h1>NÚMERO ALEATORIO</h1>
         <h1>${fechaTexto()}</h1>
       </header>
       <section class="simple-body">
-        <div class="numero-gigante">${numero4()}</div>
-        <h1 style="font-size:56px;text-shadow:4px 4px 0 #000;">LLAMADOR PARA JUGAR</h1>
+        <div class="tragamonedas">${reel.repeat(4)}</div>
       </section>
-      <footer class="footer">Presioná 8 para generar otro número</footer>
     </main>
   `;
+
+  iniciarGiroTragamonedas();
+}
+
+function iniciarGiroTragamonedas() {
+  const numero = numero4();
+  const reels = document.querySelectorAll(".pantalla-tragamonedas .reel");
+
+  reels.forEach((reel, i) => {
+    const tira = reel.querySelector(".tira");
+    const alturaReel = reel.clientHeight;
+    const vueltas = 3 + i;
+    const secuencia = [];
+    for (let v = 0; v < vueltas; v++) {
+      for (let d = 0; d <= 9; d++) secuencia.push(d);
+    }
+    secuencia.push(Number(numero[i]));
+
+    tira.innerHTML = secuencia.map(d => `<div class="digito" style="height:${alturaReel}px">${d}</div>`).join("");
+    tira.style.transition = "none";
+    tira.style.transform = "translateY(0px)";
+    void tira.offsetHeight;
+
+    const duracion = (1.3 + i * 0.4).toFixed(2);
+    requestAnimationFrame(() => {
+      tira.style.transition = `transform ${duracion}s cubic-bezier(0.12, 0.85, 0.25, 1)`;
+      tira.style.transform = `translateY(-${(secuencia.length - 1) * alturaReel}px)`;
+    });
+  });
 }
 
 function randomQuini() {
