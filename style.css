@@ -1474,6 +1474,8 @@ body {
 
 .captura-qplus-body .qplus-banner-sorteo-valor {
   font-size: clamp(2rem, 3.6cqw, 4.2rem);
+  white-space: normal;
+  line-height: 1.05;
 }
 
 .captura-qplus-body .qplus-banner-logo img {
