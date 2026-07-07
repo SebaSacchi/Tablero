@@ -1211,7 +1211,6 @@ function renderAleatorio() {
       <header class="simple-header tragamonedas-header">
         <div class="tragamonedas-titulos">
           <h1 class="tragamonedas-titulo">TOCÁ Y PROBÁ TU SUERTE</h1>
-          <p class="tragamonedas-subtitulo">Generador aleatorio de 4 cifras</p>
         </div>
         <div class="tragamonedas-marca-card">
           <img class="tragamonedas-marca-logo" src="assets/logo-izq.png" alt="Agencia" onerror="this.remove()">
