@@ -1491,20 +1491,19 @@ function pantallaPorHora() {
 }
 
 const pantallasOrden = [
-  { key: "1", fn: () => renderTurno("PREVIA") },
-  { key: "2", fn: () => renderTurno("PRIMERA") },
-  { key: "3", fn: () => renderTurno("MATUTINA") },
-  { key: "4", fn: () => renderTurno("VESPERTINA") },
-  { key: "5", fn: () => renderTurno("NOCTURNA") },
-  { key: "6", fn: () => renderCabezas() },
-  { key: "7", fn: () => pantallaActual === "HISTORIAL" ? renderQuinielaPlus() : renderHistorial() },
+  { key: "1", fn: () => pantallaActual === "PREVIA" ? renderTurno("PRIMERA") : renderTurno("PREVIA") },
+  { key: "2", fn: () => renderTurno("MATUTINA") },
+  { key: "3", fn: () => renderTurno("VESPERTINA") },
+  { key: "4", fn: () => renderTurno("NOCTURNA") },
+  { key: "5", fn: () => renderQuinielaPlus() },
+  { key: "6", fn: () => pantallaActual === "CABEZAS" ? renderHistorial() : renderCabezas() },
+  { key: "7", fn: () => renderPublicidad() },
   { key: "8", fn: () => renderAleatorio() },
-  { key: "9", fn: () => renderQuini() },
-  { key: "0", fn: () => renderPublicidad() }
+  { key: "9", fn: () => renderQuini() }
 ];
 
 function indicePantallaActual() {
-  const mapa = { PREVIA: 0, PRIMERA: 1, MATUTINA: 2, VESPERTINA: 3, NOCTURNA: 4, CABEZAS: 5, HISTORIAL: 6, QUINIELA_PLUS: 6, ALEATORIO: 7, QUINI: 8, PUBLICIDAD: 9 };
+  const mapa = { PREVIA: 0, PRIMERA: 0, MATUTINA: 1, VESPERTINA: 2, NOCTURNA: 3, QUINIELA_PLUS: 4, CABEZAS: 5, HISTORIAL: 5, PUBLICIDAD: 6, ALEATORIO: 7, QUINI: 8 };
   return mapa[pantallaActual] ?? 0;
 }
 
@@ -1531,6 +1530,8 @@ document.addEventListener("keydown", (e) => {
   for (const p of pantallasOrden) {
     if (tecla === p.key) { p.fn(); return; }
   }
+
+  if (tecla === "0") { renderPublicidad(); return; }
 
   if (tecla === "ArrowRight" || e.keyCode === 22 || e.keyCode === 166) navegarPantalla(1);
   if (tecla === "ArrowLeft" || e.keyCode === 21 || e.keyCode === 167) navegarPantalla(-1);
