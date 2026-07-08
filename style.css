@@ -1152,8 +1152,8 @@ body {
   gap: 0.9cqw;
   padding: 0.5cqh 1.1cqw;
   border-radius: 999px;
-  background: #1c0b08;
-  border: 0.09cqh solid #c9a227;
+  background: #0b2870;
+  border: 0.09cqh solid #ffd400;
   box-shadow: 0 0.3cqh 0.7cqh rgba(0, 0, 0, 0.5);
 }
 
@@ -1166,9 +1166,9 @@ body {
 .tragamonedas-marca-fecha {
   font-size: clamp(0.56rem, 0.92cqw, 0.9rem);
   font-weight: 700;
-  color: rgba(243, 234, 217, 0.75);
+  color: rgba(255, 255, 255, 0.8);
   white-space: nowrap;
-  border-left: 0.09cqh solid rgba(201, 162, 39, 0.5);
+  border-left: 0.09cqh solid rgba(255, 212, 0, 0.5);
   padding-left: 0.8cqw;
 }
 
@@ -1192,13 +1192,12 @@ body {
   align-items: center;
   gap: 0.6cqw;
   padding: 1.6cqh 1.8cqw;
-  background: linear-gradient(180deg, #d8ad3f, #9c7d1c);
+  background: #0b2870;
   border-radius: 1.2cqh;
-  border: 0.16cqh solid #6b4a1c;
+  border: 0.2cqh solid #ffd400;
   box-shadow:
     0 1.6cqh 2.6cqh rgba(0, 0, 0, 0.6),
-    inset 0 0.25cqh 0.5cqh rgba(255, 255, 255, 0.35),
-    inset 0 -0.3cqh 0.5cqh rgba(0, 0, 0, 0.3);
+    inset 0 0.25cqh 0.5cqh rgba(255, 255, 255, 0.12);
 }
 
 .tragamonedas--resultado::after {
@@ -1239,9 +1238,9 @@ body {
   font-size: clamp(0.62rem, 1.05cqw, 1rem);
   font-weight: 1000;
   letter-spacing: 0.2em;
-  color: #f0d78a;
-  background: #1c0b08;
-  border: 0.12cqh solid #c9a227;
+  color: #ffe600;
+  background: #0b2870;
+  border: 0.12cqh solid #ffd400;
   padding: 0.45cqh 1.2cqw;
   border-radius: 999px;
   white-space: nowrap;
@@ -1253,8 +1252,8 @@ body {
   height: clamp(10.5rem, 46cqh, 32rem);
   overflow: hidden;
   border-radius: 0.4cqh;
-  background: #f3ead9;
-  box-shadow: inset 0 0 0 0.12cqh rgba(0, 0, 0, 0.25);
+  background: #ffffff;
+  box-shadow: inset 0 0 0 0.12cqh rgba(0, 0, 0, 0.15);
 }
 
 .reel::before,
@@ -1291,7 +1290,7 @@ body {
   font-size: clamp(4.4rem, 25cqh, 14rem);
   font-weight: 1000;
   font-variant-numeric: tabular-nums;
-  color: #1a1408;
+  color: #111111;
   text-shadow: 0.025em 0.03em 0.04em rgba(0, 0, 0, 0.3);
 }
 
@@ -1309,10 +1308,10 @@ body {
   font-size: clamp(1.15rem, 2.4cqw, 2.3rem);
   font-weight: 1000;
   letter-spacing: 0.04em;
-  color: #2a1210;
-  background: linear-gradient(180deg, #f0d78a, #c9a227 50%, #9c7d1c);
+  color: #1a1408;
+  background: linear-gradient(180deg, #fff5b0, #ffe600 50%, #e6ac00);
   box-shadow:
-    0 0.5cqh 0 #6b4a1c,
+    0 0.5cqh 0 #a67a00,
     0 0.9cqh 1.4cqh rgba(0, 0, 0, 0.5);
   transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
 }
@@ -1329,7 +1328,7 @@ body {
 .tragamonedas-boton:active {
   transform: translateY(0.3cqh);
   box-shadow:
-    0 0.15cqh 0 #6b4a1c,
+    0 0.15cqh 0 #a67a00,
     0 0.3cqh 0.8cqh rgba(0, 0, 0, 0.5);
 }
 
@@ -1349,7 +1348,7 @@ body {
   position: absolute;
   inset: -0.3cqh;
   border-radius: inherit;
-  border: 0.14cqh solid rgba(201, 162, 39, 0.7);
+  border: 0.14cqh solid rgba(255, 212, 0, 0.7);
   opacity: 0;
   animation: tragamonedas-tap 2.4s ease-out infinite;
   pointer-events: none;
