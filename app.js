@@ -110,6 +110,42 @@ let ultimasCabezasCacheTiempo = 0;
 let resultadosPlusCache = null;
 let resultadosPlusCacheTiempo = 0;
 
+let feriadosManual = new Set();
+let feriadosManualCacheTiempo = 0;
+
+function esFeriadoManual(fecha) {
+  return feriadosManual.has(fechaISO(fecha));
+}
+
+async function cargarFeriadosManual() {
+  if (!supabaseConfigurado()) return feriadosManual;
+  if (feriadosManualCacheTiempo > 0 && (Date.now() - feriadosManualCacheTiempo) < 60000) {
+    return feriadosManual;
+  }
+
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const params = new URLSearchParams({ select: "valor", clave: "eq.feriados" });
+
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/config_tablero?${params.toString()}`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (respuesta.ok) {
+      const filas = await respuesta.json();
+      const valor = filas[0]?.valor || "";
+      feriadosManual = new Set(valor.split(",").map(s => s.trim()).filter(Boolean));
+    }
+    feriadosManualCacheTiempo = Date.now();
+  } catch (error) {
+    console.warn("No se pudieron cargar los feriados manuales", error);
+  }
+
+  return feriadosManual;
+}
+
 const PUB_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg", "pub4.jpg", "pub5.jpg", "pub6.jpg", "pub7.jpg", "pub8.jpg"];
 const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg"];
 
@@ -337,7 +373,7 @@ function fechaAyer(fecha = new Date()) {
 
 function fechaAyerSinDomingo(fecha = new Date()) {
   let ayer = fechaAyer(fecha);
-  while (ayer.getDay() === 0) {
+  while (ayer.getDay() === 0 || esFeriadoManual(ayer)) {
     ayer = fechaAyer(ayer);
   }
   return ayer;
@@ -346,7 +382,7 @@ function fechaAyerSinDomingo(fecha = new Date()) {
 function ultimoDiaSorteo(fecha = new Date()) {
   const d = new Date(fecha);
   d.setDate(d.getDate() - 1);
-  while (d.getDay() === 0) {
+  while (d.getDay() === 0 || esFeriadoManual(d)) {
     d.setDate(d.getDate() - 1);
   }
   return d;
@@ -555,6 +591,15 @@ function estadoTurno(turno, fecha = new Date()) {
     };
   }
 
+  if (esFeriadoManual(fecha)) {
+    return {
+      clase: "estado-finalizado",
+      etiqueta: "FERIADO",
+      detalle: "SIN SORTEO · PRÓXIMO MAÑANA",
+      fechaResultados: ultimoDiaSorteo(fecha)
+    };
+  }
+
   const horario = horariosTurnos[turno];
   const minutos = fecha.getHours() * 60 + fecha.getMinutes();
   const inicio = horaAMinutos(horario.inicio);
@@ -669,10 +714,11 @@ async function cargarCabezasDelDiaSupabase(fecha = new Date()) {
 }
 
 async function cargarFechasHistorialSupabase() {
+  await cargarFeriadosManual();
   const hoy = new Date();
   const hoyTxt = fechaISO(hoy);
-  const esHoyDomingo = hoy.getDay() === 0;
-  const totalPrevias = esHoyDomingo ? 6 : 5;
+  const esHoyNoLaborable = hoy.getDay() === 0 || esFeriadoManual(hoy);
+  const totalPrevias = esHoyNoLaborable ? 6 : 5;
 
   if (!supabaseConfigurado()) {
     return fechasHistorialFallback(hoy);
@@ -701,7 +747,7 @@ async function cargarFechasHistorialSupabase() {
     const filas = await respuesta.json();
     const unicas = [...new Set((Array.isArray(filas) ? filas : []).map(f => f.fecha).filter(Boolean))];
     const anteriores = unicas
-      .filter(f => f < hoyTxt && fechaDesdeISO(f).getDay() !== 0)
+      .filter(f => f < hoyTxt && fechaDesdeISO(f).getDay() !== 0 && !esFeriadoManual(fechaDesdeISO(f)))
       .slice(0, totalPrevias)
       .reverse();
     const fechas = anteriores.map(fechaDesdeISO);
@@ -713,7 +759,7 @@ async function cargarFechasHistorialSupabase() {
       }
     }
 
-    if (!esHoyDomingo) {
+    if (!esHoyNoLaborable) {
       fechas.push(hoy);
     }
     return fechas;
@@ -724,8 +770,8 @@ async function cargarFechasHistorialSupabase() {
 }
 
 function fechasHistorialFallback(hoy = new Date()) {
-  const esHoyDomingo = hoy.getDay() === 0;
-  const totalPrevias = esHoyDomingo ? 6 : 5;
+  const esHoyNoLaborable = hoy.getDay() === 0 || esFeriadoManual(hoy);
+  const totalPrevias = esHoyNoLaborable ? 6 : 5;
   const fechas = [];
 
   let cursor = hoy;
@@ -734,7 +780,7 @@ function fechasHistorialFallback(hoy = new Date()) {
     fechas.unshift(cursor);
   }
 
-  if (!esHoyDomingo) {
+  if (!esHoyNoLaborable) {
     fechas.push(hoy);
   }
   return fechas;
@@ -863,7 +909,8 @@ async function cargarDatosPantalla(turno, estado) {
   const pedidos = [
     cargarResultadosSupabase(turno, estado.fechaResultados),
     cargarUltimasCabezasSupabase(),
-    cargarResultadosPlus()
+    cargarResultadosPlus(),
+    cargarFeriadosManual()
   ];
 
   await Promise.all(pedidos);
@@ -1639,7 +1686,8 @@ let turnoVivoAnterior = null;
 
 function detectarInicioTurno() {
   const ahora = new Date();
-  if (ahora.getDay() === 0) return;
+  cargarFeriadosManual();
+  if (ahora.getDay() === 0 || esFeriadoManual(ahora)) return;
   const minutos = ahora.getHours() * 60 + ahora.getMinutes();
 
   let turnoVivo = null;

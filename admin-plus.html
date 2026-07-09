@@ -169,6 +169,15 @@
     <div class="estado" id="estadoProximo"></div>
   </div>
 
+  <h2 class="seccion">FERIADOS SIN SORTEO (afecta todo el tablero)</h2>
+  <div class="card">
+    <label>Marcá acá los días sin sorteo por feriado. Ese día, todas las pantallas (1 a 5) van a seguir mostrando el último resultado real con la etiqueta "FERIADO", en vez de mostrar guiones vacíos, hasta que arranque el próximo sorteo real.</label>
+    <input type="date" id="nuevoFeriado">
+    <button type="button" class="btn-secundario" id="btn-agregar-feriado">AGREGAR FERIADO</button>
+    <div id="listaFeriados" style="margin-top:10px;"></div>
+    <div class="estado" id="estadoFeriados"></div>
+  </div>
+
   <h2 class="seccion">JUEGOS</h2>
   <div id="juegos"></div>
 
@@ -607,6 +616,104 @@
     });
 
     cargarProximoSorteoManual();
+
+    // --- Feriados sin sorteo ---
+
+    const CLAVE_FERIADOS = "feriados";
+    const inputNuevoFeriado = document.getElementById("nuevoFeriado");
+    const listaFeriados = document.getElementById("listaFeriados");
+    const estadoFeriados = document.getElementById("estadoFeriados");
+    let feriados = [];
+
+    function formatoFechaCorta(iso) {
+      const [y, m, d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    function pintarFeriados() {
+      if (feriados.length === 0) {
+        listaFeriados.innerHTML = '<div style="font-size:0.8rem;color:#999;">No hay feriados cargados.</div>';
+        return;
+      }
+      listaFeriados.innerHTML = feriados
+        .slice()
+        .sort()
+        .map(f => `
+          <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.06);border-radius:8px;padding:8px 10px;margin-bottom:6px;">
+            <span>${formatoFechaCorta(f)}</span>
+            <button type="button" class="btn-quitar" data-feriado="${f}">X</button>
+          </div>
+        `).join("");
+
+      listaFeriados.querySelectorAll("[data-feriado]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          feriados = feriados.filter(f => f !== btn.dataset.feriado);
+          await guardarFeriados();
+          pintarFeriados();
+        });
+      });
+    }
+
+    async function cargarFeriados() {
+      try {
+        const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+        const params = new URLSearchParams({ select: "valor", clave: `eq.${CLAVE_FERIADOS}` });
+        const res = await fetch(`${baseUrl}/rest/v1/config_tablero?${params.toString()}`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        if (!res.ok) return;
+        const filas = await res.json();
+        const valor = filas[0]?.valor || "";
+        feriados = valor.split(",").map(s => s.trim()).filter(Boolean);
+        pintarFeriados();
+      } catch (error) {
+        console.warn("No se pudieron cargar los feriados", error);
+      }
+    }
+
+    async function guardarFeriados() {
+      const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+      const res = await fetch(`${baseUrl}/rest/v1/config_tablero?on_conflict=clave`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "resolution=merge-duplicates,return=minimal"
+        },
+        body: JSON.stringify([{ clave: CLAVE_FERIADOS, valor: feriados.join(","), actualizado_en: new Date().toISOString() }])
+      });
+      if (!res.ok) throw new Error(await res.text());
+    }
+
+    document.getElementById("btn-agregar-feriado").addEventListener("click", async () => {
+      const valor = inputNuevoFeriado.value;
+      if (!valor) {
+        estadoFeriados.className = "estado err";
+        estadoFeriados.textContent = "Elegí una fecha primero.";
+        return;
+      }
+      if (feriados.includes(valor)) {
+        estadoFeriados.className = "estado err";
+        estadoFeriados.textContent = "Ese día ya está cargado.";
+        return;
+      }
+      estadoFeriados.className = "estado cargando";
+      estadoFeriados.textContent = "Guardando...";
+      try {
+        feriados.push(valor);
+        await guardarFeriados();
+        pintarFeriados();
+        inputNuevoFeriado.value = "";
+        estadoFeriados.className = "estado ok";
+        estadoFeriados.textContent = "Feriado agregado.";
+      } catch (error) {
+        estadoFeriados.className = "estado err";
+        estadoFeriados.textContent = "Error al guardar: " + error.message;
+      }
+    });
+
+    cargarFeriados();
   </script>
 </body>
 </html>
