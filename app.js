@@ -838,7 +838,7 @@ function construirResumenQuinielaPlus() {
     const primerPremio = d.premios[0];
     const esVacanteJuego = !!primerPremio && /vacante/i.test(primerPremio.ganadores || "");
     const pozoEstimado = calcularPozoEstimado(juego, d.pozo, d.premios);
-    const numerosHTML = d.numeros.map(n => `<span class="resumen-plus-num">${n}</span>`).join("");
+    const numerosTexto = d.numeros.join("-");
 
     return `
       <div class="resumen-plus-item">
@@ -846,7 +846,7 @@ function construirResumenQuinielaPlus() {
           <span class="resumen-plus-juego">${nombreJuegoPlus(juego)}</span>
           <span class="resumen-plus-pozo">${esVacanteJuego ? "VACANTE" : "POZO"} ${formatoPesos(pozoEstimado)}</span>
         </div>
-        <div class="resumen-plus-numeros">${numerosHTML}</div>
+        <div class="resumen-plus-numeros">${numerosTexto}</div>
       </div>
     `;
   }).join("");

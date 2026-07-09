@@ -290,22 +290,26 @@ body {
 }
 
 .pantalla-con-plus {
-  grid-template-rows: 8.2cqh minmax(0, 1fr) 9.5cqh;
+  grid-template-rows: 8.2cqh minmax(0, 1fr) 7cqh;
 }
 
 .resumen-plus {
-  display: grid;
-  grid-template-columns: auto repeat(3, 1fr);
-  gap: 0.45cqw;
+  display: flex;
+  align-items: stretch;
   margin-top: 0.5cqh;
   min-height: 0;
+  background: #000;
+  border: 0.09cqh solid rgba(255, 214, 0, 0.55);
+  border-radius: 0.5cqh;
+  overflow: hidden;
 }
 
 .resumen-plus-logo {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.2cqh 0.3cqw;
+  padding: 0.2cqh 0.6cqw;
 }
 
 .resumen-plus-logo img {
@@ -315,16 +319,15 @@ body {
 }
 
 .resumen-plus-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.3cqh;
   min-width: 0;
-  padding: 0.35cqh 0.8cqw;
-  background: #000;
-  border: 0.09cqh solid rgba(255, 214, 0, 0.55);
-  border-radius: 0.5cqh;
+  padding: 0.35cqh 0.4cqw;
+  border-left: 0.09cqh solid rgba(255, 214, 0, 0.4);
   overflow: hidden;
 }
 
@@ -355,10 +358,16 @@ body {
 }
 
 .resumen-plus-numeros {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.15cqh 0.55cqw;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: clamp(0.35rem, 0.62cqw, 0.66rem);
+  font-weight: 1000;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-shadow: 0.08cqh 0.08cqh 0 #000;
 }
 
 .resumen-plus-num {
