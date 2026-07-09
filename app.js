@@ -418,7 +418,7 @@ function getResultadosRealesTurno(turno, fecha) {
 function tieneResultadosReales(resultadoTurno) {
   if (!resultadoTurno) return false;
   return Object.values(resultadoTurno).some(
-    (numeros) => Array.isArray(numeros) && numeros.some((n) => n && n !== "----")
+    (numeros) => Array.isArray(numeros) && numeros[0] && numeros[0] !== "----"
   );
 }
 
