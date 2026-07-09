@@ -819,10 +819,39 @@ const lineas = b.cabezas.map(cabeza => `
 async function cargarDatosPantalla(turno, estado) {
   const pedidos = [
     cargarResultadosSupabase(turno, estado.fechaResultados),
-    cargarUltimasCabezasSupabase()
+    cargarUltimasCabezasSupabase(),
+    cargarResultadosPlus()
   ];
 
   await Promise.all(pedidos);
+}
+
+function construirResumenQuinielaPlus() {
+  const datos = resultadosPlusCache;
+  if (!datos || !datos.juegos) return "";
+
+  const juegosOrden = ["PLUS", "SUPER", "CHANCE"];
+  const items = juegosOrden.map(juego => {
+    const d = datos.juegos[juego];
+    if (!d) return "";
+
+    const primerPremio = d.premios[0];
+    const esVacanteJuego = !!primerPremio && /vacante/i.test(primerPremio.ganadores || "");
+    const pozoEstimado = calcularPozoEstimado(juego, d.pozo, d.premios);
+    const numerosHTML = d.numeros.map(n => `<span class="resumen-plus-num">${n}</span>`).join("");
+
+    return `
+      <div class="resumen-plus-item">
+        <div class="resumen-plus-cabecera">
+          <span class="resumen-plus-juego">${nombreJuegoPlus(juego)}</span>
+          <span class="resumen-plus-pozo">${esVacanteJuego ? "VACANTE" : "POZO"} ${formatoPesos(pozoEstimado)}</span>
+        </div>
+        <div class="resumen-plus-numeros">${numerosHTML}</div>
+      </div>
+    `;
+  }).join("");
+
+  return `<footer class="resumen-plus">${items}</footer>`;
 }
 
 function dibujarTurno(turno) {
@@ -851,8 +880,10 @@ function dibujarTurno(turno) {
     `;
   }).join("");
 
+  const resumenPlus = construirResumenQuinielaPlus();
+
   app.innerHTML = `
-    <main class="pantalla ${estado.clase}">
+    <main class="pantalla ${estado.clase}${resumenPlus ? " pantalla-con-plus" : ""}">
       <header class="topbar">
         <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
         <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
@@ -880,6 +911,8 @@ function dibujarTurno(turno) {
           ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
         </aside>
       </section>
+
+      ${resumenPlus}
     </main>
   `;
 }

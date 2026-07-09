@@ -289,6 +289,73 @@ body {
   min-height: 0;
 }
 
+.pantalla-con-plus {
+  grid-template-rows: 8.2cqh minmax(0, 1fr) 8.2cqh;
+}
+
+.resumen-plus {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45cqw;
+  margin-top: 0.5cqh;
+  min-height: 0;
+}
+
+.resumen-plus-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25cqh;
+  min-width: 0;
+  padding: 0.35cqh 0.8cqw;
+  background: #0a2049;
+  border: 0.09cqh solid rgba(255, 214, 0, 0.55);
+  border-radius: 0.5cqh;
+  overflow: hidden;
+}
+
+.resumen-plus-cabecera {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5cqw;
+}
+
+.resumen-plus-juego {
+  flex: 0 0 auto;
+  font-size: clamp(0.5rem, 0.95cqw, 0.95rem);
+  font-weight: 1000;
+  color: #ffe600;
+  white-space: nowrap;
+  text-shadow: 0.15cqh 0.15cqh 0 #000;
+}
+
+.resumen-plus-pozo {
+  flex: 1;
+  min-width: 0;
+  font-size: clamp(0.44rem, 0.78cqw, 0.78rem);
+  font-weight: 900;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-left: 0.09cqh solid rgba(255, 255, 255, 0.3);
+  padding-left: 0.5cqw;
+}
+
+.resumen-plus-numeros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1cqh 0.4cqw;
+  overflow: hidden;
+}
+
+.resumen-plus-num {
+  flex: 0 0 auto;
+  font-size: clamp(0.42rem, 0.72cqw, 0.72rem);
+  font-weight: 900;
+  color: #fff;
+}
+
 .columna-loteria {
   min-width: 0;
   background:
