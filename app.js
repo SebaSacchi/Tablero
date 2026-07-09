@@ -1317,7 +1317,8 @@ async function renderQuinielaPlus() {
 function construirVistaLotoPlus(datos) {
   let subtitulo = "SIN SORTEOS CARGADOS";
   let columnas = `<div class="qplus-sin-datos">SIN DATOS DE LOTO PLUS</div>`;
-  let bannerHTML = "";
+  let bannerSuperiorHTML = "";
+  let bannerInferiorHTML = "";
 
   if (datos && datos.subjuegos) {
     const fechaFmt = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR", {
@@ -1375,9 +1376,12 @@ function construirVistaLotoPlus(datos) {
       `;
     }).join("");
 
-    bannerHTML = `
+    bannerSuperiorHTML = `
       <div class="qplus-banner">
         <div class="qplus-banner-top">
+          <div class="qplus-banner-logo">
+            <img src="assets/logo-lotoplus.png" alt="Loto Plus" onerror="this.replaceWith(document.createTextNode('LOTO PLUS'))">
+          </div>
           <div class="loto-banner-plus">
             <span class="loto-banner-plus-etiqueta">NÚMERO PLUS</span>
             <span class="loto-banner-plus-valor">${datos.numeroPlus ?? "--"}</span>
@@ -1387,19 +1391,22 @@ function construirVistaLotoPlus(datos) {
             <span class="qplus-banner-sorteo-valor">${proximoSorteoTexto}</span>
           </div>
         </div>
-        <div class="qplus-banner-pozo loto-banner-pozo">
-          <span class="qplus-banner-etiqueta">POZO ESTIMADO</span>
-          <span class="qplus-banner-monto">${formatoPesos(datos.proximoPozo)}</span>
-        </div>
+      </div>
+    `;
+
+    bannerInferiorHTML = `
+      <div class="loto-banner-inferior">
+        <span class="loto-banner-inferior-etiqueta">POZO ESTIMADO</span>
+        <span class="loto-banner-inferior-monto">${formatoPesos(datos.proximoPozo)}</span>
       </div>
     `;
   }
 
-  return { subtitulo, bannerHTML, columnas };
+  return { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas };
 }
 
 function dibujarLotoPlus() {
-  const { subtitulo, bannerHTML, columnas } = construirVistaLotoPlus(resultadosLotoPlusCache);
+  const { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas } = construirVistaLotoPlus(resultadosLotoPlusCache);
 
   app.innerHTML = `
     <main class="pantalla estado-finalizado pantalla-loto-plus">
@@ -1423,8 +1430,9 @@ function dibujarLotoPlus() {
         </aside>
 
         <section class="tabla-loto">
-          ${bannerHTML}
+          ${bannerSuperiorHTML}
           <div class="columnas-loto">${columnas}</div>
+          ${bannerInferiorHTML}
         </section>
 
         <aside class="promo-lateral">
@@ -2099,7 +2107,7 @@ async function capturarLotoPlus() {
     return;
   }
 
-  const { subtitulo, bannerHTML, columnas } = construirVistaLotoPlus(datos);
+  const { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas } = construirVistaLotoPlus(datos);
   const fechaArchivo = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR").replace(/\//g, "-");
 
   const escala = document.createElement("div");
@@ -2114,8 +2122,9 @@ async function capturarLotoPlus() {
     </header>
     <div class="captura-loto-body">
       <div class="tabla-loto">
-        ${bannerHTML}
+        ${bannerSuperiorHTML}
         <div class="columnas-loto">${columnas}</div>
+        ${bannerInferiorHTML}
       </div>
     </div>
   `;

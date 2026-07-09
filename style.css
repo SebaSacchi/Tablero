@@ -862,16 +862,43 @@ body {
   line-height: 1;
 }
 
-.loto-banner-pozo .qplus-banner-etiqueta {
-  font-size: clamp(0.85rem, 1.5cqw, 1.7rem);
-  padding: 0.6cqh 1cqw;
-  white-space: normal;
-  line-height: 1.05;
+.loto-banner-inferior {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-width: 0;
+  margin-top: 0.3cqh;
+  border-radius: 0.6cqh;
+  overflow: hidden;
+  box-shadow: 0 0.3cqh 0.6cqh rgba(0, 0, 0, 0.4);
 }
 
-.loto-banner-pozo .qplus-banner-monto {
-  font-size: clamp(1.3rem, 2.5cqw, 2.9rem);
-  padding: 0.6cqh 1.2cqw;
+.loto-banner-inferior-etiqueta {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  background: linear-gradient(135deg, #b71c1c, #7a0e0e);
+  color: #fff;
+  font-weight: 1000;
+  font-size: clamp(1rem, 1.8cqw, 2.05rem);
+  padding: 0.6cqh 1.5cqw;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.loto-banner-inferior-monto {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  background: linear-gradient(135deg, #132a52, #0a1830);
+  color: #ffd23f;
+  font-weight: 1000;
+  font-size: clamp(1.9rem, 3.9cqw, 4.4rem);
+  padding: 0.6cqh 1.8cqw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .footer {
@@ -2024,12 +2051,24 @@ body {
 
 .captura-loto-body .qplus-banner-sorteo-etiqueta,
 .captura-loto-body .loto-banner-plus-etiqueta {
-  font-size: clamp(1.3rem, 2.3cqw, 2.6rem);
+  font-size: clamp(1rem, 1.7cqw, 1.9rem);
 }
 
 .captura-loto-body .qplus-banner-sorteo-valor,
 .captura-loto-body .loto-banner-plus-valor {
-  font-size: clamp(2rem, 3.6cqw, 4.2rem);
-  white-space: normal;
+  font-size: clamp(1.5rem, 2.6cqw, 3rem);
+  white-space: nowrap;
   line-height: 1.05;
+}
+
+.captura-loto-body .qplus-banner-logo img {
+  height: clamp(5.4rem, 10cqw, 11rem);
+}
+
+.captura-loto-body .loto-banner-inferior-etiqueta {
+  font-size: clamp(1.1rem, 1.9cqw, 2.2rem);
+}
+
+.captura-loto-body .loto-banner-inferior-monto {
+  font-size: clamp(2rem, 4cqw, 4.6rem);
 }
