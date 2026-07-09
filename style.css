@@ -290,12 +290,13 @@ body {
 }
 
 .pantalla-con-plus {
-  grid-template-rows: 8.2cqh minmax(0, 1fr) 7cqh;
+  grid-template-rows: 8.2cqh minmax(0, 1fr) 9.5cqh;
 }
 
 .resumen-plus {
-  display: flex;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: repeat(3, 1fr);
   margin-top: 0.5cqh;
   min-height: 0;
   background: #000;
@@ -305,42 +306,46 @@ body {
 }
 
 .resumen-plus-logo {
-  flex: 0 0 auto;
+  grid-row: 1 / span 3;
+  grid-column: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.2cqh 0.6cqw;
+  padding: 0.3cqh 0.7cqw;
+  border-right: 0.09cqh solid rgba(255, 214, 0, 0.4);
 }
 
 .resumen-plus-logo img {
-  height: 100%;
-  max-width: 7cqw;
+  height: 85%;
+  max-width: 6cqw;
   object-fit: contain;
 }
 
 .resumen-plus-item {
-  flex: 1;
+  grid-column: 2;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.3cqh;
+  gap: 0.7cqw;
   min-width: 0;
-  padding: 0.35cqh 0.4cqw;
-  border-left: 0.09cqh solid rgba(255, 214, 0, 0.4);
+  padding: 0.15cqh 1cqw;
+  border-top: 0.07cqh solid rgba(255, 214, 0, 0.25);
   overflow: hidden;
 }
 
+.resumen-plus-item:first-of-type {
+  border-top: none;
+}
+
 .resumen-plus-cabecera {
+  flex: 0 0 auto;
   display: flex;
   align-items: baseline;
-  justify-content: center;
-  gap: 0.5cqw;
+  gap: 0.6cqw;
 }
 
 .resumen-plus-juego {
   flex: 0 0 auto;
-  font-size: clamp(0.5rem, 0.95cqw, 0.95rem);
+  font-size: clamp(0.7rem, 1.2cqw, 1.3rem);
   font-weight: 1000;
   color: #ffe600;
   white-space: nowrap;
@@ -349,25 +354,28 @@ body {
 
 .resumen-plus-pozo {
   flex: 0 0 auto;
-  font-size: clamp(0.44rem, 0.78cqw, 0.78rem);
+  font-size: clamp(0.62rem, 1.05cqw, 1.15rem);
   font-weight: 900;
   color: #fff;
   white-space: nowrap;
   border-left: 0.09cqh solid rgba(255, 255, 255, 0.3);
-  padding-left: 0.5cqw;
+  padding-left: 0.6cqw;
 }
 
 .resumen-plus-numeros {
-  width: 100%;
-  text-align: center;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
   white-space: nowrap;
   overflow: hidden;
-  font-size: clamp(0.35rem, 0.62cqw, 0.66rem);
+  font-size: clamp(0.8rem, 1.7cqw, 1.9rem);
   font-weight: 1000;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
   color: #fff;
-  text-shadow: 0.08cqh 0.08cqh 0 #000;
+  text-shadow: 0.1cqh 0.1cqh 0 #000;
+  border-left: 0.09cqh solid rgba(255, 255, 255, 0.3);
+  padding-left: 0.7cqw;
 }
 
 .resumen-plus-num {
