@@ -851,7 +851,12 @@ function construirResumenQuinielaPlus() {
     `;
   }).join("");
 
-  return `<footer class="resumen-plus">${items}</footer>`;
+  return `
+    <footer class="resumen-plus">
+      <div class="resumen-plus-logo"><img src="assets/logo-plus.png" alt="Quiniela Plus"></div>
+      ${items}
+    </footer>
+  `;
 }
 
 function dibujarTurno(turno) {

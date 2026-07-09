@@ -290,25 +290,39 @@ body {
 }
 
 .pantalla-con-plus {
-  grid-template-rows: 8.2cqh minmax(0, 1fr) 8.2cqh;
+  grid-template-rows: 8.2cqh minmax(0, 1fr) 9.5cqh;
 }
 
 .resumen-plus {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: auto repeat(3, 1fr);
   gap: 0.45cqw;
   margin-top: 0.5cqh;
   min-height: 0;
 }
 
+.resumen-plus-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2cqh 0.3cqw;
+}
+
+.resumen-plus-logo img {
+  height: 100%;
+  max-width: 7cqw;
+  object-fit: contain;
+}
+
 .resumen-plus-item {
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 0.25cqh;
+  gap: 0.3cqh;
   min-width: 0;
   padding: 0.35cqh 0.8cqw;
-  background: #0a2049;
+  background: #000;
   border: 0.09cqh solid rgba(255, 214, 0, 0.55);
   border-radius: 0.5cqh;
   overflow: hidden;
@@ -317,6 +331,7 @@ body {
 .resumen-plus-cabecera {
   display: flex;
   align-items: baseline;
+  justify-content: center;
   gap: 0.5cqw;
 }
 
@@ -330,14 +345,11 @@ body {
 }
 
 .resumen-plus-pozo {
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 auto;
   font-size: clamp(0.44rem, 0.78cqw, 0.78rem);
   font-weight: 900;
   color: #fff;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   border-left: 0.09cqh solid rgba(255, 255, 255, 0.3);
   padding-left: 0.5cqw;
 }
@@ -345,15 +357,16 @@ body {
 .resumen-plus-numeros {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.1cqh 0.4cqw;
-  overflow: hidden;
+  justify-content: center;
+  gap: 0.15cqh 0.55cqw;
 }
 
 .resumen-plus-num {
   flex: 0 0 auto;
-  font-size: clamp(0.42rem, 0.72cqw, 0.72rem);
-  font-weight: 900;
+  font-size: clamp(0.62rem, 1.25cqw, 1.35rem);
+  font-weight: 1000;
   color: #fff;
+  text-shadow: 0.12cqh 0.12cqh 0 #000;
 }
 
 .columna-loteria {
