@@ -459,6 +459,28 @@ function calcularPozoEstimado(juego, pozoActual, premios) {
   return POZO_MINIMO_PLUS[juego] || 0;
 }
 
+async function cargarProximoSorteoPlusManual() {
+  if (!supabaseConfigurado()) return null;
+
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const params = new URLSearchParams({ select: "valor", clave: "eq.proximo_sorteo_plus" });
+
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/config_tablero?${params.toString()}`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (!respuesta.ok) return null;
+    const filas = await respuesta.json();
+    return filas[0]?.valor || null;
+  } catch (error) {
+    console.warn("No se pudo cargar el próximo sorteo manual", error);
+    return null;
+  }
+}
+
 async function cargarResultadosPlus() {
   if (!supabaseConfigurado()) {
     return null;
@@ -512,7 +534,9 @@ async function cargarResultadosPlus() {
       };
     });
 
-    resultadosPlusCache = { fecha: fechaMax, sorteo: filasDia[0].sorteo || "", juegos };
+    const proximoSorteoManual = await cargarProximoSorteoPlusManual();
+
+    resultadosPlusCache = { fecha: fechaMax, sorteo: filasDia[0].sorteo || "", juegos, proximoSorteoManual };
     resultadosPlusCacheTiempo = Date.now();
     return resultadosPlusCache;
   } catch (error) {
@@ -981,6 +1005,14 @@ function construirVistaQuinielaPlus(datos) {
     while (proximoSorteo.getDay() === 0) {
       proximoSorteo.setDate(proximoSorteo.getDate() + 1);
     }
+
+    if (datos.proximoSorteoManual) {
+      const manual = fechaDesdeISO(datos.proximoSorteoManual);
+      if (manual > fechaDesdeISO(datos.fecha)) {
+        proximoSorteo.setTime(manual.getTime());
+      }
+    }
+
     const proximoSorteoTexto = proximoSorteo.toLocaleDateString("es-AR", {
       weekday: "long", day: "2-digit", month: "2-digit"
     }).toUpperCase();

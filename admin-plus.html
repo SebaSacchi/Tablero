@@ -160,6 +160,15 @@
     <div class="estado" id="estadoPdf"></div>
   </div>
 
+  <h2 class="seccion">PRÓXIMO SORTEO MANUAL (feriados)</h2>
+  <div class="card">
+    <label>Usar esta fecha en vez de calcularla sola. Se usa solo mientras sea posterior a la fecha del último sorteo cargado; después el tablero vuelve a calcularla automáticamente.</label>
+    <input type="date" id="proximoSorteoManual">
+    <button type="button" class="btn-secundario" id="btn-guardar-proximo">GUARDAR FECHA MANUAL</button>
+    <button type="button" class="btn-secundario" id="btn-borrar-proximo">VOLVER A AUTOMÁTICO</button>
+    <div class="estado" id="estadoProximo"></div>
+  </div>
+
   <h2 class="seccion">JUEGOS</h2>
   <div id="juegos"></div>
 
@@ -528,6 +537,76 @@
       const dd = String(hoy.getDate()).padStart(2, "0");
       document.getElementById("fecha").value = `${yyyy}-${mm}-${dd}`;
     })();
+
+    // --- Próximo sorteo manual (feriados) ---
+
+    const CLAVE_PROXIMO_SORTEO = "proximo_sorteo_plus";
+    const inputProximo = document.getElementById("proximoSorteoManual");
+    const estadoProximo = document.getElementById("estadoProximo");
+
+    async function cargarProximoSorteoManual() {
+      try {
+        const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+        const params = new URLSearchParams({ select: "valor", clave: `eq.${CLAVE_PROXIMO_SORTEO}` });
+        const res = await fetch(`${baseUrl}/rest/v1/config_tablero?${params.toString()}`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        if (!res.ok) return;
+        const filas = await res.json();
+        if (filas[0]?.valor) inputProximo.value = filas[0].valor;
+      } catch (error) {
+        console.warn("No se pudo cargar el próximo sorteo manual", error);
+      }
+    }
+
+    async function guardarProximoSorteoManual(valor) {
+      const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+      const res = await fetch(`${baseUrl}/rest/v1/config_tablero?on_conflict=clave`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "resolution=merge-duplicates,return=minimal"
+        },
+        body: JSON.stringify([{ clave: CLAVE_PROXIMO_SORTEO, valor, actualizado_en: new Date().toISOString() }])
+      });
+      if (!res.ok) throw new Error(await res.text());
+    }
+
+    document.getElementById("btn-guardar-proximo").addEventListener("click", async () => {
+      if (!inputProximo.value) {
+        estadoProximo.className = "estado err";
+        estadoProximo.textContent = "Elegí una fecha primero.";
+        return;
+      }
+      estadoProximo.className = "estado cargando";
+      estadoProximo.textContent = "Guardando...";
+      try {
+        await guardarProximoSorteoManual(inputProximo.value);
+        estadoProximo.className = "estado ok";
+        estadoProximo.textContent = "Fecha manual guardada. Se va a usar en el tablero.";
+      } catch (error) {
+        estadoProximo.className = "estado err";
+        estadoProximo.textContent = "Error al guardar: " + error.message;
+      }
+    });
+
+    document.getElementById("btn-borrar-proximo").addEventListener("click", async () => {
+      estadoProximo.className = "estado cargando";
+      estadoProximo.textContent = "Borrando...";
+      try {
+        await guardarProximoSorteoManual("");
+        inputProximo.value = "";
+        estadoProximo.className = "estado ok";
+        estadoProximo.textContent = "Fecha manual borrada. El tablero vuelve a calcularla solo.";
+      } catch (error) {
+        estadoProximo.className = "estado err";
+        estadoProximo.textContent = "Error al borrar: " + error.message;
+      }
+    });
+
+    cargarProximoSorteoManual();
   </script>
 </body>
 </html>
