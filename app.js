@@ -416,7 +416,10 @@ function getResultadosRealesTurno(turno, fecha) {
 }
 
 function tieneResultadosReales(resultadoTurno) {
-  return Boolean(resultadoTurno && Object.keys(resultadoTurno).length > 0);
+  if (!resultadoTurno) return false;
+  return Object.values(resultadoTurno).some(
+    (numeros) => Array.isArray(numeros) && numeros.some((n) => n && n !== "----")
+  );
 }
 
 async function cargarResultadosSupabase(turno, fecha) {
@@ -472,7 +475,9 @@ async function cargarResultadosSupabase(turno, fecha) {
         agrupado[loteria] = [];
       }
 
-      agrupado[loteria][posicion - 1] = String(fila.numero).padStart(4, "0");
+      agrupado[loteria][posicion - 1] = loteria === "MONTEVIDEO"
+        ? String(fila.numero)
+        : String(fila.numero).padStart(4, "0");
     });
 
     resultadosSupabaseCache[key] = agrupado;
