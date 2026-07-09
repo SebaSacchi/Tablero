@@ -335,6 +335,14 @@ function fechaAyer(fecha = new Date()) {
   return ayer;
 }
 
+function fechaAyerSinDomingo(fecha = new Date()) {
+  let ayer = fechaAyer(fecha);
+  while (ayer.getDay() === 0) {
+    ayer = fechaAyer(ayer);
+  }
+  return ayer;
+}
+
 function ultimoDiaSorteo(fecha = new Date()) {
   const d = new Date(fecha);
   d.setDate(d.getDate() - 1);
@@ -639,6 +647,8 @@ async function cargarCabezasDelDiaSupabase(fecha = new Date()) {
 async function cargarFechasHistorialSupabase() {
   const hoy = new Date();
   const hoyTxt = fechaISO(hoy);
+  const esHoyDomingo = hoy.getDay() === 0;
+  const totalPrevias = esHoyDomingo ? 6 : 5;
 
   if (!supabaseConfigurado()) {
     return fechasHistorialFallback(hoy);
@@ -666,17 +676,22 @@ async function cargarFechasHistorialSupabase() {
 
     const filas = await respuesta.json();
     const unicas = [...new Set((Array.isArray(filas) ? filas : []).map(f => f.fecha).filter(Boolean))];
-    const anteriores = unicas.filter(f => f < hoyTxt).slice(0, 5).reverse();
+    const anteriores = unicas
+      .filter(f => f < hoyTxt && fechaDesdeISO(f).getDay() !== 0)
+      .slice(0, totalPrevias)
+      .reverse();
     const fechas = anteriores.map(fechaDesdeISO);
 
-    while (fechas.length < 5) {
-      const fecha = fechaAyer(fechas[0] || hoy);
+    while (fechas.length < totalPrevias) {
+      const fecha = fechaAyerSinDomingo(fechas[0] || hoy);
       if (!fechas.some(f => fechaISO(f) === fechaISO(fecha))) {
         fechas.unshift(fecha);
       }
     }
 
-    fechas.push(hoy);
+    if (!esHoyDomingo) {
+      fechas.push(hoy);
+    }
     return fechas;
   } catch (error) {
     console.warn("Error cargando fechas de historial", error);
@@ -685,15 +700,19 @@ async function cargarFechasHistorialSupabase() {
 }
 
 function fechasHistorialFallback(hoy = new Date()) {
+  const esHoyDomingo = hoy.getDay() === 0;
+  const totalPrevias = esHoyDomingo ? 6 : 5;
   const fechas = [];
 
-  for (let i = 5; i >= 1; i -= 1) {
-    const fecha = new Date(hoy);
-    fecha.setDate(fecha.getDate() - i);
-    fechas.push(fecha);
+  let cursor = hoy;
+  for (let i = 0; i < totalPrevias; i += 1) {
+    cursor = fechaAyerSinDomingo(cursor);
+    fechas.unshift(cursor);
   }
 
-  fechas.push(hoy);
+  if (!esHoyDomingo) {
+    fechas.push(hoy);
+  }
   return fechas;
 }
 
