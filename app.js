@@ -113,6 +113,9 @@ let resultadosPlusCacheTiempo = 0;
 let resultadosLotoPlusCache = null;
 let resultadosLotoPlusCacheTiempo = 0;
 
+let resultadosQuini6Cache = null;
+let resultadosQuini6CacheTiempo = 0;
+
 let feriadosManual = new Set();
 let feriadosManualCacheTiempo = 0;
 
@@ -687,6 +690,116 @@ async function cargarResultadosLotoPlus() {
     return resultadosLotoPlusCache;
   } catch (error) {
     console.warn("Error cargando resultados de Loto Plus", error);
+    return null;
+  }
+}
+
+const SUBJUEGOS_QUINI6 = ["TRADICIONAL", "SEGUNDA", "REVANCHA", "SIEMPRE_SALE", "EXTRA"];
+
+function nombreSubjuegoQuini6(subjuego) {
+  return subjuego === "TRADICIONAL" ? "TRADICIONAL" :
+         subjuego === "SEGUNDA" ? "LA SEGUNDA" :
+         subjuego === "REVANCHA" ? "REVANCHA" :
+         subjuego === "SIEMPRE_SALE" ? "SIEMPRE SALE" :
+         subjuego === "EXTRA" ? "PREMIO EXTRA" : subjuego;
+}
+
+async function cargarProximoSorteoQuini6Manual() {
+  if (!supabaseConfigurado()) return null;
+
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const params = new URLSearchParams({ select: "valor", clave: "eq.proximo_sorteo_quini6" });
+
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/config_tablero?${params.toString()}`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+    });
+    if (!respuesta.ok) return null;
+    const filas = await respuesta.json();
+    return filas[0]?.valor || null;
+  } catch (error) {
+    console.warn("No se pudo cargar el próximo sorteo manual de Quini 6", error);
+    return null;
+  }
+}
+
+function proximoSorteoQuini6(fechaBase) {
+  const diasSorteo = [0, 3]; // domingo, miércoles
+  const proximo = new Date(fechaBase);
+  proximo.setDate(proximo.getDate() + 1);
+  while (!diasSorteo.includes(proximo.getDay())) {
+    proximo.setDate(proximo.getDate() + 1);
+  }
+  return proximo;
+}
+
+async function cargarResultadosQuini6() {
+  if (!supabaseConfigurado()) return null;
+
+  if (resultadosQuini6Cache && (Date.now() - resultadosQuini6CacheTiempo) < 60000) {
+    return resultadosQuini6Cache;
+  }
+
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const params = new URLSearchParams({
+    select: "subjuego,fecha,sorteo,numeros,pozo,premios_detalle,extra",
+    loteria: "eq.QUINI6",
+    order: "fecha.desc"
+  });
+
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/resultados_loterias?${params.toString()}`, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+
+    if (!respuesta.ok) {
+      console.warn("No se pudieron cargar resultados de Quini 6", respuesta.status);
+      return null;
+    }
+
+    const filas = await respuesta.json();
+
+    if (!Array.isArray(filas) || filas.length === 0) {
+      resultadosQuini6Cache = null;
+      resultadosQuini6CacheTiempo = Date.now();
+      return null;
+    }
+
+    const fechaMax = filas[0].fecha;
+    const filasDia = filas.filter(f => f.fecha === fechaMax);
+
+    const subjuegos = {};
+    filasDia.forEach(f => {
+      const numeros = (f.numeros || "")
+        .split(/[\s-]+/)
+        .filter(Boolean)
+        .sort((a, b) => Number(a) - Number(b));
+
+      subjuegos[f.subjuego] = {
+        numeros,
+        pozo: Number(f.pozo) || 0,
+        premios: Array.isArray(f.premios_detalle) ? f.premios_detalle : []
+      };
+    });
+
+    const extraTradicional = filasDia.find(f => f.subjuego === "TRADICIONAL")?.extra || {};
+    const proximoSorteoManual = await cargarProximoSorteoQuini6Manual();
+
+    resultadosQuini6Cache = {
+      fecha: fechaMax,
+      sorteo: filasDia[0].sorteo || "",
+      subjuegos,
+      proximoPozo: Number(extraTradicional.proximoPozo) || 0,
+      proximoFecha: extraTradicional.proximoFecha || null,
+      proximoSorteoManual
+    };
+    resultadosQuini6CacheTiempo = Date.now();
+    return resultadosQuini6Cache;
+  } catch (error) {
+    console.warn("Error cargando resultados de Quini 6", error);
     return null;
   }
 }
@@ -1464,6 +1577,154 @@ async function renderLotoPlus() {
   }
 }
 
+function construirVistaQuini6(datos) {
+  let subtitulo = "SIN SORTEOS CARGADOS";
+  let columnas = `<div class="qplus-sin-datos">SIN DATOS DE QUINI 6</div>`;
+  let bannerSuperiorHTML = "";
+  let bannerInferiorHTML = "";
+
+  if (datos && datos.subjuegos) {
+    const fechaFmt = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR", {
+      day: "2-digit", month: "2-digit", year: "numeric"
+    });
+    subtitulo = `CONCURSO ${datos.sorteo || "--"} · ${fechaFmt}`;
+
+    let proximoSorteo = proximoSorteoQuini6(fechaDesdeISO(datos.fecha));
+
+    if (datos.proximoFecha) {
+      const guardado = fechaDesdeISO(datos.proximoFecha);
+      if (guardado > fechaDesdeISO(datos.fecha)) proximoSorteo = guardado;
+    }
+    if (datos.proximoSorteoManual) {
+      const manual = fechaDesdeISO(datos.proximoSorteoManual);
+      if (manual > fechaDesdeISO(datos.fecha)) proximoSorteo = manual;
+    }
+
+    const proximoSorteoTexto = proximoSorteo.toLocaleDateString("es-AR", {
+      weekday: "long", day: "2-digit", month: "2-digit"
+    }).toUpperCase();
+
+    columnas = SUBJUEGOS_QUINI6.map(subjuego => {
+      const d = datos.subjuegos[subjuego];
+      if (!d) {
+        return `
+          <div class="columna-quini6">
+            <div class="quini6-titulo">${nombreSubjuegoQuini6(subjuego)}</div>
+            <div class="qplus-sin-datos">SIN DATOS</div>
+          </div>
+        `;
+      }
+
+      const numerosHTML = d.numeros.length
+        ? `<div class="quini6-numeros">${d.numeros.map(n => `<div class="quini6-num">${n}</div>`).join("")}</div>`
+        : "";
+
+      const premiosHTML = d.premios.map(p => `
+        <div class="qplus-premio-fila">
+          <span class="qplus-premio-nivel">${p.nivel}</span>
+          <span class="qplus-premio-ganadores">${p.ganadores}</span>
+          <span class="qplus-premio-importe">${quitarDecimales(p.importe)}</span>
+        </div>
+      `).join("");
+
+      return `
+        <div class="columna-quini6">
+          <div class="quini6-titulo">${nombreSubjuegoQuini6(subjuego)}</div>
+          ${numerosHTML}
+          <div class="qplus-premios">
+            <div class="qplus-premio-fila qplus-premio-header">
+              <span class="qplus-premio-nivel">PREMIO</span><span class="qplus-premio-ganadores">GANADORES</span><span class="qplus-premio-importe">IMPORTE</span>
+            </div>
+            ${premiosHTML}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    bannerSuperiorHTML = `
+      <div class="qplus-banner">
+        <div class="qplus-banner-top quini6-banner-top">
+          <div class="qplus-banner-logo">
+            <img src="assets/logo-quini6.png" alt="Quini 6" onerror="this.replaceWith(document.createTextNode('QUINI 6'))">
+          </div>
+          <div class="qplus-banner-sorteo">
+            <span class="qplus-banner-sorteo-etiqueta">PRÓXIMO SORTEO</span>
+            <span class="qplus-banner-sorteo-valor">${proximoSorteoTexto}</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    bannerInferiorHTML = `
+      <div class="quini6-banner-inferior">
+        <span class="quini6-banner-inferior-etiqueta">POZO ESTIMADO</span>
+        <span class="quini6-banner-inferior-monto">${formatoPesos(datos.proximoPozo)}</span>
+      </div>
+    `;
+  }
+
+  return { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas };
+}
+
+function dibujarQuini6() {
+  const { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas } = construirVistaQuini6(resultadosQuini6Cache);
+
+  app.innerHTML = `
+    <main class="pantalla estado-finalizado pantalla-quini6">
+      <header class="topbar">
+        <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
+        <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
+        <div class="titulo-turno">
+          <div class="linea-titulo">
+            <span>QUINI</span>
+            <strong>6</strong>
+          </div>
+          <small>${subtitulo}</small>
+        </div>
+        <div class="topbar-cierre"></div>
+        <div class="fecha">${soloFechaTexto()}</div>
+      </header>
+
+      <section class="zona-vivo">
+        <aside class="panel-izquierdo">
+          ${bloqueIzquierdo("QUINI6")}
+        </aside>
+
+        <section class="tabla-quini6">
+          ${bannerSuperiorHTML}
+          <div class="columnas-quini6">${columnas}</div>
+          ${bannerInferiorHTML}
+        </section>
+
+        <aside class="promo-lateral">
+          ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
+        </aside>
+      </section>
+    </main>
+  `;
+}
+
+async function renderQuini6() {
+  pantallaActual = "QUINI6";
+  limpiarPubInterval();
+  limpiarPubCabezasInterval();
+  limpiarCierreInterval();
+  const idRender = ++renderTurnoId;
+
+  dibujarQuini6();
+
+  await Promise.all([
+    cargarResultadosQuini6(),
+    cargarUltimasCabezasSupabase(),
+    cargarLatImages()
+  ]);
+
+  if (pantallaActual === "QUINI6" && idRender === renderTurnoId) {
+    dibujarQuini6();
+    iniciarLatRotacion();
+  }
+}
+
 function fechaCabezasPantalla() {
   const ahora = new Date();
   if (ahora.getDay() === 0) return ultimoDiaSorteo(ahora);
@@ -1878,8 +2139,8 @@ function pantallaPorHora() {
   return "NOCTURNA";
 }
 
-const ORDEN_PLUS_FAMILIA = ["QUINIELA_PLUS", "LOTO_PLUS"];
-const RENDER_PLUS_FAMILIA = { QUINIELA_PLUS: renderQuinielaPlus, LOTO_PLUS: renderLotoPlus };
+const ORDEN_PLUS_FAMILIA = ["QUINIELA_PLUS", "LOTO_PLUS", "QUINI6"];
+const RENDER_PLUS_FAMILIA = { QUINIELA_PLUS: renderQuinielaPlus, LOTO_PLUS: renderLotoPlus, QUINI6: renderQuini6 };
 
 function siguientePantallaPlusFamilia() {
   const actual = ORDEN_PLUS_FAMILIA.includes(pantallaActual) ? pantallaActual : "QUINIELA_PLUS";
@@ -1900,7 +2161,7 @@ const pantallasOrden = [
 ];
 
 function indicePantallaActual() {
-  const mapa = { PREVIA: 0, PRIMERA: 0, MATUTINA: 1, VESPERTINA: 2, NOCTURNA: 3, QUINIELA_PLUS: 4, LOTO_PLUS: 4, CABEZAS: 5, HISTORIAL: 5, PUBLICIDAD: 6, ALEATORIO: 7, QUINI: 8 };
+  const mapa = { PREVIA: 0, PRIMERA: 0, MATUTINA: 1, VESPERTINA: 2, NOCTURNA: 3, QUINIELA_PLUS: 4, LOTO_PLUS: 4, QUINI6: 4, CABEZAS: 5, HISTORIAL: 5, PUBLICIDAD: 6, ALEATORIO: 7, QUINI: 8 };
   return mapa[pantallaActual] ?? 0;
 }
 
@@ -1946,6 +2207,7 @@ document.addEventListener("keydown", (e) => {
   if (tecla === "c" || tecla === "C") {
     if (pantallaActual === "QUINIELA_PLUS") capturarQuinielaPlus();
     else if (pantallaActual === "LOTO_PLUS") capturarLotoPlus();
+    else if (pantallaActual === "QUINI6") capturarQuini6();
     else capturarTurno();
   }
 });
@@ -2000,6 +2262,9 @@ setInterval(() => {
   }
   if (pantallaActual === "LOTO_PLUS") {
     renderLotoPlus();
+  }
+  if (pantallaActual === "QUINI6") {
+    renderQuini6();
   }
 }, 10000);
 
@@ -2135,6 +2400,51 @@ async function capturarLotoPlus() {
     const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
     const link = document.createElement("a");
     link.download = `LOTO_PLUS_${fechaArchivo}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    console.error("Error al capturar:", err);
+    alert("Error al generar la captura");
+  } finally {
+    document.body.removeChild(escala);
+  }
+}
+
+async function capturarQuini6() {
+  const datos = resultadosQuini6Cache;
+  if (!datos || !datos.subjuegos) {
+    alert("No hay datos de Quini 6 para capturar");
+    return;
+  }
+
+  const { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas } = construirVistaQuini6(datos);
+  const fechaArchivo = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR").replace(/\//g, "-");
+
+  const escala = document.createElement("div");
+  escala.className = "captura-quini6-escala";
+
+  const contenedor = document.createElement("div");
+  contenedor.className = "captura-quini6-pantalla";
+  contenedor.innerHTML = `
+    <header class="captura-quini6-header">
+      <div class="captura-quini6-titulo"><span>QUINI</span><strong>6</strong></div>
+      <div class="captura-quini6-subtitulo">${subtitulo}</div>
+    </header>
+    <div class="captura-quini6-body">
+      <div class="tabla-quini6">
+        ${bannerSuperiorHTML}
+        <div class="columnas-quini6">${columnas}</div>
+        ${bannerInferiorHTML}
+      </div>
+    </div>
+  `;
+  escala.appendChild(contenedor);
+  document.body.appendChild(escala);
+
+  try {
+    const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
+    const link = document.createElement("a");
+    link.download = `QUINI6_${fechaArchivo}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   } catch (err) {
