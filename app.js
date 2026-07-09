@@ -1378,7 +1378,7 @@ function construirVistaLotoPlus(datos) {
 
     bannerSuperiorHTML = `
       <div class="qplus-banner">
-        <div class="qplus-banner-top">
+        <div class="qplus-banner-top loto-banner-top">
           <div class="qplus-banner-logo">
             <img src="assets/logo-lotoplus.png" alt="Loto Plus" onerror="this.replaceWith(document.createTextNode('LOTO PLUS'))">
           </div>
