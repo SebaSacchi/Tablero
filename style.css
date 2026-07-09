@@ -312,6 +312,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0.3cqh 0.7cqw;
+  background: #fff;
   border-right: 0.09cqh solid rgba(255, 214, 0, 0.4);
 }
 
@@ -323,9 +324,10 @@ body {
 
 .resumen-plus-item {
   grid-column: 2;
-  display: flex;
+  display: grid;
+  grid-template-columns: 12cqw 15cqw 1fr;
   align-items: center;
-  gap: 0.7cqw;
+  gap: 0.6cqw;
   min-width: 0;
   padding: 0.15cqh 1cqw;
   border-top: 0.07cqh solid rgba(255, 214, 0, 0.25);
@@ -336,46 +338,46 @@ body {
   border-top: none;
 }
 
-.resumen-plus-cabecera {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: baseline;
-  gap: 0.6cqw;
-}
-
 .resumen-plus-juego {
-  flex: 0 0 auto;
+  min-width: 0;
   font-size: clamp(0.7rem, 1.2cqw, 1.3rem);
   font-weight: 1000;
   color: #ffe600;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-shadow: 0.15cqh 0.15cqh 0 #000;
 }
 
 .resumen-plus-pozo {
-  flex: 0 0 auto;
-  font-size: clamp(0.62rem, 1.05cqw, 1.15rem);
+  min-width: 0;
+  font-size: clamp(0.6rem, 1cqw, 1.1rem);
   font-weight: 900;
   color: #fff;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border-left: 0.09cqh solid rgba(255, 255, 255, 0.3);
   padding-left: 0.6cqw;
 }
 
 .resumen-plus-numeros {
-  flex: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.6cqw;
   min-width: 0;
-  text-align: left;
-  white-space: nowrap;
   overflow: hidden;
+  border-left: 0.09cqh solid rgba(255, 255, 255, 0.3);
+  padding-left: 0.7cqw;
+}
+
+.resumen-plus-num {
+  flex: 0 0 auto;
   font-size: clamp(0.8rem, 1.7cqw, 1.9rem);
   font-weight: 1000;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
   color: #fff;
   text-shadow: 0.1cqh 0.1cqh 0 #000;
-  border-left: 0.09cqh solid rgba(255, 255, 255, 0.3);
-  padding-left: 0.7cqw;
 }
 
 .resumen-plus-num {
