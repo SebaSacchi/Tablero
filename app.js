@@ -1620,8 +1620,16 @@ function construirVistaQuini6(datos) {
         `;
       }
 
-      const numerosHTML = d.numeros.length
-        ? `<div class="quini6-numeros">${d.numeros.map(n => `<div class="quini6-num">${n}</div>`).join("")}</div>`
+      const numerosMostrados = subjuego === "EXTRA"
+        ? [...new Set([
+            ...(datos.subjuegos.TRADICIONAL?.numeros || []),
+            ...(datos.subjuegos.SEGUNDA?.numeros || []),
+            ...(datos.subjuegos.REVANCHA?.numeros || [])
+          ])].sort((a, b) => Number(a) - Number(b))
+        : d.numeros;
+
+      const numerosHTML = numerosMostrados.length
+        ? `<div class="quini6-numeros">${numerosMostrados.map(n => `<div class="quini6-num">${n}</div>`).join("")}</div>`
         : "";
 
       const premiosHTML = d.premios.map(p => `
