@@ -938,13 +938,12 @@ body {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  grid-auto-rows: 1fr;
-  gap: 0.3cqh 0.5cqw;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr)) minmax(0, 0.55fr);
+  gap: 0.35cqh 0.6cqw;
 }
 
 .columna-quini6 {
-  grid-column: span 2;
   min-width: 0;
   min-height: 0;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 22%), #123166;
@@ -956,14 +955,14 @@ body {
   overflow: hidden;
 }
 
-.columna-quini6:nth-child(n+4) {
-  grid-column: span 3;
+.columna-quini6-extra {
+  grid-column: 1 / -1;
 }
 
 .quini6-titulo {
   flex: 0 0 auto;
   padding: 0.25cqh 0.8cqw;
-  font-size: clamp(0.62rem, 1.05cqw, 1.1rem);
+  font-size: clamp(0.7rem, 1.15cqw, 1.25rem);
   font-weight: 1000;
   background: #0a2049;
   color: #fff;
@@ -977,8 +976,8 @@ body {
   flex: 0 0 auto;
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 0.25cqh 0.3cqw;
-  margin: 0.35cqh 0.6cqw 0.2cqh;
+  gap: 0.3cqh 0.5cqw;
+  margin: 0.5cqh 0.8cqw 0.3cqh;
 }
 
 .quini6-num {
@@ -989,26 +988,37 @@ body {
   justify-content: center;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 28%, #ffffff, #dce4f5 88%);
-  border: 0.07cqh solid rgba(13, 44, 92, 0.3);
-  font-size: clamp(0.75rem, 1.5cqw, 1.6rem);
+  border: 0.09cqh solid rgba(13, 44, 92, 0.3);
+  font-size: clamp(1.1rem, 2.3cqw, 2.5rem);
   font-weight: 1000;
   color: #0d2c5c;
   line-height: 1;
-  box-shadow: 0 0.14cqh 0.26cqh rgba(0, 0, 0, 0.4), inset 0 -0.07cqh 0.14cqh rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.16cqh 0.3cqh rgba(0, 0, 0, 0.4), inset 0 -0.08cqh 0.16cqh rgba(0, 0, 0, 0.15);
+}
+
+.quini6-numeros-extra {
+  grid-template-columns: repeat(18, minmax(0, 1fr));
+  gap: 0.15cqh 0.25cqw;
+  margin: 0.3cqh 0.8cqw 0.2cqh;
+}
+
+.quini6-num-extra {
+  font-size: clamp(0.42rem, 0.85cqw, 0.92rem);
+  border-width: 0.05cqh;
 }
 
 .columna-quini6 .qplus-premio-fila {
   grid-template-columns: minmax(0, 0.75fr) minmax(0, 0.7fr) minmax(0, 1.35fr);
-  font-size: clamp(0.4rem, 0.62cqw, 0.68rem);
-  padding: 0.08cqh 0.15cqw;
+  font-size: clamp(0.48rem, 0.78cqw, 0.86rem);
+  padding: 0.1cqh 0.2cqw;
 }
 
 .columna-quini6 .qplus-premio-header {
-  font-size: clamp(0.32rem, 0.48cqw, 0.52rem);
+  font-size: clamp(0.38rem, 0.6cqw, 0.66rem);
 }
 
 .columna-quini6 .qplus-premio-importe {
-  font-size: clamp(0.46rem, 0.72cqw, 0.78rem);
+  font-size: clamp(0.56rem, 0.9cqw, 1rem);
 }
 
 .quini6-banner-top {
@@ -2300,10 +2310,6 @@ body {
 
 .captura-quini6-body .tabla-quini6 {
   width: 100%;
-}
-
-.captura-quini6-body .columnas-quini6 {
-  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 
 .captura-quini6-body .quini6-num {

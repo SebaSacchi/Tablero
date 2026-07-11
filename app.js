@@ -1610,10 +1610,11 @@ function construirVistaQuini6(datos) {
     }).toUpperCase();
 
     columnas = SUBJUEGOS_QUINI6.map(subjuego => {
+      const claseColumna = subjuego === "EXTRA" ? "columna-quini6 columna-quini6-extra" : "columna-quini6";
       const d = datos.subjuegos[subjuego];
       if (!d) {
         return `
-          <div class="columna-quini6">
+          <div class="${claseColumna}">
             <div class="quini6-titulo">${nombreSubjuegoQuini6(subjuego)}</div>
             <div class="qplus-sin-datos">SIN DATOS</div>
           </div>
@@ -1628,8 +1629,10 @@ function construirVistaQuini6(datos) {
           ])].sort((a, b) => Number(a) - Number(b))
         : d.numeros;
 
+      const claseNumeros = subjuego === "EXTRA" ? "quini6-numeros quini6-numeros-extra" : "quini6-numeros";
+      const claseNum = subjuego === "EXTRA" ? "quini6-num quini6-num-extra" : "quini6-num";
       const numerosHTML = numerosMostrados.length
-        ? `<div class="quini6-numeros">${numerosMostrados.map(n => `<div class="quini6-num">${n}</div>`).join("")}</div>`
+        ? `<div class="${claseNumeros}">${numerosMostrados.map(n => `<div class="${claseNum}">${n}</div>`).join("")}</div>`
         : "";
 
       const premiosHTML = d.premios.map(p => `
@@ -1641,7 +1644,7 @@ function construirVistaQuini6(datos) {
       `).join("");
 
       return `
-        <div class="columna-quini6">
+        <div class="${claseColumna}">
           <div class="quini6-titulo">${nombreSubjuegoQuini6(subjuego)}</div>
           ${numerosHTML}
           <div class="qplus-premios">
