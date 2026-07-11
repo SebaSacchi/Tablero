@@ -939,7 +939,7 @@ body {
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr)) minmax(0, 0.55fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr)) minmax(0, 0.68fr);
   gap: 0.35cqh 0.6cqw;
 }
 
@@ -998,13 +998,13 @@ body {
 
 .quini6-numeros-extra {
   grid-template-columns: repeat(18, minmax(0, 1fr));
-  gap: 0.15cqh 0.25cqw;
-  margin: 0.3cqh 0.8cqw 0.2cqh;
+  gap: 0.2cqh 0.22cqw;
+  margin: 0.4cqh 0.6cqw 0.3cqh;
 }
 
 .quini6-num-extra {
-  font-size: clamp(0.42rem, 0.85cqw, 0.92rem);
-  border-width: 0.05cqh;
+  font-size: clamp(0.68rem, 1.4cqw, 1.55rem);
+  border-width: 0.06cqh;
 }
 
 .columna-quini6 .qplus-premio-fila {
@@ -1035,6 +1035,10 @@ body {
 
 .quini6-banner-top .qplus-banner-sorteo-valor {
   font-size: clamp(1.4rem, 2.5cqw, 2.9rem);
+}
+
+.quini6-banner-top .qplus-banner-promo {
+  height: clamp(3.2rem, 8cqh, 6.2rem);
 }
 
 .quini6-banner-inferior {
@@ -2329,6 +2333,10 @@ body {
 
 .captura-quini6-body .qplus-banner-logo img {
   height: clamp(5.4rem, 10cqw, 11rem);
+}
+
+.captura-quini6-body .qplus-banner-promo {
+  height: clamp(4.4rem, 11cqh, 8rem);
 }
 
 .captura-quini6-body .quini6-banner-inferior-etiqueta {
