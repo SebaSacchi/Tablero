@@ -1563,6 +1563,9 @@ function construirVistaLotoPlus(datos) {
             <span class="qplus-banner-sorteo-etiqueta">PRÓXIMO SORTEO</span>
             <span class="qplus-banner-sorteo-valor">${proximoSorteoTexto}</span>
           </div>
+          <div class="qplus-banner-promo">
+            <img src="assets/promo-lotoplus-4000.png" alt="Solo por $4.000" onerror="this.parentElement.style.display='none'">
+          </div>
         </div>
       </div>
     `;
