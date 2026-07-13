@@ -241,6 +241,7 @@
     <div id="seccion-pub"></div>
 
     <h2 class="seccion">PROMO LATERAL (panel derecho en sorteos)</h2>
+    <label style="margin-bottom:8px;">En cada espacio podés subir una imagen o un video mp4 corto (recomendado ~15 segundos). El video se reproduce en loop mientras esté su turno.</label>
     <div id="seccion-lat"></div>
 
     <button class="btn-guardar" id="btn-subir" disabled>SUBIR IMÁGENES</button>
@@ -544,34 +545,157 @@
           }
         });
 
-        inputsPub.push({ fileInput, archivo, btnDel });
+        inputsPub.push({ fileInput, archivo, btnDel, preview });
+      });
+    }
+
+    // --- Promo lateral: admite imagen o video mp4 corto (~15s, se repite en loop) ---
+
+    const CLAVE_LAT_VIDEOS = "lat_videos";
+    const inputsLat = [];
+    let latVideoBasesAdmin = new Set();
+
+    async function cargarLatVideosAdmin() {
+      try {
+        const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+        const params = new URLSearchParams({ select: "valor", clave: `eq.${CLAVE_LAT_VIDEOS}` });
+        const res = await fetch(`${baseUrl}/rest/v1/config_tablero?${params.toString()}`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        if (!res.ok) return;
+        const filas = await res.json();
+        const valor = filas[0]?.valor || "";
+        latVideoBasesAdmin = new Set(valor.split(",").map(s => s.trim()).filter(Boolean));
+      } catch (error) {
+        console.warn("No se pudieron cargar los videos de promo lateral", error);
+      }
+    }
+
+    async function guardarLatVideosAdmin() {
+      const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+      const res = await fetch(`${baseUrl}/rest/v1/config_tablero?on_conflict=clave`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "resolution=merge-duplicates,return=minimal"
+        },
+        body: JSON.stringify([{ clave: CLAVE_LAT_VIDEOS, valor: [...latVideoBasesAdmin].join(","), actualizado_en: new Date().toISOString() }])
+      });
+      if (!res.ok) throw new Error(await res.text());
+    }
+
+    function crearCardsLat(contenedorId, archivos, prefijo) {
+      const contenedor = document.getElementById(contenedorId);
+      archivos.forEach((archivo, i) => {
+        const idx = prefijo + i;
+        const nombreBase = archivo.replace(/\.\w+$/, "");
+        const card = document.createElement("div");
+        card.className = "card card-pub";
+        card.innerHTML = `
+          <h3>IMAGEN ${i + 1}</h3>
+          <div class="preview-wrap" id="previewWrap_${idx}"></div>
+          <button class="btn-elegir" id="btn_${idx}">ELEGIR IMAGEN O VIDEO</button>
+          <button class="btn-borrar-img" id="del_${idx}">BORRAR</button>
+          <input type="file" class="oculto" id="file_${idx}" accept="image/*,video/mp4">
+        `;
+        contenedor.appendChild(card);
+
+        const fileInput = card.querySelector(`#file_${idx}`);
+        const previewWrap = card.querySelector(`#previewWrap_${idx}`);
+        const btn = card.querySelector(`#btn_${idx}`);
+        const btnDel = card.querySelector(`#del_${idx}`);
+
+        btn.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", () => {
+          const f = fileInput.files[0];
+          if (f) {
+            const url = URL.createObjectURL(f);
+            previewWrap.innerHTML = f.type.startsWith("video/")
+              ? `<video class="preview visible" src="${url}" muted loop controls></video>`
+              : `<img class="preview visible" src="${url}">`;
+            btn.textContent = "CAMBIAR IMAGEN O VIDEO";
+            btn.classList.add("selected");
+            btnDel.classList.add("visible");
+            checkReadyPub();
+          }
+        });
+
+        btnDel.addEventListener("click", async () => {
+          if (!confirm("¿Borrar esta imagen o video?")) return;
+          btnDel.textContent = "BORRANDO...";
+          btnDel.disabled = true;
+          try {
+            if (latVideoBasesAdmin.has(nombreBase)) {
+              await deleteFile(`${nombreBase}.mp4`);
+              latVideoBasesAdmin.delete(nombreBase);
+              await guardarLatVideosAdmin();
+            }
+            await deleteFile(`${nombreBase}.jpg`);
+            previewWrap.innerHTML = "";
+            btn.textContent = "ELEGIR IMAGEN O VIDEO";
+            btn.classList.remove("selected");
+            btnDel.classList.remove("visible");
+            btnDel.textContent = "BORRAR";
+            btnDel.disabled = false;
+            fileInput.value = "";
+            estadoSubir.className = "estado ok";
+            estadoSubir.textContent = "Imagen borrada correctamente";
+          } catch (err) {
+            estadoSubir.className = "estado err";
+            estadoSubir.textContent = "Error al borrar: " + err.message;
+            btnDel.textContent = "BORRAR";
+            btnDel.disabled = false;
+          }
+        });
+
+        inputsLat.push({ fileInput, nombreBase, btnDel, previewWrap });
       });
     }
 
     crearCardsPub("seccion-pub", PUB_FILES, "pub");
-    crearCardsPub("seccion-lat", LAT_FILES, "lat");
+    crearCardsLat("seccion-lat", LAT_FILES, "lat");
 
     function cargarExistentesPub() {
       const base = `${SUPABASE_URL}/storage/v1/object/public/media`;
       const cache = Date.now();
-      inputsPub.forEach(({ archivo, btnDel }, i) => {
+      inputsPub.forEach(({ archivo, btnDel, preview }) => {
         const img = new Image();
-        const preview = document.getElementById(`preview_${i < 8 ? "pub" : "lat"}${i < 8 ? i : i - 8}`);
         img.onload = () => {
-          if (preview) {
-            preview.src = `${base}/${archivo}?v=${cache}`;
-            preview.classList.add("visible");
-          }
-          if (btnDel) btnDel.classList.add("visible");
+          preview.src = `${base}/${archivo}?v=${cache}`;
+          preview.classList.add("visible");
+          btnDel.classList.add("visible");
         };
         img.src = `${base}/${archivo}?v=${cache}`;
       });
     }
 
+    async function cargarExistentesLat() {
+      await cargarLatVideosAdmin();
+      const base = `${SUPABASE_URL}/storage/v1/object/public/media`;
+      const cache = Date.now();
+      inputsLat.forEach(({ nombreBase, btnDel, previewWrap }) => {
+        if (latVideoBasesAdmin.has(nombreBase)) {
+          previewWrap.innerHTML = `<video class="preview visible" src="${base}/${nombreBase}.mp4?v=${cache}" muted loop controls></video>`;
+          btnDel.classList.add("visible");
+          return;
+        }
+        const img = new Image();
+        img.onload = () => {
+          previewWrap.innerHTML = `<img class="preview visible" src="${base}/${nombreBase}.jpg?v=${cache}">`;
+          btnDel.classList.add("visible");
+        };
+        img.src = `${base}/${nombreBase}.jpg?v=${cache}`;
+      });
+    }
+
     cargarExistentesPub();
+    cargarExistentesLat();
 
     function checkReadyPub() {
-      btnSubir.disabled = !inputsPub.some(({ fileInput }) => fileInput.files[0]);
+      btnSubir.disabled = !inputsPub.some(({ fileInput }) => fileInput.files[0]) &&
+        !inputsLat.some(({ fileInput }) => fileInput.files[0]);
     }
 
     async function uploadFile(file, name) {
@@ -606,7 +730,21 @@
             uploads.push(uploadFile(fileInput.files[0], archivo));
           }
         }
+
+        let cambioVideos = false;
+        for (const { fileInput, nombreBase } of inputsLat) {
+          const f = fileInput.files[0];
+          if (f) {
+            const esVideo = f.type.startsWith("video/");
+            uploads.push(uploadFile(f, esVideo ? `${nombreBase}.mp4` : `${nombreBase}.jpg`));
+            if (esVideo) latVideoBasesAdmin.add(nombreBase);
+            else latVideoBasesAdmin.delete(nombreBase);
+            cambioVideos = true;
+          }
+        }
+
         await Promise.all(uploads);
+        if (cambioVideos) await guardarLatVideosAdmin();
         estadoSubir.className = "estado ok";
         estadoSubir.textContent = "Imágenes actualizadas correctamente";
       } catch (err) {

@@ -164,6 +164,9 @@ let latIndex = 0;
 let latInterval = null;
 let latCacheTiempo = 0;
 
+let latVideoBases = new Set();
+let latVideoBasesCacheTiempo = 0;
+
 function getMediaBase() {
   return supabaseConfigurado()
     ? `${SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/media`
@@ -186,6 +189,32 @@ function preloadImages(files) {
   ).then(urls => urls.filter(Boolean));
 }
 
+async function cargarLatVideoBases() {
+  if (!supabaseConfigurado()) return latVideoBases;
+  if (latVideoBasesCacheTiempo > 0 && (Date.now() - latVideoBasesCacheTiempo) < 60000) {
+    return latVideoBases;
+  }
+
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const params = new URLSearchParams({ select: "valor", clave: "eq.lat_videos" });
+
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/config_tablero?${params.toString()}`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+    });
+    if (respuesta.ok) {
+      const filas = await respuesta.json();
+      const valor = filas[0]?.valor || "";
+      latVideoBases = new Set(valor.split(",").map(s => s.trim()).filter(Boolean));
+    }
+    latVideoBasesCacheTiempo = Date.now();
+  } catch (error) {
+    console.warn("No se pudieron cargar los videos de promo lateral", error);
+  }
+
+  return latVideoBases;
+}
+
 function limpiarPubInterval() {
   if (pubInterval) { clearInterval(pubInterval); pubInterval = null; }
 }
@@ -198,11 +227,56 @@ async function cargarLatImages() {
   if (latImagesCargadas.length > 0 && (Date.now() - latCacheTiempo) < 300000) {
     return latImagesCargadas;
   }
-  latImagesCargadas = await preloadImages(LAT_FILES);
+
+  await cargarLatVideoBases();
+  const base = getMediaBase();
+  const cache = Date.now();
+
+  const resultados = await Promise.all(LAT_FILES.map(file => {
+    const nombreBase = file.replace(/\.\w+$/, "");
+    if (latVideoBases.has(nombreBase)) {
+      return Promise.resolve({ src: `${base}/${nombreBase}.mp4?v=${cache}`, tipo: "video" });
+    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        if (img.naturalWidth <= 1 && img.naturalHeight <= 1) resolve(null);
+        else resolve({ src: `${base}/${file}?v=${cache}`, tipo: "imagen" });
+      };
+      img.onerror = () => resolve(null);
+      img.src = `${base}/${file}?v=${cache}`;
+    });
+  }));
+
+  latImagesCargadas = resultados.filter(Boolean);
   latCacheTiempo = Date.now();
   if (latImagesCargadas.length === 0) latIndex = 0;
   else latIndex = latIndex % latImagesCargadas.length;
   return latImagesCargadas;
+}
+
+function latImagenActual() {
+  if (latImagesCargadas.length === 0) return null;
+  return latImagesCargadas[latIndex % latImagesCargadas.length];
+}
+
+function promoLateralHTML() {
+  const actual = latImagenActual();
+  if (!actual) return "";
+  if (actual.tipo === "video") {
+    return `<video src="${actual.src}" autoplay muted loop playsinline></video>`;
+  }
+  return `<img src="${actual.src}" alt="">`;
+}
+
+function actualizarPromoLateral() {
+  const contenedor = document.querySelector(".promo-lateral");
+  if (!contenedor) return;
+  const elActual = contenedor.querySelector("img, video");
+  if (elActual) elActual.style.opacity = "0";
+  setTimeout(() => {
+    contenedor.innerHTML = promoLateralHTML();
+  }, 300);
 }
 
 function iniciarLatRotacion() {
@@ -210,33 +284,14 @@ function iniciarLatRotacion() {
   if (latImagesCargadas.length <= 1) return;
   latInterval = setInterval(() => {
     latIndex = (latIndex + 1) % latImagesCargadas.length;
-    const img = document.querySelector(".promo-lateral img");
-    if (img) {
-      img.style.opacity = "0";
-      setTimeout(() => {
-        img.src = latImagesCargadas[latIndex];
-        img.style.opacity = "1";
-      }, 300);
-    }
+    actualizarPromoLateral();
   }, 60000);
-}
-
-function latImagenActual() {
-  if (latImagesCargadas.length === 0) return "";
-  return latImagesCargadas[latIndex % latImagesCargadas.length];
 }
 
 function cambiarLatImagen(dir) {
   if (latImagesCargadas.length <= 1) return;
   latIndex = (latIndex + dir + latImagesCargadas.length) % latImagesCargadas.length;
-  const img = document.querySelector(".promo-lateral img");
-  if (img) {
-    img.style.opacity = "0";
-    setTimeout(() => {
-      img.src = latImagesCargadas[latIndex];
-      img.style.opacity = "1";
-    }, 300);
-  }
+  actualizarPromoLateral();
   limpiarLatInterval();
   iniciarLatRotacion();
 }
@@ -1231,7 +1286,7 @@ function dibujarTurno(turno) {
         </section>
 
         <aside class="promo-lateral">
-          ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
+          ${promoLateralHTML()}
         </aside>
       </section>
 
@@ -1404,7 +1459,7 @@ function dibujarQuinielaPlus() {
         </section>
 
         <aside class="promo-lateral">
-          ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
+          ${promoLateralHTML()}
         </aside>
       </section>
     </main>
@@ -1554,7 +1609,7 @@ function dibujarLotoPlus() {
         </section>
 
         <aside class="promo-lateral">
-          ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
+          ${promoLateralHTML()}
         </aside>
       </section>
     </main>
@@ -1716,7 +1771,7 @@ function dibujarQuini6() {
         </section>
 
         <aside class="promo-lateral">
-          ${latImagesCargadas.length > 0 ? `<img src="${latImagenActual()}" alt="">` : ""}
+          ${promoLateralHTML()}
         </aside>
       </section>
     </main>
