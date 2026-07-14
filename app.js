@@ -1345,9 +1345,8 @@ function construirVistaQuinielaPlus(datos) {
       }
     }
 
-    const proximoSorteoTexto = proximoSorteo.toLocaleDateString("es-AR", {
-      weekday: "long", day: "2-digit", month: "2-digit"
-    }).toUpperCase();
+    const proximoSorteoDia = proximoSorteo.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase();
+    const proximoSorteoTexto = `${proximoSorteoDia} ${proximoSorteo.getDate()}/${proximoSorteo.getMonth() + 1}`;
 
     let pozoEstimadoTotal = 0;
 
@@ -1516,9 +1515,8 @@ function construirVistaLotoPlus(datos) {
       if (manual > fechaDesdeISO(datos.fecha)) proximoSorteo = manual;
     }
 
-    const proximoSorteoTexto = proximoSorteo.toLocaleDateString("es-AR", {
-      weekday: "long", day: "2-digit", month: "2-digit"
-    }).toUpperCase();
+    const proximoSorteoDia = proximoSorteo.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase();
+    const proximoSorteoTexto = `${proximoSorteoDia} ${proximoSorteo.getDate()}/${proximoSorteo.getMonth() + 1}`;
 
     columnas = SUBJUEGOS_LOTO.map(subjuego => {
       const d = datos.subjuegos[subjuego];
@@ -1691,9 +1689,8 @@ function construirVistaQuini6(datos) {
       if (manual > fechaDesdeISO(datos.fecha)) proximoSorteo = manual;
     }
 
-    const proximoSorteoTexto = proximoSorteo.toLocaleDateString("es-AR", {
-      weekday: "long", day: "2-digit", month: "2-digit"
-    }).toUpperCase();
+    const proximoSorteoDia = proximoSorteo.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase();
+    const proximoSorteoTexto = `${proximoSorteoDia} ${proximoSorteo.getDate()}/${proximoSorteo.getMonth() + 1}`;
 
     columnas = SUBJUEGOS_QUINI6.map(subjuego => {
       const claseColumna = subjuego === "EXTRA" ? "columna-quini6 columna-quini6-extra" : "columna-quini6";
