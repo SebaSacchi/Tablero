@@ -2254,6 +2254,12 @@ document.addEventListener("keydown", (e) => {
     else if (pantallaActual === "QUINI6") capturarQuini6();
     else capturarTurno();
   }
+
+  if (tecla === "p" || tecla === "P") {
+    if (pantallaActual === "QUINIELA_PLUS") capturarQuinielaPlus(true);
+    else if (pantallaActual === "LOTO_PLUS") capturarLotoPlus(true);
+    else if (pantallaActual === "QUINI6") capturarQuini6(true);
+  }
 });
 
 renderTurno(pantallaPorHora());
@@ -2365,7 +2371,7 @@ async function capturarTurno(turno) {
   }
 }
 
-async function capturarQuinielaPlus() {
+async function capturarQuinielaPlus(modoImpresion = false) {
   const datos = resultadosPlusCache;
   if (!datos || !datos.juegos) {
     alert("No hay datos de Quiniela Plus para capturar");
@@ -2379,7 +2385,7 @@ async function capturarQuinielaPlus() {
   escala.className = "captura-qplus-escala";
 
   const contenedor = document.createElement("div");
-  contenedor.className = "captura-qplus-pantalla";
+  contenedor.className = modoImpresion ? "captura-qplus-pantalla modo-impresion" : "captura-qplus-pantalla";
   contenedor.innerHTML = `
     <header class="captura-qplus-header">
       <div class="captura-qplus-titulo"><span>QUINIELA</span><strong>PLUS</strong></div>
@@ -2399,7 +2405,7 @@ async function capturarQuinielaPlus() {
   try {
     const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
     const link = document.createElement("a");
-    link.download = `QUINIELA_PLUS_${fechaArchivo}.png`;
+    link.download = `QUINIELA_PLUS_${fechaArchivo}${modoImpresion ? "_IMPRESION" : ""}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   } catch (err) {
@@ -2410,7 +2416,7 @@ async function capturarQuinielaPlus() {
   }
 }
 
-async function capturarLotoPlus() {
+async function capturarLotoPlus(modoImpresion = false) {
   const datos = resultadosLotoPlusCache;
   if (!datos || !datos.subjuegos) {
     alert("No hay datos de Loto Plus para capturar");
@@ -2424,7 +2430,7 @@ async function capturarLotoPlus() {
   escala.className = "captura-loto-escala";
 
   const contenedor = document.createElement("div");
-  contenedor.className = "captura-loto-pantalla";
+  contenedor.className = modoImpresion ? "captura-loto-pantalla modo-impresion" : "captura-loto-pantalla";
   contenedor.innerHTML = `
     <header class="captura-loto-header">
       <div class="captura-loto-titulo"><span>LOTO</span><strong>PLUS</strong></div>
@@ -2444,7 +2450,7 @@ async function capturarLotoPlus() {
   try {
     const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
     const link = document.createElement("a");
-    link.download = `LOTO_PLUS_${fechaArchivo}.png`;
+    link.download = `LOTO_PLUS_${fechaArchivo}${modoImpresion ? "_IMPRESION" : ""}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   } catch (err) {
@@ -2455,7 +2461,7 @@ async function capturarLotoPlus() {
   }
 }
 
-async function capturarQuini6() {
+async function capturarQuini6(modoImpresion = false) {
   const datos = resultadosQuini6Cache;
   if (!datos || !datos.subjuegos) {
     alert("No hay datos de Quini 6 para capturar");
@@ -2469,7 +2475,7 @@ async function capturarQuini6() {
   escala.className = "captura-quini6-escala";
 
   const contenedor = document.createElement("div");
-  contenedor.className = "captura-quini6-pantalla";
+  contenedor.className = modoImpresion ? "captura-quini6-pantalla modo-impresion" : "captura-quini6-pantalla";
   contenedor.innerHTML = `
     <header class="captura-quini6-header">
       <div class="captura-quini6-titulo"><span>QUINI</span><strong>6</strong></div>
@@ -2489,7 +2495,7 @@ async function capturarQuini6() {
   try {
     const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
     const link = document.createElement("a");
-    link.download = `QUINI6_${fechaArchivo}.png`;
+    link.download = `QUINI6_${fechaArchivo}${modoImpresion ? "_IMPRESION" : ""}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   } catch (err) {

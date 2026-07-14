@@ -2089,3 +2089,31 @@ body {
 .captura-quini6-body .quini6-banner-inferior-monto {
   font-size: clamp(2rem, 4cqw, 4.6rem);
 }
+
+/* Modo impresion: fondo blanco en vez del degrade azul, para ahorrar tinta */
+.captura-qplus-pantalla.modo-impresion,
+.captura-loto-pantalla.modo-impresion,
+.captura-quini6-pantalla.modo-impresion {
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(10, 30, 60, 0.15);
+}
+
+.captura-qplus-pantalla.modo-impresion .captura-qplus-titulo,
+.captura-loto-pantalla.modo-impresion .captura-loto-titulo,
+.captura-quini6-pantalla.modo-impresion .captura-quini6-titulo {
+  color: #0a2049;
+  text-shadow: none;
+}
+
+.captura-qplus-pantalla.modo-impresion .captura-qplus-titulo strong,
+.captura-loto-pantalla.modo-impresion .captura-loto-titulo strong,
+.captura-quini6-pantalla.modo-impresion .captura-quini6-titulo strong {
+  color: #d61f26;
+}
+
+.captura-qplus-pantalla.modo-impresion .captura-qplus-subtitulo,
+.captura-loto-pantalla.modo-impresion .captura-loto-subtitulo,
+.captura-quini6-pantalla.modo-impresion .captura-quini6-subtitulo {
+  color: #0a2049;
+  text-shadow: none;
+}
