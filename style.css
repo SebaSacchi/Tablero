@@ -1786,6 +1786,7 @@ body {
 
 .captura-qplus-pantalla {
   width: 62cqw;
+  height: 100cqh;
   display: flex;
   flex-direction: column;
   padding: 1.4cqh 1.4cqw 1.9cqh;
@@ -1832,11 +1833,14 @@ body {
 
 .captura-qplus-body {
   display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
   justify-content: center;
 }
 
 .captura-qplus-body .tabla-qplus {
   width: 100%;
+  height: 100%;
 }
 
 .captura-qplus-body .qplus-num {
