@@ -1323,7 +1323,8 @@ function construirVistaQuinielaPlus(datos) {
 
   let subtitulo = "SIN SORTEOS CARGADOS";
   let columnas = `<div class="qplus-sin-datos">SIN DATOS DE QUINIELA PLUS</div>`;
-  let bannerHTML = "";
+  let bannerSuperiorHTML = "";
+  let bannerInferiorHTML = "";
 
   if (datos && datos.juegos) {
     const fechaFmt = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR", {
@@ -1405,7 +1406,7 @@ function construirVistaQuinielaPlus(datos) {
       `;
     }).join("");
 
-    bannerHTML = `
+    bannerSuperiorHTML = `
       <div class="qplus-banner">
         <div class="qplus-banner-top">
           <div class="qplus-banner-logo">
@@ -1419,19 +1420,22 @@ function construirVistaQuinielaPlus(datos) {
             <img src="assets/promo-1000.png" alt="Solo por $1.000">
           </div>
         </div>
-        <div class="qplus-banner-pozo">
-          <span class="qplus-banner-etiqueta">POZO ESTIMADO</span>
-          <span class="qplus-banner-monto">${formatoPesos(pozoEstimadoTotal)}</span>
-        </div>
+      </div>
+    `;
+
+    bannerInferiorHTML = `
+      <div class="loto-banner-inferior">
+        <span class="loto-banner-inferior-etiqueta">POZO ESTIMADO</span>
+        <span class="loto-banner-inferior-monto">${formatoPesos(pozoEstimadoTotal)}</span>
       </div>
     `;
   }
 
-  return { subtitulo, bannerHTML, columnas };
+  return { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas };
 }
 
 function dibujarQuinielaPlus() {
-  const { subtitulo, bannerHTML, columnas } = construirVistaQuinielaPlus(resultadosPlusCache);
+  const { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas } = construirVistaQuinielaPlus(resultadosPlusCache);
 
   app.innerHTML = `
     <main class="pantalla estado-finalizado">
@@ -1455,8 +1459,9 @@ function dibujarQuinielaPlus() {
         </aside>
 
         <section class="tabla-qplus">
-          ${bannerHTML}
+          ${bannerSuperiorHTML}
           ${columnas}
+          ${bannerInferiorHTML}
         </section>
 
         <aside class="promo-lateral">
@@ -1962,93 +1967,19 @@ function renderAleatorio() {
   limpiarCierreInterval();
   limpiarLatInterval();
 
-  const reel = `<div class="reel"><div class="tira"><div class="digito">0</div></div></div>`;
-  const separador = `<span class="tragamonedas-separador"></span>`;
-  const reels = [reel, separador, reel, separador, reel, separador, reel].join("");
-
   app.innerHTML = `
-    <main class="pantalla-simple pantalla-tragamonedas">
-      <header class="simple-header tragamonedas-header">
-        <div class="tragamonedas-titulos">
-          <h1 class="tragamonedas-titulo">TOCÁ Y PROBÁ TU SUERTE</h1>
-        </div>
-        <div class="tragamonedas-marca-card">
-          <img class="tragamonedas-marca-logo" src="assets/logo-izq.png" alt="Agencia" onerror="this.remove()">
-          <span class="tragamonedas-marca-fecha">${fechaTexto()}</span>
-        </div>
+    <main class="pantalla-simple pantalla-aleatorio">
+      <header class="simple-header">
+        <h1>NÚMERO ALEATORIO</h1>
+        <h1>${fechaTexto()}</h1>
       </header>
       <section class="simple-body">
-        <div class="tragamonedas-marco">
-          <div class="tragamonedas" id="tragamonedas-panel">${reels}</div>
-          <span class="tragamonedas-etiqueta">★ 4 CIFRAS ★</span>
-        </div>
-        <button type="button" class="tragamonedas-boton" id="btn-tirar-numero">
-          <svg class="tragamonedas-boton-icono" viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true">
-            <circle cx="9" cy="15" r="3" fill="currentColor"></circle>
-            <path d="M14 8c1.5 1.5 1.5 6.5 0 8" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
-            <path d="M17.3 5c3 3 3 11 0 14" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
-          </svg>
-          TIRAR NÚMERO
-        </button>
-        <p class="tragamonedas-ayuda">Probá tu suerte y jugalo en El Grillo</p>
+        <div class="aleatorio-numero">${numero4()}</div>
+        <span class="aleatorio-etiqueta">★ 4 CIFRAS ★</span>
       </section>
-      <span class="tragamonedas-legal">Jugá responsablemente</span>
+      <footer class="footer">Presioná 8 para generar otro número</footer>
     </main>
   `;
-
-  const boton = document.getElementById("btn-tirar-numero");
-  if (boton) boton.addEventListener("click", tirarTragamonedas);
-
-  iniciarGiroTragamonedas();
-}
-
-function tirarTragamonedas() {
-  const boton = document.getElementById("btn-tirar-numero");
-  if (boton) {
-    if (boton.disabled) return;
-    boton.disabled = true;
-    setTimeout(() => { boton.disabled = false; }, 2100);
-  }
-  iniciarGiroTragamonedas();
-}
-
-function iniciarGiroTragamonedas() {
-  const numero = numero4();
-  const panel = document.getElementById("tragamonedas-panel");
-  const reels = document.querySelectorAll(".pantalla-tragamonedas .reel");
-  let maxDuracion = 0;
-
-  reels.forEach((reel, i) => {
-    const tira = reel.querySelector(".tira");
-    const alturaReel = reel.clientHeight;
-    const vueltas = 2 + i;
-    const secuencia = [];
-    for (let v = 0; v < vueltas; v++) {
-      for (let d = 0; d <= 9; d++) secuencia.push(d);
-    }
-    secuencia.push(Number(numero[i]));
-
-    tira.innerHTML = secuencia.map(d => `<div class="digito" style="height:${alturaReel}px">${d}</div>`).join("");
-    tira.style.transition = "none";
-    tira.style.transform = "translateY(0px)";
-    void tira.offsetHeight;
-
-    const duracion = 0.7 + i * 0.22;
-    maxDuracion = Math.max(maxDuracion, duracion);
-
-    requestAnimationFrame(() => {
-      tira.style.transition = `transform ${duracion}s cubic-bezier(0.2, 0.7, 0.3, 1)`;
-      tira.style.transform = `translateY(-${(secuencia.length - 1) * alturaReel}px)`;
-    });
-  });
-
-  if (panel) {
-    clearTimeout(panel._tOn);
-    clearTimeout(panel._tOff);
-    panel.classList.remove("tragamonedas--resultado");
-    panel._tOn = setTimeout(() => panel.classList.add("tragamonedas--resultado"), maxDuracion * 1000);
-    panel._tOff = setTimeout(() => panel.classList.remove("tragamonedas--resultado"), maxDuracion * 1000 + 1000);
-  }
 }
 
 function randomQuini() {
@@ -2444,7 +2375,7 @@ async function capturarQuinielaPlus() {
     return;
   }
 
-  const { subtitulo, bannerHTML, columnas } = construirVistaQuinielaPlus(datos);
+  const { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas } = construirVistaQuinielaPlus(datos);
   const fechaArchivo = fechaDesdeISO(datos.fecha).toLocaleDateString("es-AR").replace(/\//g, "-");
 
   const escala = document.createElement("div");
@@ -2459,8 +2390,9 @@ async function capturarQuinielaPlus() {
     </header>
     <div class="captura-qplus-body">
       <div class="tabla-qplus">
-        ${bannerHTML}
+        ${bannerSuperiorHTML}
         ${columnas}
+        ${bannerInferiorHTML}
       </div>
     </div>
   `;
