@@ -1859,11 +1859,11 @@ body {
 }
 
 .captura-qplus-body .qplus-banner-logo img {
-  height: clamp(5.4rem, 10cqw, 11rem);
+  height: clamp(6.5rem, 12cqw, 13rem);
 }
 
 .captura-qplus-body .qplus-banner-promo {
-  height: clamp(4.4rem, 11cqh, 8rem);
+  height: clamp(5.2rem, 13cqh, 9.5rem);
 }
 
 .captura-qplus-body .loto-banner-inferior-etiqueta {
