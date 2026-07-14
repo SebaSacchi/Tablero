@@ -1655,6 +1655,10 @@ const ACIERTOS_POR_PREMIO_QUINI6 = {
 };
 
 function nivelPremioQuini6(subjuego, nivel) {
+  if (subjuego === "SIEMPRE_SALE") {
+    const m = /^ACIERTOS\s*(\d+)$/i.exec(nivel || "");
+    if (m) return `${m[1]} ACIERTOS`;
+  }
   return ACIERTOS_POR_PREMIO_QUINI6[subjuego]?.[nivel] || nivel;
 }
 
@@ -1713,6 +1717,7 @@ function construirVistaQuini6(datos) {
 
       const premiosHTML = d.premios
         .filter(p => !/^ESTÍMULO$/i.test(p.nivel || ""))
+        .filter(p => !(subjuego === "SIEMPRE_SALE" && /^ACIERTOS\s*0$/i.test(p.nivel || "")))
         .map(p => `
         <div class="qplus-premio-fila">
           <span class="qplus-premio-nivel">${nivelPremioQuini6(subjuego, p.nivel)}</span>

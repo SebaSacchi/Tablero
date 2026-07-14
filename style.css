@@ -987,7 +987,7 @@ body {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.3cqh 0.5cqw;
-  margin: 0.5cqh 0.8cqw 0.3cqh;
+  margin: 0.35cqh 0.8cqw 0.15cqh;
 }
 
 .quini6-num {
@@ -1020,7 +1020,7 @@ body {
 .columna-quini6 .qplus-premio-fila {
   grid-template-columns: minmax(0, 0.75fr) minmax(0, 0.7fr) minmax(0, 1.35fr);
   font-size: clamp(0.48rem, 0.78cqw, 0.86rem);
-  padding: 0.1cqh 0.2cqw;
+  padding: 0.04cqh 0.2cqw;
 }
 
 .columna-quini6 .qplus-premio-header {
@@ -1028,7 +1028,7 @@ body {
 }
 
 .columna-quini6 .qplus-premio-importe {
-  font-size: clamp(0.56rem, 0.9cqw, 1rem);
+  font-size: clamp(0.64rem, 1cqw, 1.15rem);
 }
 
 .quini6-banner-top {
