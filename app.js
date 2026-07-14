@@ -1535,9 +1535,21 @@ function construirVistaLotoPlus(datos) {
         </div>
       `).join("");
 
+      const numeroPlusHTML = subjuego === "TRADICIONAL" && datos.numeroPlus != null
+        ? `
+          <div class="loto-numero-plus">
+            <span class="loto-numero-plus-etiqueta">NÚMERO PLUS</span>
+            <span class="loto-numero-plus-valor">${datos.numeroPlus}</span>
+          </div>
+        `
+        : "";
+
       return `
         <div class="columna-loto">
-          <div class="loto-titulo">${nombreSubjuegoLoto(subjuego)}</div>
+          <div class="loto-titulo">
+            <span>${nombreSubjuegoLoto(subjuego)}</span>
+            ${numeroPlusHTML}
+          </div>
           <div class="loto-numeros">${numerosHTML}</div>
           <div class="qplus-premios">
             <div class="qplus-premio-fila qplus-premio-header">
@@ -1554,10 +1566,6 @@ function construirVistaLotoPlus(datos) {
         <div class="qplus-banner-top loto-banner-top">
           <div class="qplus-banner-logo">
             <img src="assets/logo-lotoplus.png" alt="Loto Plus" onerror="this.replaceWith(document.createTextNode('LOTO PLUS'))">
-          </div>
-          <div class="loto-banner-plus">
-            <span class="loto-banner-plus-etiqueta">NÚMERO PLUS</span>
-            <span class="loto-banner-plus-valor">${datos.numeroPlus ?? "--"}</span>
           </div>
           <div class="qplus-banner-sorteo">
             <span class="qplus-banner-sorteo-etiqueta">PRÓXIMO SORTEO</span>
