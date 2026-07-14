@@ -1885,6 +1885,7 @@ body {
 
 .captura-loto-pantalla {
   width: 62cqw;
+  height: 100cqh;
   display: flex;
   flex-direction: column;
   padding: 1.4cqh 1.4cqw 1.9cqh;
@@ -1931,11 +1932,14 @@ body {
 
 .captura-loto-body {
   display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
   justify-content: center;
 }
 
 .captura-loto-body .tabla-loto {
   width: 100%;
+  height: 100%;
 }
 
 .captura-loto-body .columnas-loto {
@@ -1997,6 +2001,7 @@ body {
 
 .captura-quini6-pantalla {
   width: 62cqw;
+  height: 100cqh;
   display: flex;
   flex-direction: column;
   padding: 1.4cqh 1.4cqw 1.9cqh;
@@ -2043,11 +2048,14 @@ body {
 
 .captura-quini6-body {
   display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
   justify-content: center;
 }
 
 .captura-quini6-body .tabla-quini6 {
   width: 100%;
+  height: 100%;
 }
 
 .captura-quini6-body .quini6-num {
