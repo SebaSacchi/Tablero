@@ -1849,21 +1849,21 @@ body {
 }
 
 .captura-qplus-body .qplus-banner-sorteo-etiqueta {
-  font-size: clamp(1.3rem, 2.3cqw, 2.6rem);
+  font-size: clamp(1rem, 1.7cqw, 1.9rem);
 }
 
 .captura-qplus-body .qplus-banner-sorteo-valor {
-  font-size: clamp(2rem, 3.6cqw, 4.2rem);
-  white-space: normal;
+  font-size: clamp(1.5rem, 2.6cqw, 3rem);
+  white-space: nowrap;
   line-height: 1.05;
 }
 
 .captura-qplus-body .qplus-banner-logo img {
-  height: clamp(10rem, 19cqw, 21rem);
+  height: clamp(5.4rem, 10cqw, 11rem);
 }
 
 .captura-qplus-body .qplus-banner-promo {
-  height: clamp(6rem, 17cqh, 11.5rem);
+  height: clamp(4.4rem, 11cqh, 8rem);
 }
 
 .captura-qplus-body .loto-banner-inferior-etiqueta {
