@@ -1701,7 +1701,9 @@ function construirVistaQuini6(datos) {
         ? `<div class="${claseNumeros}">${numerosMostrados.map(n => `<div class="${claseNum}">${n}</div>`).join("")}</div>`
         : "";
 
-      const premiosHTML = d.premios.map(p => `
+      const premiosHTML = d.premios
+        .filter(p => !/^ESTÍMULO$/i.test(p.nivel || ""))
+        .map(p => `
         <div class="qplus-premio-fila">
           <span class="qplus-premio-nivel">${p.nivel}</span>
           <span class="qplus-premio-ganadores">${p.ganadores}</span>
