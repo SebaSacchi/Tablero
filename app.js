@@ -49,6 +49,7 @@ function getLoteriasTurno(turno, fecha = new Date()) {
 
 
 const ordenTurnos = ["PREVIA", "PRIMERA", "MATUTINA", "VESPERTINA", "NOCTURNA"];
+const PANTALLAS_CON_LATERAL = [...ordenTurnos, "QUINIELA_PLUS", "LOTO_PLUS", "QUINI6"];
 
 const horariosTurnos = {
   PREVIA: { inicio: "10:15", fin: "10:45" },
@@ -2262,15 +2263,28 @@ const pantallasOrden = [
   { key: "9", fn: () => renderQuini() }
 ];
 
-function indicePantallaActual() {
-  const mapa = { PREVIA: 0, PRIMERA: 0, MATUTINA: 1, VESPERTINA: 2, NOCTURNA: 3, QUINIELA_PLUS: 4, LOTO_PLUS: 4, QUINI6: 4, CABEZAS: 5, HISTORIAL: 5, PUBLICIDAD: 6, ALEATORIO: 7, QUINI: 8 };
-  return mapa[pantallaActual] ?? 0;
-}
+const PANTALLAS_NAVEGABLES = [
+  { id: "PREVIA", fn: () => renderTurno("PREVIA") },
+  { id: "PRIMERA", fn: () => renderTurno("PRIMERA") },
+  { id: "MATUTINA", fn: () => renderTurno("MATUTINA") },
+  { id: "VESPERTINA", fn: () => renderTurno("VESPERTINA") },
+  { id: "NOCTURNA", fn: () => renderTurno("NOCTURNA") },
+  { id: "QUINIELA_PLUS", fn: () => renderQuinielaPlus() },
+  { id: "LOTO_PLUS", fn: () => renderLotoPlus() },
+  { id: "QUINI6", fn: () => renderQuini6() },
+  { id: "CABEZAS", fn: () => renderCabezas() },
+  { id: "HISTORIAL", fn: () => renderHistorial() },
+  { id: "PUBLICIDAD", fn: () => renderPublicidad() },
+  { id: "ALEATORIO", fn: () => renderAleatorio() },
+  { id: "QUINI", fn: () => renderQuini() }
+];
 
 function navegarPantalla(dir) {
-  const total = pantallasOrden.length;
-  const nuevo = (indicePantallaActual() + dir + total) % total;
-  pantallasOrden[nuevo].fn();
+  const total = PANTALLAS_NAVEGABLES.length;
+  const actual = PANTALLAS_NAVEGABLES.findIndex(p => p.id === pantallaActual);
+  const idx = actual === -1 ? 0 : actual;
+  const nuevo = (idx + dir + total) % total;
+  PANTALLAS_NAVEGABLES[nuevo].fn();
 }
 
 let idleTimeoutId = null;
@@ -2296,7 +2310,7 @@ document.addEventListener("keydown", (e) => {
   if (tecla === "ArrowRight" || e.keyCode === 22 || e.keyCode === 166) navegarPantalla(1);
   if (tecla === "ArrowLeft" || e.keyCode === 21 || e.keyCode === 167) navegarPantalla(-1);
 
-  if (ordenTurnos.includes(pantallaActual)) {
+  if (PANTALLAS_CON_LATERAL.includes(pantallaActual)) {
     if (tecla === "ArrowUp" || e.keyCode === 19) cambiarLatImagen(-1);
     if (tecla === "ArrowDown" || e.keyCode === 20) cambiarLatImagen(1);
   }
