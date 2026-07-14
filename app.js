@@ -1648,6 +1648,16 @@ async function renderLotoPlus() {
   }
 }
 
+const ACIERTOS_POR_PREMIO_QUINI6 = {
+  TRADICIONAL: { "1° PREMIO": "6 ACIERTOS", "2° PREMIO": "5 ACIERTOS", "3° PREMIO": "4 ACIERTOS" },
+  SEGUNDA: { "1° PREMIO": "6 ACIERTOS", "2° PREMIO": "5 ACIERTOS", "3° PREMIO": "4 ACIERTOS" },
+  REVANCHA: { "1° PREMIO": "6 ACIERTOS" }
+};
+
+function nivelPremioQuini6(subjuego, nivel) {
+  return ACIERTOS_POR_PREMIO_QUINI6[subjuego]?.[nivel] || nivel;
+}
+
 function construirVistaQuini6(datos) {
   let subtitulo = "SIN SORTEOS CARGADOS";
   let columnas = `<div class="qplus-sin-datos">SIN DATOS DE QUINI 6</div>`;
@@ -1705,7 +1715,7 @@ function construirVistaQuini6(datos) {
         .filter(p => !/^ESTÍMULO$/i.test(p.nivel || ""))
         .map(p => `
         <div class="qplus-premio-fila">
-          <span class="qplus-premio-nivel">${p.nivel}</span>
+          <span class="qplus-premio-nivel">${nivelPremioQuini6(subjuego, p.nivel)}</span>
           <span class="qplus-premio-ganadores">${p.ganadores}</span>
           <span class="qplus-premio-importe">${quitarDecimales(p.importe)}</span>
         </div>
