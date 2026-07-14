@@ -894,11 +894,6 @@ body {
   line-height: 1.05;
 }
 
-.loto-banner-top .qplus-banner-promo {
-  height: clamp(3.8rem, 8.5cqh, 6.6rem);
-  aspect-ratio: 1;
-}
-
 .loto-banner-inferior {
   flex: 0 0 auto;
   display: flex;
@@ -1049,8 +1044,9 @@ body {
   font-size: clamp(1.4rem, 2.5cqw, 2.9rem);
 }
 
-.quini6-banner-top .qplus-banner-promo {
-  height: clamp(5.3rem, 12cqh, 9.1rem);
+.quini6-banner-top .qplus-banner-promo,
+.loto-banner-top .qplus-banner-promo {
+  height: clamp(6.9rem, 15.6cqh, 11.8rem);
   aspect-ratio: 1;
 }
 
