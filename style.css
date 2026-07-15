@@ -526,6 +526,9 @@ body {
   font-weight: 1000;
   letter-spacing: 0.08em;
   color: #a9c0f5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .qplus-numeros {
