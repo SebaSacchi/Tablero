@@ -2117,3 +2117,83 @@ body {
   color: #0a2049;
   text-shadow: none;
 }
+
+/* Modo impresion: tarjetas de resultados sin relleno de color */
+.modo-impresion .columna-qplus,
+.modo-impresion .columna-loto,
+.modo-impresion .columna-quini6 {
+  background: #ffffff;
+  border: 0.09cqh solid #123166;
+  box-shadow: none;
+}
+
+.modo-impresion .qplus-titulo,
+.modo-impresion .loto-titulo,
+.modo-impresion .quini6-titulo {
+  background: #ffffff;
+  color: #0a2049;
+  border-bottom: 0.09cqh solid #123166;
+}
+
+.modo-impresion .qplus-numeros-bloque {
+  border-color: rgba(10, 30, 60, 0.25);
+}
+
+.modo-impresion .qplus-premio-fila {
+  color: #16233f;
+  border-bottom: 0.07cqh solid rgba(10, 30, 60, 0.18);
+}
+
+.modo-impresion .qplus-premio-header {
+  color: #123166;
+  border-bottom: 0.11cqh solid rgba(10, 30, 60, 0.35);
+}
+
+.modo-impresion .qplus-premio-importe {
+  color: #9a6b00;
+}
+
+.modo-impresion .qplus-vacante {
+  background: #ffffff;
+  border: 0.09cqh solid #1f9c3a;
+  border-left: 0.09cqh solid #1f9c3a;
+}
+
+.modo-impresion .qplus-vacante-etiqueta {
+  color: #1f9c3a;
+}
+
+.modo-impresion .qplus-vacante-monto {
+  color: #0f6b23;
+}
+
+.modo-impresion .loto-numero-plus {
+  background: #ffffff;
+  border: 0.07cqh solid #a30d0d;
+}
+
+.modo-impresion .loto-numero-plus-etiqueta {
+  color: #a30d0d;
+}
+
+.modo-impresion .loto-numero-plus-valor {
+  color: #a30d0d;
+}
+
+.modo-impresion .loto-banner-inferior-etiqueta,
+.modo-impresion .quini6-banner-inferior-etiqueta {
+  background: #ffffff;
+  color: #a30d0d;
+  border: 0.09cqh solid #a30d0d;
+  text-shadow: none;
+  box-shadow: none;
+}
+
+.modo-impresion .loto-banner-inferior-monto,
+.modo-impresion .quini6-banner-inferior-monto {
+  background: #ffffff;
+  color: #0a2049;
+  border: 0.09cqh solid #0a2049;
+  border-left: none;
+  animation: none;
+}
