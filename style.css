@@ -2197,3 +2197,53 @@ body {
   border-left: none;
   animation: none;
 }
+
+/* Modo impresion: capturas de Quiniela (Previa/Primera/Matutina/Vespertina/Nocturna) */
+.captura-contenedor.modo-impresion {
+  background: #ffffff;
+  color: #0a2049;
+  box-shadow: 0 0 0 1px rgba(10, 30, 60, 0.15);
+}
+
+.captura-contenedor.modo-impresion .captura-titulo {
+  color: #0a2049;
+  text-shadow: none;
+}
+
+.captura-contenedor.modo-impresion .captura-fecha {
+  color: #0a2049;
+  text-shadow: none;
+}
+
+.captura-contenedor.modo-impresion .captura-columna {
+  background: #ffffff;
+  border-left: 3px solid #123166;
+  border-right: 3px solid #123166;
+  box-shadow: none;
+}
+
+.captura-contenedor.modo-impresion .captura-columna h2 {
+  background: #ffffff;
+  color: #0a2049;
+  text-shadow: none;
+  border-bottom: 3px solid #123166;
+}
+
+.captura-contenedor.modo-impresion .captura-sep {
+  border-top: 1px solid rgba(10, 30, 60, 0.3);
+}
+
+.captura-contenedor.modo-impresion .captura-pos {
+  color: #123166;
+  opacity: 1;
+  text-shadow: none;
+}
+
+.captura-contenedor.modo-impresion .captura-num {
+  color: #16233f;
+  text-shadow: none;
+}
+
+.captura-contenedor.modo-impresion .captura-fila:first-of-type .captura-num {
+  color: #a30d0d;
+}

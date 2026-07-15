@@ -2259,6 +2259,7 @@ document.addEventListener("keydown", (e) => {
     if (pantallaActual === "QUINIELA_PLUS") capturarQuinielaPlus(true);
     else if (pantallaActual === "LOTO_PLUS") capturarLotoPlus(true);
     else if (pantallaActual === "QUINI6") capturarQuini6(true);
+    else capturarTurno(undefined, true);
   }
 });
 
@@ -2318,7 +2319,7 @@ setInterval(() => {
   }
 }, 10000);
 
-async function capturarTurno(turno) {
+async function capturarTurno(turno, modoImpresion = false) {
   if (!turno) {
     turno = ordenTurnos.includes(pantallaActual) ? pantallaActual : pantallaPorHora();
   }
@@ -2347,7 +2348,7 @@ async function capturarTurno(turno) {
   }).join("");
 
   const contenedor = document.createElement("div");
-  contenedor.className = "captura-contenedor";
+  contenedor.className = modoImpresion ? "captura-contenedor modo-impresion" : "captura-contenedor";
   contenedor.innerHTML = `
     <div class="captura-header">
       <div class="captura-titulo">${turno}</div>
@@ -2360,7 +2361,7 @@ async function capturarTurno(turno) {
   try {
     const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
     const link = document.createElement("a");
-    link.download = `${turno}_${fechaTxt.replace(/\//g, "-")}.png`;
+    link.download = `${turno}_${fechaTxt.replace(/\//g, "-")}${modoImpresion ? "_IMPRESION" : ""}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   } catch (err) {
