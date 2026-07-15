@@ -520,6 +520,7 @@ body {
 }
 
 .qplus-numeros-label {
+  flex-shrink: 0;
   text-align: center;
   padding: 0.3cqh 0.2cqw 0.15cqh;
   font-size: clamp(0.5rem, 0.82cqw, 0.88rem);
