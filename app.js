@@ -265,7 +265,7 @@ function promoLateralHTML() {
   const actual = latImagenActual();
   if (!actual) return "";
   if (actual.tipo === "video") {
-    return `<video src="${actual.src}" autoplay muted loop playsinline></video>`;
+    return `<video src="${actual.src}" autoplay muted playsinline></video>`;
   }
   return `<img src="${actual.src}" alt="">`;
 }
@@ -277,6 +277,8 @@ function actualizarPromoLateral() {
   if (elActual) elActual.style.opacity = "0";
   setTimeout(() => {
     contenedor.innerHTML = promoLateralHTML();
+    const video = contenedor.querySelector("video");
+    if (video) video.addEventListener("ended", () => cambiarLatImagen(1), { once: true });
   }, 300);
 }
 
