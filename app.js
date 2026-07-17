@@ -164,6 +164,7 @@ let latImagesCargadas = [];
 let latIndex = 0;
 let latInterval = null;
 let latCacheTiempo = 0;
+let latPromoId = 0;
 
 let latVideoBases = new Set();
 let latVideoBasesCacheTiempo = 0;
@@ -270,16 +271,52 @@ function promoLateralHTML() {
   return `<img src="${actual.src}" alt="">`;
 }
 
-function actualizarPromoLateral() {
+function crearElementoLat(actual) {
+  return new Promise((resolve) => {
+    if (!actual) { resolve(null); return; }
+    if (actual.tipo === "video") {
+      const video = document.createElement("video");
+      video.muted = true;
+      video.playsInline = true;
+      video.style.opacity = "0";
+      const listo = () => resolve(video);
+      video.addEventListener("loadeddata", listo, { once: true });
+      video.addEventListener("error", listo, { once: true });
+      video.src = actual.src;
+    } else {
+      const img = document.createElement("img");
+      img.alt = "";
+      img.style.opacity = "0";
+      const listo = () => resolve(img);
+      img.addEventListener("load", listo, { once: true });
+      img.addEventListener("error", listo, { once: true });
+      img.src = actual.src;
+    }
+  });
+}
+
+async function actualizarPromoLateral() {
   const contenedor = document.querySelector(".promo-lateral");
   if (!contenedor) return;
   const elActual = contenedor.querySelector("img, video");
   if (elActual) elActual.style.opacity = "0";
-  setTimeout(() => {
-    contenedor.innerHTML = promoLateralHTML();
-    const video = contenedor.querySelector("video");
-    if (video) video.addEventListener("ended", () => cambiarLatImagen(1), { once: true });
-  }, 300);
+
+  const idPromo = ++latPromoId;
+  const espera = new Promise((resolve) => setTimeout(resolve, 300));
+  const [nuevoEl] = await Promise.all([crearElementoLat(latImagenActual()), espera]);
+  if (idPromo !== latPromoId) return;
+
+  const contenedorActual = document.querySelector(".promo-lateral");
+  if (!contenedorActual) return;
+  contenedorActual.innerHTML = "";
+  if (nuevoEl) {
+    contenedorActual.appendChild(nuevoEl);
+    requestAnimationFrame(() => { nuevoEl.style.opacity = "1"; });
+    if (nuevoEl.tagName === "VIDEO") {
+      nuevoEl.addEventListener("ended", () => cambiarLatImagen(1), { once: true });
+      nuevoEl.play().catch(() => {});
+    }
+  }
 }
 
 function iniciarLatRotacion() {
