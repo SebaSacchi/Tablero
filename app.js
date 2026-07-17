@@ -164,7 +164,7 @@ let latImagesCargadas = [];
 let latIndex = 0;
 let latInterval = null;
 let latCacheTiempo = 0;
-let latPromoId = 0;
+let latSlotActivoIdx = 0;
 
 let latVideoBases = new Set();
 let latVideoBasesCacheTiempo = 0;
@@ -266,7 +266,7 @@ function promoLateralHTML() {
   const actual = latImagenActual();
   if (!actual) return "";
   if (actual.tipo === "video") {
-    return `<video src="${actual.src}" autoplay muted playsinline></video>`;
+    return `<video src="${actual.src}" autoplay muted playsinline preload="auto"></video>`;
   }
   return `<img src="${actual.src}" alt="">`;
 }
@@ -278,7 +278,7 @@ function crearElementoLat(actual) {
       const video = document.createElement("video");
       video.muted = true;
       video.playsInline = true;
-      video.style.opacity = "0";
+      video.preload = "auto";
       const listo = () => resolve(video);
       video.addEventListener("loadeddata", listo, { once: true });
       video.addEventListener("error", listo, { once: true });
@@ -286,7 +286,6 @@ function crearElementoLat(actual) {
     } else {
       const img = document.createElement("img");
       img.alt = "";
-      img.style.opacity = "0";
       const listo = () => resolve(img);
       img.addEventListener("load", listo, { once: true });
       img.addEventListener("error", listo, { once: true });
@@ -295,31 +294,110 @@ function crearElementoLat(actual) {
   });
 }
 
+// Los slots quedan montados en el DOM (nunca display:none) a proposito:
+// en smart TV / Android TV el video no arranca a bufferizar hasta estar
+// adjunto al DOM, asi que el slot oculto necesita estar "presente" (solo
+// con opacity 0) para poder precargar el siguiente video mientras el
+// actual todavia se esta reproduciendo.
+function obtenerSlotsLat(contenedor) {
+  if (contenedor.dataset.latSlots !== "1") {
+    const existente = contenedor.querySelector("img, video");
+    contenedor.innerHTML = "";
+    const slotA = document.createElement("div");
+    slotA.className = "lat-slot lat-slot-activo";
+    const slotB = document.createElement("div");
+    slotB.className = "lat-slot";
+    contenedor.appendChild(slotA);
+    contenedor.appendChild(slotB);
+    contenedor.dataset.latSlots = "1";
+    if (existente) {
+      slotA.appendChild(existente);
+      const actual = latImagenActual();
+      slotA.dataset.latSrc = actual ? actual.src : "";
+    }
+  }
+  return Array.from(contenedor.children).filter(el => el.classList.contains("lat-slot"));
+}
+
+// Las pantallas se redibujan por completo (app.innerHTML) cada 10s para
+// refrescar datos. Sin esto, esa recreacion tira el <video> que se venia
+// bufferizando/reproduciendo y hay que arrancar de cero cada vez (el
+// "segundo de flecha negra" en smart TV). Por eso el nodo de la promo se
+// saca antes de redibujar y se reinserta despues, intacto.
+function capturarPromoLateralPrevia() {
+  const contenedor = document.querySelector(".promo-lateral");
+  if (!contenedor || contenedor.dataset.latSlots !== "1") return null;
+  return Array.from(contenedor.childNodes);
+}
+
+function restaurarPromoLateralPrevia(nodos) {
+  if (!nodos) return;
+  const contenedor = document.querySelector(".promo-lateral");
+  if (!contenedor) return;
+  contenedor.innerHTML = "";
+  nodos.forEach(nodo => contenedor.appendChild(nodo));
+  contenedor.dataset.latSlots = "1";
+}
+
+function activarVideoDelSlot(slot) {
+  const video = slot.querySelector("video");
+  // dibujarTurno/etc. redibujan la pantalla cada 10s y llaman de nuevo a
+  // iniciarLatRotacion: si no hubiera guarda, un video ya en reproduccion
+  // se reiniciaria (currentTime=0) y se le apilaria un listener "ended"
+  // nuevo cada vez.
+  if (!video || video.dataset.latIniciado === "1") return;
+  video.dataset.latIniciado = "1";
+  video.play().catch(() => {});
+  video.addEventListener("ended", () => cambiarLatImagen(1), { once: true });
+}
+
+async function precargarEnSlot(slot, item) {
+  const src = item ? item.src : "";
+  if (slot.dataset.latSrc === src) return slot.firstElementChild || null;
+  const el = await crearElementoLat(item);
+  slot.innerHTML = "";
+  slot.dataset.latSrc = src;
+  if (el) slot.appendChild(el);
+  return el;
+}
+
+function precargarSiguienteLat(contenedor) {
+  if (latImagesCargadas.length <= 1) return;
+  const slots = obtenerSlotsLat(contenedor);
+  const inactivo = slots[1 - latSlotActivoIdx];
+  const siguienteIndex = (latIndex + 1) % latImagesCargadas.length;
+  precargarEnSlot(inactivo, latImagesCargadas[siguienteIndex]);
+}
+
 async function actualizarPromoLateral() {
   const contenedor = document.querySelector(".promo-lateral");
   if (!contenedor) return;
-  const elActual = contenedor.querySelector("img, video");
-  if (elActual) elActual.style.opacity = "0";
+  const slots = obtenerSlotsLat(contenedor);
+  const activo = slots[latSlotActivoIdx];
+  const inactivo = slots[1 - latSlotActivoIdx];
+  const objetivo = latImagenActual();
 
-  const idPromo = ++latPromoId;
-  const espera = new Promise((resolve) => setTimeout(resolve, 300));
-  const [nuevoEl] = await Promise.all([crearElementoLat(latImagenActual()), espera]);
-  if (idPromo !== latPromoId) return;
+  await precargarEnSlot(inactivo, objetivo);
 
   const contenedorActual = document.querySelector(".promo-lateral");
   if (!contenedorActual) return;
-  contenedorActual.innerHTML = "";
-  if (nuevoEl) {
-    contenedorActual.appendChild(nuevoEl);
-    requestAnimationFrame(() => { nuevoEl.style.opacity = "1"; });
-    if (nuevoEl.tagName === "VIDEO") {
-      nuevoEl.addEventListener("ended", () => cambiarLatImagen(1), { once: true });
-      nuevoEl.play().catch(() => {});
-    }
-  }
+
+  activo.style.opacity = "0";
+  activo.classList.remove("lat-slot-activo");
+  inactivo.style.opacity = "1";
+  inactivo.classList.add("lat-slot-activo");
+  latSlotActivoIdx = 1 - latSlotActivoIdx;
+  activarVideoDelSlot(inactivo);
+  precargarSiguienteLat(contenedorActual);
 }
 
 function iniciarLatRotacion() {
+  const contenedor = document.querySelector(".promo-lateral");
+  if (contenedor) {
+    const slots = obtenerSlotsLat(contenedor);
+    activarVideoDelSlot(slots[latSlotActivoIdx]);
+    precargarSiguienteLat(contenedor);
+  }
   if (latInterval) return;
   if (latImagesCargadas.length <= 1) return;
   latInterval = setInterval(() => {
@@ -1300,6 +1378,7 @@ function dibujarTurno(turno) {
 
   const resumenPlus = construirResumenQuinielaPlus();
 
+  const promoPreservada = capturarPromoLateralPrevia();
   app.innerHTML = `
     <main class="pantalla ${estado.clase}${resumenPlus ? " pantalla-con-plus" : ""}">
       <header class="topbar">
@@ -1333,6 +1412,7 @@ function dibujarTurno(turno) {
       ${resumenPlus}
     </main>
   `;
+  restaurarPromoLateralPrevia(promoPreservada);
 }
 
 async function renderTurno(turno) {
@@ -1475,6 +1555,7 @@ function construirVistaQuinielaPlus(datos) {
 function dibujarQuinielaPlus() {
   const { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas } = construirVistaQuinielaPlus(resultadosPlusCache);
 
+  const promoPreservada = capturarPromoLateralPrevia();
   app.innerHTML = `
     <main class="pantalla estado-finalizado">
       <header class="topbar">
@@ -1508,6 +1589,7 @@ function dibujarQuinielaPlus() {
       </section>
     </main>
   `;
+  restaurarPromoLateralPrevia(promoPreservada);
 }
 
 async function renderQuinielaPlus() {
@@ -1635,6 +1717,7 @@ function construirVistaLotoPlus(datos) {
 function dibujarLotoPlus() {
   const { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas } = construirVistaLotoPlus(resultadosLotoPlusCache);
 
+  const promoPreservada = capturarPromoLateralPrevia();
   app.innerHTML = `
     <main class="pantalla estado-finalizado pantalla-loto-plus">
       <header class="topbar">
@@ -1668,6 +1751,7 @@ function dibujarLotoPlus() {
       </section>
     </main>
   `;
+  restaurarPromoLateralPrevia(promoPreservada);
 }
 
 async function renderLotoPlus() {
@@ -1813,6 +1897,7 @@ function construirVistaQuini6(datos) {
 function dibujarQuini6() {
   const { subtitulo, bannerSuperiorHTML, bannerInferiorHTML, columnas } = construirVistaQuini6(resultadosQuini6Cache);
 
+  const promoPreservada = capturarPromoLateralPrevia();
   app.innerHTML = `
     <main class="pantalla estado-finalizado pantalla-quini6">
       <header class="topbar">
@@ -1846,6 +1931,7 @@ function dibujarQuini6() {
       </section>
     </main>
   `;
+  restaurarPromoLateralPrevia(promoPreservada);
 }
 
 async function renderQuini6() {

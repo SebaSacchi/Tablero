@@ -651,6 +651,7 @@ body {
 }
 
 .promo-lateral {
+  position: relative;
   border-radius: 8px;
   overflow: hidden;
   min-width: 0;
@@ -660,6 +661,21 @@ body {
   justify-content: center;
 }
 
+.promo-lateral .lat-slot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.promo-lateral .lat-slot.lat-slot-activo {
+  opacity: 1;
+}
+
 .promo-lateral img,
 .promo-lateral video {
   width: 100%;
@@ -667,7 +683,6 @@ body {
   object-fit: fill;
   border-radius: 6px;
   background: #fff;
-  transition: opacity 0.3s ease;
   border: 0.85cqh solid #ffd400;
   box-shadow: 0 0 0.8cqh rgba(255, 212, 0, 0.3);
 }
