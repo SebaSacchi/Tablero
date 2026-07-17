@@ -266,7 +266,7 @@ function promoLateralHTML() {
   const actual = latImagenActual();
   if (!actual) return "";
   if (actual.tipo === "video") {
-    return `<video src="${actual.src}" autoplay muted playsinline preload="auto"></video>`;
+    return `<video src="${actual.src}" autoplay muted loop playsinline preload="auto"></video>`;
   }
   return `<img src="${actual.src}" alt="">`;
 }
@@ -277,6 +277,7 @@ function crearElementoLat(actual) {
     if (actual.tipo === "video") {
       const video = document.createElement("video");
       video.muted = true;
+      video.loop = true;
       video.playsInline = true;
       video.preload = "auto";
       const listo = () => resolve(video);
@@ -344,15 +345,16 @@ function restaurarPromoLateralPrevia(nodos) {
 // slot se revela recien cuando hay imagen real en pantalla y no se ve
 // la flecha de "pausado" que muestran los smart TV mientras el video
 // esta cargado pero todavia no reproduce.
+// El video tiene loop=true (nunca dispara "ended"): se repite solo hasta
+// que el timer de 60s de iniciarLatRotacion avance a la siguiente, igual
+// que las imagenes.
 function activarVideoDelSlot(slot) {
   const video = slot.querySelector("video");
   // dibujarTurno/etc. redibujan la pantalla cada 10s y llaman de nuevo a
   // iniciarLatRotacion: si no hubiera guarda, un video ya en reproduccion
-  // se reiniciaria (currentTime=0) y se le apilaria un listener "ended"
-  // nuevo cada vez.
+  // se reiniciaria (currentTime=0).
   if (!video || video.dataset.latIniciado === "1") return Promise.resolve();
   video.dataset.latIniciado = "1";
-  video.addEventListener("ended", () => cambiarLatImagen(1), { once: true });
   return new Promise((resolve) => {
     let resuelto = false;
     const listo = () => {
