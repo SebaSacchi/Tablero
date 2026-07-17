@@ -339,16 +339,31 @@ function restaurarPromoLateralPrevia(nodos) {
   contenedor.dataset.latSlots = "1";
 }
 
+// Devuelve una promesa que se resuelve cuando el video ya arranco a
+// reproducirse (evento "playing"), no apenas se llama a play(). Asi el
+// slot se revela recien cuando hay imagen real en pantalla y no se ve
+// la flecha de "pausado" que muestran los smart TV mientras el video
+// esta cargado pero todavia no reproduce.
 function activarVideoDelSlot(slot) {
   const video = slot.querySelector("video");
   // dibujarTurno/etc. redibujan la pantalla cada 10s y llaman de nuevo a
   // iniciarLatRotacion: si no hubiera guarda, un video ya en reproduccion
   // se reiniciaria (currentTime=0) y se le apilaria un listener "ended"
   // nuevo cada vez.
-  if (!video || video.dataset.latIniciado === "1") return;
+  if (!video || video.dataset.latIniciado === "1") return Promise.resolve();
   video.dataset.latIniciado = "1";
-  video.play().catch(() => {});
   video.addEventListener("ended", () => cambiarLatImagen(1), { once: true });
+  return new Promise((resolve) => {
+    let resuelto = false;
+    const listo = () => {
+      if (resuelto) return;
+      resuelto = true;
+      resolve();
+    };
+    video.addEventListener("playing", listo, { once: true });
+    video.play().catch(listo);
+    setTimeout(listo, 500);
+  });
 }
 
 async function precargarEnSlot(slot, item) {
@@ -378,6 +393,7 @@ async function actualizarPromoLateral() {
   const objetivo = latImagenActual();
 
   await precargarEnSlot(inactivo, objetivo);
+  await activarVideoDelSlot(inactivo);
 
   const contenedorActual = document.querySelector(".promo-lateral");
   if (!contenedorActual) return;
@@ -387,7 +403,6 @@ async function actualizarPromoLateral() {
   inactivo.style.opacity = "1";
   inactivo.classList.add("lat-slot-activo");
   latSlotActivoIdx = 1 - latSlotActivoIdx;
-  activarVideoDelSlot(inactivo);
   precargarSiguienteLat(contenedorActual);
 }
 
