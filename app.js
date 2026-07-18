@@ -169,6 +169,14 @@ let latSlotActivoIdx = 0;
 let latVideoBases = new Set();
 let latVideoBasesCacheTiempo = 0;
 
+// Fijo por pestaña (no por Date.now() en cada refresco de latImagesCargadas):
+// si el "?v=" de los videos cambiara cada 5 minutos, el navegador los trataria
+// como un recurso nuevo y los volveria a descargar enteros desde Supabase
+// Storage aunque el archivo no haya cambiado. Con un valor fijo, el video se
+// descarga una sola vez por pestaña y las repeticiones del loop las sirve la
+// cache del navegador (esto fue lo que agoto la cuota de Cached Egress).
+const latVideoCacheBust = Date.now();
+
 function getMediaBase() {
   return supabaseConfigurado()
     ? `${SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/media`
@@ -237,7 +245,7 @@ async function cargarLatImages() {
   const resultados = await Promise.all(LAT_FILES.map(file => {
     const nombreBase = file.replace(/\.\w+$/, "");
     if (latVideoBases.has(nombreBase)) {
-      return Promise.resolve({ src: `${base}/${nombreBase}.mp4?v=${cache}`, tipo: "video" });
+      return Promise.resolve({ src: `${base}/${nombreBase}.mp4?v=${latVideoCacheBust}`, tipo: "video" });
     }
     return new Promise((resolve) => {
       const img = new Image();
