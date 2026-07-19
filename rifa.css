@@ -16,6 +16,12 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* El atributo [hidden] pierde contra cualquier regla de autor que fije
+   "display" (ej. .modal-overlay { display:flex }), asi que sin este
+   !important los modales y el overlay de carga quedan visibles desde
+   que carga la pagina, tapando el login. */
+[hidden] { display: none !important; }
+
 body {
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--crema);
