@@ -45,6 +45,7 @@
       </div>
       <div class="cabecera-usuario">
         <span id="usuarioActivo" class="usuario-activo"></span>
+        <button type="button" id="btnConfiguracion" class="btn-secundario btn-chico">⚙️ CONFIGURACIÓN</button>
         <button type="button" id="btnLogout" class="btn-secundario btn-chico">CERRAR SESIÓN</button>
       </div>
     </header>
@@ -96,6 +97,7 @@
     </section>
 
     <section class="barra-acciones">
+      <button type="button" id="btnGenerarImagen" class="btn-accion btn-accion-destacada">🖼️ GENERAR IMAGEN PARA COMPARTIR</button>
       <button type="button" id="btnCopiarResumen" class="btn-accion">📋 COPIAR RESUMEN WHATSAPP</button>
       <button type="button" id="btnExportarCSV" class="btn-accion">⬇️ EXPORTAR CSV</button>
       <button type="button" id="btnImprimir" class="btn-accion">🖨️ IMPRIMIR</button>
@@ -185,6 +187,99 @@
           <button type="button" id="btnCancelarModal" class="btn-secundario">CANCELAR</button>
           <button type="button" id="btnGuardarModal" class="btn-primario">GUARDAR</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL DE CONFIGURACIÓN                                                -->
+  <!-- ===================================================================== -->
+  <div id="modalConfigOverlay" class="modal-overlay" hidden>
+    <div class="modal-tarjeta">
+      <div class="modal-cabecera">
+        <h2>⚙️ Configuración de la rifa</h2>
+        <button type="button" id="btnCerrarConfig" class="btn-cerrar-modal" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-cuerpo">
+        <label for="configDestino">Destino / motivo del viaje</label>
+        <input type="text" id="configDestino" maxlength="80" placeholder="Santa Fe" />
+
+        <label for="configMotivo">Frase del motivo</label>
+        <input type="text" id="configMotivo" maxlength="140" placeholder="Para representarnos en un torneo de vóley" />
+
+        <label for="configPremio1">1º Premio</label>
+        <input type="text" id="configPremio1" maxlength="80" placeholder="Fernet con Coca" />
+
+        <label for="configPremio2">2º Premio (opcional)</label>
+        <input type="text" id="configPremio2" maxlength="80" placeholder="Camiseta de la Selección Argentina" />
+
+        <label for="configValor">Valor del número</label>
+        <input type="number" id="configValor" min="0" step="1" />
+
+        <label for="configAlias">Alias</label>
+        <input type="text" id="configAlias" maxlength="80" placeholder="tualias.mp" />
+
+        <label for="configCvu">CVU</label>
+        <input type="text" id="configCvu" maxlength="40" placeholder="0000000000000000000000" />
+
+        <label for="configNombre">Nombre del titular</label>
+        <input type="text" id="configNombre" maxlength="120" placeholder="Nombre y apellido" />
+
+        <div id="configMensaje" class="mensaje-modal" hidden></div>
+      </div>
+
+      <div class="modal-pie">
+        <div class="modal-pie-derecha">
+          <button type="button" id="btnCancelarConfig" class="btn-secundario">CANCELAR</button>
+          <button type="button" id="btnGuardarConfig" class="btn-primario">GUARDAR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL PARA COMPARTIR (imagen + textos)                                -->
+  <!-- ===================================================================== -->
+  <div id="modalCompartirOverlay" class="modal-overlay" hidden>
+    <div class="modal-tarjeta modal-tarjeta-ancha">
+      <div class="modal-cabecera">
+        <h2>🖼️ Compartir rifa</h2>
+        <button type="button" id="btnCerrarCompartir" class="btn-cerrar-modal" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-cuerpo">
+        <div class="poster-preview-wrap">
+          <canvas id="posterCanvas" width="1080" height="1620"></canvas>
+        </div>
+
+        <button type="button" id="btnDescargarImagen" class="btn-primario">⬇️ DESCARGAR IMAGEN</button>
+
+        <div class="filas-compartir">
+          <div class="fila-compartir">
+            <div>
+              <span class="fila-compartir-label">Alias</span>
+              <span id="compartirAlias" class="fila-compartir-valor">-</span>
+            </div>
+            <button type="button" class="btn-copiar-chico" data-copiar="alias">📋 COPIAR</button>
+          </div>
+          <div class="fila-compartir">
+            <div>
+              <span class="fila-compartir-label">CVU</span>
+              <span id="compartirCvu" class="fila-compartir-valor">-</span>
+            </div>
+            <button type="button" class="btn-copiar-chico" data-copiar="cvu">📋 COPIAR</button>
+          </div>
+          <div class="fila-compartir">
+            <div>
+              <span class="fila-compartir-label">Nombre</span>
+              <span id="compartirNombre" class="fila-compartir-valor">-</span>
+            </div>
+            <button type="button" class="btn-copiar-chico" data-copiar="nombre">📋 COPIAR</button>
+          </div>
+        </div>
+
+        <button type="button" id="btnCopiarMensaje" class="btn-accion btn-accion-destacada btn-ancho">💌 COPIAR MENSAJE PARA WHATSAPP</button>
       </div>
     </div>
   </div>

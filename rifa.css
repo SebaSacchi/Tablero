@@ -317,6 +317,16 @@ button, input, select, textarea {
 
 .btn-accion:hover { border-color: var(--rojo); color: var(--rojo); }
 
+.btn-accion-destacada {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  color: var(--blanco);
+}
+
+.btn-accion-destacada:hover { background: var(--rojo-oscuro); color: var(--blanco); }
+
+.btn-ancho { width: 100%; }
+
 /* ===================================================================== */
 /* GRILLA DE NUMEROS                                                     */
 /* ===================================================================== */
@@ -440,6 +450,73 @@ button, input, select, textarea {
 @media (min-width: 640px) {
   .modal-tarjeta { border-radius: 20px; }
 }
+
+.modal-tarjeta-ancha { max-width: 640px; }
+
+.poster-preview-wrap {
+  background: var(--crema-oscuro);
+  border-radius: 14px;
+  padding: 10px;
+  margin-bottom: 14px;
+  max-height: 60dvh;
+  overflow-y: auto;
+}
+
+#posterCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.filas-compartir {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.fila-compartir {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 2px solid var(--borde);
+  background: var(--blanco);
+}
+
+.fila-compartir-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+  letter-spacing: 0.5px;
+}
+
+.fila-compartir-valor {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--texto);
+  word-break: break-all;
+}
+
+.btn-copiar-chico {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid var(--rojo);
+  background: var(--blanco);
+  color: var(--rojo);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-copiar-chico:hover { background: var(--rojo-claro); }
 
 .modal-cabecera {
   display: flex;

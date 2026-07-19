@@ -134,6 +134,58 @@ begin
   end if;
 end $$;
 
+-- ---------------------------------------------------------------------
+-- 8. TABLA DE CONFIGURACION (destino, premios, valor, datos de transferencia)
+-- ---------------------------------------------------------------------
+create table if not exists public.rifa_config (
+  id             integer primary key default 1,
+  destino        text not null default 'Santa Fe',
+  motivo         text not null default 'Para representarnos en un torneo de vóley',
+  premio_1       text not null default 'Fernet con Coca',
+  premio_2       text default 'Camiseta de la Selección Argentina',
+  valor          numeric(12, 2) not null default 2500,
+  alias          text default '',
+  cvu            text default '',
+  nombre         text default '',
+  actualizado_en timestamptz not null default now(),
+  constraint rifa_config_single_row check (id = 1)
+);
+
+insert into public.rifa_config (id)
+values (1)
+on conflict (id) do nothing;
+
+create or replace function public.rifa_config_set_actualizado_en()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.actualizado_en = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_rifa_config_actualizado_en on public.rifa_config;
+create trigger trg_rifa_config_actualizado_en
+  before update on public.rifa_config
+  for each row
+  execute function public.rifa_config_set_actualizado_en();
+
+alter table public.rifa_config enable row level security;
+
+drop policy if exists "rifa_config_select_auth" on public.rifa_config;
+create policy "rifa_config_select_auth"
+  on public.rifa_config for select
+  to authenticated
+  using (true);
+
+drop policy if exists "rifa_config_update_auth" on public.rifa_config;
+create policy "rifa_config_update_auth"
+  on public.rifa_config for update
+  to authenticated
+  using (true)
+  with check (true);
+
 -- =====================================================================
 -- FIN DEL SCRIPT
 -- =====================================================================
