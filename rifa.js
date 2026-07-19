@@ -629,24 +629,35 @@ async function copiarAlPortapapeles(texto) {
 // RESUMEN WHATSAPP
 // ==================================================================
 btnCopiarResumen.addEventListener("click", async () => {
-  const textoBusqueda = buscador.value.trim().toLowerCase();
-  const estadoFiltro = filtroEstado.value;
-
-  const conDatos = numeros
-    .filter((n) => n.estado !== "disponible")
-    .filter((n) => coincideFiltro(n, textoBusqueda, estadoFiltro))
+  const disponibles = numeros
+    .filter((n) => n.estado === "disponible")
     .sort((a, b) => a.numero - b.numero);
 
-  if (conDatos.length === 0) {
-    alert("No hay números vendidos, reservados o pagados para copiar con el filtro actual.");
+  if (disponibles.length === 0) {
+    alert("No quedan números disponibles para vender.");
     return;
   }
 
-  const resumen = conDatos
-    .map((n) => `${n.numero} - ${n.nombre || "Sin nombre"} - ${etiquetaEstado(n.estado)}`)
-    .join("\n");
+  const listaNumeros = disponibles.map((n) => n.numero).join(" - ");
 
-  await copiarAlPortapapeles(resumen);
+  const lineas = [
+    `🎟️✨ ¡Quedan números disponibles para la rifa! ✨🎟️`,
+    "",
+    `${config.motivo || ""}`,
+    "",
+    `🔢 Disponibles (${disponibles.length}): ${listaNumeros}`,
+    "",
+    `💵 Valor del número: ${formatoDinero(config.valor)}`,
+    "",
+    "💳 Datos para transferir:",
+    `Alias: ${config.alias || "-"}`,
+    `CVU: ${config.cvu || "-"}`,
+    `Nombre: ${config.nombre || "-"}`,
+    "",
+    "📲 ¡Avisame cuál número querés y te lo reservo! 🙏"
+  ];
+
+  await copiarAlPortapapeles(lineas.join("\n"));
   alert("Resumen copiado. Ya lo podés pegar en WhatsApp.");
 });
 
