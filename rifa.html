@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RIFA</title>
+  <link rel="stylesheet" href="rifa.css" />
+</head>
+<body>
+
+  <!-- ===================================================================== -->
+  <!-- PANTALLA DE LOGIN                                                     -->
+  <!-- ===================================================================== -->
+  <div id="pantallaLogin" class="pantalla-login">
+    <div class="tarjeta-login">
+      <div class="logo-rifa">🏐</div>
+      <h1>RIFA</h1>
+      <p class="subtitulo-login">Ingresá para administrar los números</p>
+
+      <form id="formLogin" autocomplete="on">
+        <label for="loginUsuario">Usuario</label>
+        <input type="text" id="loginUsuario" name="username" autocomplete="username" placeholder="FAUSTO" required />
+
+        <label for="loginPassword">Contraseña</label>
+        <input type="password" id="loginPassword" name="password" autocomplete="current-password" placeholder="••••••" required />
+
+        <button type="submit" id="btnLogin" class="btn-primario">INGRESAR</button>
+        <div id="loginError" class="mensaje-error" hidden></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- APP DE LA RIFA (oculta hasta autenticar)                              -->
+  <!-- ===================================================================== -->
+  <div id="appRifa" class="app-rifa" hidden>
+
+    <header class="cabecera">
+      <div class="cabecera-titulo">
+        <span class="logo-rifa-chica">🏐</span>
+        <div>
+          <h1>RIFA</h1>
+          <p class="cabecera-subtitulo">Números del 1 al 140</p>
+        </div>
+      </div>
+      <div class="cabecera-usuario">
+        <span id="usuarioActivo" class="usuario-activo"></span>
+        <button type="button" id="btnLogout" class="btn-secundario btn-chico">CERRAR SESIÓN</button>
+      </div>
+    </header>
+
+    <section class="contadores">
+      <div class="contador contador-disponible">
+        <span class="contador-numero" id="cDisponibles">0</span>
+        <span class="contador-label">Disponibles</span>
+      </div>
+      <div class="contador contador-reservado">
+        <span class="contador-numero" id="cReservados">0</span>
+        <span class="contador-label">Reservados</span>
+      </div>
+      <div class="contador contador-vendido">
+        <span class="contador-numero" id="cVendidos">0</span>
+        <span class="contador-label">Vendidos</span>
+      </div>
+      <div class="contador contador-pagado">
+        <span class="contador-numero" id="cPagados">0</span>
+        <span class="contador-label">Pagados</span>
+      </div>
+      <div class="contador contador-dinero">
+        <span class="contador-numero" id="cRecaudado">$0</span>
+        <span class="contador-label">Total recaudado</span>
+      </div>
+      <div class="contador contador-dinero">
+        <span class="contador-numero" id="cPendiente">$0</span>
+        <span class="contador-label">Total pendiente</span>
+      </div>
+    </section>
+
+    <div id="estadoConexion" class="estado-conexion" hidden></div>
+
+    <section class="barra-herramientas">
+      <input type="search" id="buscador" class="buscador" placeholder="Buscar por número, nombre o teléfono..." />
+
+      <select id="filtroEstado" class="filtro-estado">
+        <option value="todos">Todos los estados</option>
+        <option value="disponible">Disponibles</option>
+        <option value="reservado">Reservados</option>
+        <option value="vendido">Vendidos</option>
+        <option value="pagado">Pagados</option>
+      </select>
+
+      <div class="botones-vista">
+        <button type="button" id="btnVistaGrilla" class="btn-vista activo">GRILLA</button>
+        <button type="button" id="btnVistaLista" class="btn-vista">LISTADO</button>
+      </div>
+    </section>
+
+    <section class="barra-acciones">
+      <button type="button" id="btnCopiarResumen" class="btn-accion">📋 COPIAR RESUMEN WHATSAPP</button>
+      <button type="button" id="btnExportarCSV" class="btn-accion">⬇️ EXPORTAR CSV</button>
+      <button type="button" id="btnImprimir" class="btn-accion">🖨️ IMPRIMIR</button>
+      <button type="button" id="btnBackupJSON" class="btn-accion">💾 COPIA DE SEGURIDAD JSON</button>
+    </section>
+
+    <!-- Vista grilla -->
+    <section id="vistaGrilla" class="grilla-numeros"></section>
+
+    <!-- Vista listado -->
+    <section id="vistaLista" class="vista-lista" hidden>
+      <div class="tabla-lista-wrap">
+        <table class="tabla-lista">
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Estado</th>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Importe</th>
+              <th>Forma de pago</th>
+              <th>Vendido por</th>
+              <th>Actualizado</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTablaLista"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p id="sinResultados" class="sin-resultados" hidden>No se encontraron números con ese criterio.</p>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL DE NÚMERO                                                       -->
+  <!-- ===================================================================== -->
+  <div id="modalOverlay" class="modal-overlay" hidden>
+    <div class="modal-tarjeta">
+      <div class="modal-cabecera">
+        <h2>Número <span id="modalNumero"></span></h2>
+        <button type="button" id="btnCerrarModal" class="btn-cerrar-modal" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="modal-cuerpo">
+        <div class="estado-actual-badge">
+          <span id="modalEstadoBadge" class="badge-estado"></span>
+        </div>
+
+        <label for="modalNombre">Nombre y apellido</label>
+        <input type="text" id="modalNombre" maxlength="120" placeholder="Nombre del comprador" />
+
+        <label for="modalTelefono">Teléfono</label>
+        <input type="tel" id="modalTelefono" maxlength="40" placeholder="341 000 0000" />
+
+        <label for="modalImporte">Importe</label>
+        <input type="number" id="modalImporte" min="0" step="1" />
+
+        <label for="modalFormaPago">Forma de pago</label>
+        <select id="modalFormaPago">
+          <option value="">Sin especificar</option>
+          <option value="Transferencia">Transferencia</option>
+          <option value="Efectivo">Efectivo</option>
+          <option value="Mercado Pago">Mercado Pago</option>
+          <option value="Otro">Otro</option>
+        </select>
+
+        <label for="modalVendidoPor">Vendido por</label>
+        <input type="text" id="modalVendidoPor" maxlength="80" placeholder="FAUSTO" />
+
+        <label for="modalNotas">Notas</label>
+        <textarea id="modalNotas" rows="2" maxlength="300" placeholder="Notas opcionales"></textarea>
+
+        <p class="modal-fecha">Última actualización: <span id="modalFecha">-</span></p>
+
+        <div id="modalMensaje" class="mensaje-modal" hidden></div>
+      </div>
+
+      <div class="modal-acciones-estado">
+        <button type="button" class="btn-estado btn-estado-reservado" data-estado="reservado">RESERVAR</button>
+        <button type="button" class="btn-estado btn-estado-vendido" data-estado="vendido">VENDIDO</button>
+        <button type="button" class="btn-estado btn-estado-pagado" data-estado="pagado">PAGADO</button>
+      </div>
+
+      <div class="modal-pie">
+        <button type="button" id="btnLiberarNumero" class="btn-secundario btn-liberar">LIBERAR NÚMERO</button>
+        <div class="modal-pie-derecha">
+          <button type="button" id="btnCancelarModal" class="btn-secundario">CANCELAR</button>
+          <button type="button" id="btnGuardarModal" class="btn-primario">GUARDAR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cargando" class="overlay-cargando" hidden>
+    <div class="spinner"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="rifa.js"></script>
+</body>
+</html>
