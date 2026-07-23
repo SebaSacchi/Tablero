@@ -36,17 +36,17 @@ body {
 }
 
 .pantalla {
-  --base-oscura: #04102e;
-  --base-media: #0b2870;
-  --base-clara: #1640a8;
+  --base-oscura: #030d24;
+  --base-media: #092352;
+  --base-clara: #123b8a;
   display: grid;
   grid-template-rows: 8.2cqh minmax(0, 1fr);
   padding: 0.75cqh;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.18), transparent 22%),
-    radial-gradient(circle at 78% 75%, rgba(0, 0, 0, 0.32), transparent 30%),
+    radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.12), transparent 22%),
+    radial-gradient(circle at 78% 75%, rgba(0, 0, 0, 0.24), transparent 30%),
     linear-gradient(145deg, var(--base-oscura), var(--base-clara) 46%, var(--base-media));
   background-size: 26px 26px, 26px 26px, auto, auto, auto;
   border: 0.65cqh solid #171717;
@@ -59,9 +59,9 @@ body {
 }
 
 .pantalla.estado-finalizado {
-  --base-oscura: #041430;
-  --base-media: #0a2868;
-  --base-clara: #1040a0;
+  --base-oscura: #030d24;
+  --base-media: #092352;
+  --base-clara: #123b8a;
 }
 
 .pantalla.estado-pendiente {
@@ -154,7 +154,7 @@ body {
 }
 
 .topbar-hora {
-  font-size: clamp(1.4rem, 2.5cqw, 2.8rem);
+  font-size: clamp(1.26rem, 2.25cqw, 2.52rem);
   font-weight: 1000;
   color: #ffe600;
   text-shadow: 0.3cqh 0.3cqh 0 #000, 0 0 0.6cqh rgba(0, 0, 0, 0.9);
@@ -181,7 +181,7 @@ body {
 
 .fecha {
   text-align: right;
-  font-size: clamp(0.74rem, 1.3cqw, 1.42rem);
+  font-size: clamp(0.81rem, 1.43cqw, 1.56rem);
 }
 
 .zona-vivo {
@@ -438,18 +438,22 @@ body {
 .numero {
   font-size: clamp(0.98rem, 1.85cqw, 1.85rem);
   line-height: 1;
-  font-weight: 1000;
+  font-weight: 900;
   color: white;
   text-shadow:
-    0.38cqh 0.38cqh 0 #000,
-    0.12cqh 0.12cqh 0 #000,
-    0 0 0.8cqh rgba(0, 0, 0, 0.95);
+    0.26cqh 0.26cqh 0 #000,
+    0 0 0.55cqh rgba(0, 0, 0, 0.85);
   white-space: nowrap;
 }
 
 .fila-premio:first-of-type .numero {
-  font-size: clamp(1.35rem, 2.65cqw, 2.65rem);
+  font-size: clamp(1.46rem, 2.86cqw, 2.86rem);
+  font-weight: 1000;
   color: #fff200;
+  text-shadow:
+    0.38cqh 0.38cqh 0 #000,
+    0.12cqh 0.12cqh 0 #000,
+    0 0 0.8cqh rgba(0, 0, 0, 0.95);
 }
 
 .tabla-qplus {
@@ -1688,9 +1692,9 @@ body {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.18), transparent 22%),
-    radial-gradient(circle at 78% 75%, rgba(0, 0, 0, 0.32), transparent 30%),
-    linear-gradient(145deg, #04102e, #1640a8 46%, #0b2870);
+    radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.12), transparent 22%),
+    radial-gradient(circle at 78% 75%, rgba(0, 0, 0, 0.24), transparent 30%),
+    linear-gradient(145deg, #030d24, #123b8a 46%, #092352);
   background-size: 26px 26px, 26px 26px, auto, auto, auto;
   padding: 14px 12px;
   font-family: Arial, Helvetica, sans-serif;
@@ -1720,7 +1724,7 @@ body {
 .captura-fecha {
   position: absolute;
   right: 12px;
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 900;
   color: #fff;
   text-shadow: 2px 2px 0 #000;
@@ -1781,16 +1785,18 @@ body {
 
 .captura-num {
   font-size: 48px;
-  font-weight: 1000;
+  font-weight: 900;
   color: #fff;
-  text-shadow: 3px 3px 0 #000, 1px 1px 0 #000, 0 0 8px rgba(0, 0, 0, 0.95);
+  text-shadow: 2px 2px 0 #000, 0 0 6px rgba(0, 0, 0, 0.85);
   line-height: 1.15;
   letter-spacing: 2px;
 }
 
 .captura-fila:first-of-type .captura-num {
-  font-size: 64px;
+  font-size: 69px;
+  font-weight: 1000;
   color: #fff200;
+  text-shadow: 3px 3px 0 #000, 1px 1px 0 #000, 0 0 8px rgba(0, 0, 0, 0.95);
   letter-spacing: 3px;
 }
 
