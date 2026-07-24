@@ -139,6 +139,7 @@
   </style>
 </head>
 <body>
+  <script src="admin-auth.js"></script>
   <h1>CARGAR RESULTADOS LOTO PLUS</h1>
 
   <h2 class="seccion">DATOS DEL SORTEO</h2>
@@ -237,6 +238,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
+  async function iniciarPagina() {
     pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
     const SUPABASE_URL = "https://ldjwkwfkiqqfypftdeqa.supabase.co";
@@ -1048,6 +1050,9 @@
     });
 
     cargarProximoSorteoManualQ6();
+  }
+
+  verificarAccesoAdmin().then(iniciarPagina);
   </script>
 </body>
 </html>

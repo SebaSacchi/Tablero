@@ -242,6 +242,7 @@
   </style>
 </head>
 <body>
+  <script src="admin-auth.js"></script>
   <h1>ADMINISTRACIÓN DEL TABLERO</h1>
 
   <a href="rifa.html" class="btn-rifa" target="_blank" rel="noopener">🏐 RIFA</a>
@@ -257,12 +258,12 @@
   <!-- GENERAL: Publicidades + Feriados                                      -->
   <!-- ===================================================================== -->
   <section class="tab-panel active" data-tab="general">
-    <h2 class="seccion">PUBLICIDAD PANTALLA COMPLETA (tecla 0)</h2>
-    <div id="seccion-pub"></div>
-
     <h2 class="seccion">PROMO LATERAL (panel derecho en sorteos)</h2>
     <label style="margin-bottom:8px;">En cada espacio podés subir una imagen o un video mp4 corto (recomendado ~15 segundos). El video se reproduce en loop mientras esté su turno.</label>
     <div id="seccion-lat"></div>
+
+    <h2 class="seccion">ANUNCIO PANTALLA COMPLETA (cada 45 min, tecla 0)</h2>
+    <div id="seccion-pub"></div>
 
     <button class="btn-guardar" id="btn-subir" disabled>SUBIR IMÁGENES</button>
     <div class="estado" id="estadoSubir"></div>
@@ -274,6 +275,16 @@
       <button type="button" class="btn-secundario" id="btn-agregar-feriado">AGREGAR FERIADO</button>
       <div id="listaFeriados" style="margin-top:10px;"></div>
       <div class="estado" id="estadoFeriados"></div>
+    </div>
+
+    <h2 class="seccion">CONTRASEÑA DE ACCESO A LOS PANELES DE ADMIN</h2>
+    <div class="card">
+      <label>Contraseña actual</label>
+      <input type="password" id="passActual" autocomplete="off">
+      <label>Contraseña nueva</label>
+      <input type="password" id="passNueva" autocomplete="off">
+      <button type="button" class="btn-secundario" id="btn-cambiar-pass">CAMBIAR CONTRASEÑA</button>
+      <div class="estado" id="estadoPass"></div>
     </div>
   </section>
 
@@ -414,6 +425,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
+  async function iniciarPagina() {
     pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
     const SUPABASE_URL = "https://ldjwkwfkiqqfypftdeqa.supabase.co";
@@ -473,7 +485,7 @@
     // GENERAL: PUBLICIDADES (pantalla completa + promo lateral)
     // ==================================================================
 
-    const PUB_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg", "pub4.jpg", "pub5.jpg", "pub6.jpg", "pub7.jpg", "pub8.jpg"];
+    const PUB_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg"];
     const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg"];
 
     const btnSubir = document.getElementById("btn-subir");
@@ -873,6 +885,46 @@
     });
 
     cargarFeriados();
+
+    // ==================================================================
+    // GENERAL: CAMBIAR CONTRASEÑA DE ADMIN
+    // ==================================================================
+
+    const passActual = document.getElementById("passActual");
+    const passNueva = document.getElementById("passNueva");
+    const estadoPass = document.getElementById("estadoPass");
+
+    document.getElementById("btn-cambiar-pass").addEventListener("click", async () => {
+      const actual = passActual.value;
+      const nueva = passNueva.value.trim();
+      if (!actual || !nueva) {
+        estadoPass.className = "estado err";
+        estadoPass.textContent = "Completá los dos campos.";
+        return;
+      }
+      if (nueva.length < 4) {
+        estadoPass.className = "estado err";
+        estadoPass.textContent = "La contraseña nueva debe tener al menos 4 caracteres.";
+        return;
+      }
+      estadoPass.className = "estado cargando";
+      estadoPass.textContent = "Guardando...";
+      try {
+        const ok = await cambiarPasswordAdmin(actual, nueva);
+        if (ok) {
+          passActual.value = "";
+          passNueva.value = "";
+          estadoPass.className = "estado ok";
+          estadoPass.textContent = "Contraseña actualizada correctamente.";
+        } else {
+          estadoPass.className = "estado err";
+          estadoPass.textContent = "La contraseña actual no es correcta.";
+        }
+      } catch (error) {
+        estadoPass.className = "estado err";
+        estadoPass.textContent = "Error al guardar: " + error.message;
+      }
+    });
 
     // ==================================================================
     // QUINIELA PLUS
@@ -2060,6 +2112,9 @@
     });
 
     cargarProximoSorteoManualQ6();
+  }
+
+  verificarAccesoAdmin().then(iniciarPagina);
   </script>
 </body>
 </html>

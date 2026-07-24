@@ -106,6 +106,7 @@
   </style>
 </head>
 <body>
+  <script src="admin-auth.js"></script>
   <h1>PUBLICIDADES DEL DIA</h1>
 
   <h2 class="seccion">PROMO LATERAL (panel derecho en sorteos)</h2>
@@ -118,6 +119,7 @@
   <div id="estado"></div>
 
   <script>
+  async function iniciarPagina() {
     const SUPABASE_URL = "https://ldjwkwfkiqqfypftdeqa.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_birytOVhIQ0AoBY6f0yT-g_HpV01OhE";
 
@@ -307,6 +309,9 @@
         btnSubir.disabled = false;
       }
     });
+  }
+
+  verificarAccesoAdmin().then(iniciarPagina);
   </script>
 </body>
 </html>
