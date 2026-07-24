@@ -26,7 +26,8 @@ body {
 }
 
 .pantalla,
-.pantalla-simple {
+.pantalla-simple,
+.pantalla-anuncio-full {
   width: min(100vw, 177.777vh);
   height: min(100vh, 56.25vw);
   aspect-ratio: 16 / 9;
@@ -72,7 +73,7 @@ body {
 
 .topbar {
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 0.5cqw;
   min-width: 0;
@@ -87,26 +88,13 @@ body {
   padding: 0 0.7cqw;
 }
 
-.marca,
 .fecha,
 .titulo-turno {
   font-weight: 1000;
   text-shadow: 0.26cqh 0.26cqh 0 #000, 0 0 0.55cqh rgba(0, 0, 0, 0.85);
   white-space: nowrap;
   overflow: hidden;
-}
-
-.marca {
-  font-size: clamp(1rem, 2.1cqw, 2rem);
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.marca img {
-  height: 85%;
-  object-fit: contain;
-  filter: drop-shadow(0 0.2cqh 0.4cqh rgba(0, 0, 0, 0.6));
+  line-height: 1;
 }
 
 .titulo-turno {
@@ -129,7 +117,7 @@ body {
 }
 
 .linea-titulo span {
-  font-size: clamp(1.6rem, 3.6cqw, 3.6rem);
+  font-size: clamp(1.7rem, 3.85cqw, 3.85rem);
   line-height: 0.9;
   overflow: hidden;
   text-overflow: clip;
@@ -138,7 +126,7 @@ body {
 .linea-titulo strong {
   flex: 0 0 auto;
   color: #fff200;
-  font-size: clamp(0.85rem, 1.7cqw, 1.75rem);
+  font-size: clamp(0.78rem, 1.55cqw, 1.6rem);
   line-height: 0.9;
   text-shadow: 0.3cqh 0.3cqh 0 #000, 0 0 0.75cqh rgba(0, 0, 0, 0.95);
 }
@@ -146,7 +134,7 @@ body {
 .titulo-turno small {
   display: block;
   max-width: 100%;
-  font-size: clamp(0.7rem, 1.1cqw, 1.16rem);
+  font-size: clamp(0.66rem, 1.02cqw, 1.08rem);
   color: #fff;
   line-height: 1.05;
   overflow: hidden;
@@ -159,7 +147,7 @@ body {
   color: #ffe600;
   text-shadow: 0.3cqh 0.3cqh 0 #000, 0 0 0.6cqh rgba(0, 0, 0, 0.9);
   white-space: nowrap;
-  transform: translateY(-3px);
+  line-height: 1;
 }
 
 .topbar-cierre {
@@ -170,6 +158,7 @@ body {
   text-shadow: 0.25cqh 0.25cqh 0 #000, 0 0 0.5cqh rgba(0, 0, 0, 0.8);
   white-space: nowrap;
   padding: 0 1.5cqw;
+  line-height: 1;
 }
 
 .topbar-cierre small {
@@ -189,12 +178,15 @@ body {
 .zona-vivo {
   display: grid;
   grid-template-columns: 13.8cqw minmax(0, 1fr) 26.5cqw;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 0.5cqw;
   min-height: 0;
   padding-top: 0.75cqh;
 }
 
 .panel-izquierdo {
+  grid-column: 1;
+  grid-row: 1 / -1;
   background: rgba(0, 0, 0, 0.38);
   border: 0.28cqh solid rgba(255, 255, 255, 0.72);
   box-shadow: inset 0 0 1.6cqh rgba(0, 0, 0, 0.55);
@@ -285,21 +277,21 @@ body {
 }
 
 .tabla-sorteos {
+  grid-column: 2;
+  grid-row: 1;
   display: grid;
   gap: 0.5cqw;
   min-width: 0;
   min-height: 0;
 }
 
-.pantalla-con-plus {
-  grid-template-rows: 8.2cqh minmax(0, 1fr) 9.5cqh;
-}
-
 .resumen-plus {
+  grid-column: 2 / 4;
+  grid-row: 2;
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-rows: repeat(3, 1fr);
-  margin-top: 0.5cqh;
+  height: 9.5cqh;
   min-height: 0;
   background: #000;
   border: 0.09cqh solid rgba(255, 214, 0, 0.55);
@@ -370,7 +362,7 @@ body {
   min-width: 0;
   overflow: hidden;
   border-left: 0.09cqh solid rgba(255, 255, 255, 0.3);
-  padding-left: 1cqw;
+  padding-left: 1.15cqw;
 }
 
 .resumen-plus-num {
@@ -659,6 +651,8 @@ body {
 }
 
 .promo-lateral {
+  grid-column: 3;
+  grid-row: 1;
   position: relative;
   border-radius: 8px;
   overflow: hidden;
@@ -1578,115 +1572,17 @@ body {
   text-shadow: 0.22cqh 0.22cqh 0 #000;
 }
 
-.pantalla-laminas {
-  padding: 0.8cqh 1cqw !important;
-  background:
-    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.06), transparent 32%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(135deg, #040418, #080840 48%, #020210) !important;
-  background-size: auto, 28px 28px, 28px 28px, auto !important;
-  display: grid !important;
-  grid-template-rows: minmax(0, 1fr) auto !important;
-  align-items: stretch !important;
-}
-
-.laminas-cuerpo {
+.pantalla-anuncio-full {
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2cqw;
-  height: 100%;
-  min-height: 0;
-  position: relative;
 }
 
-.lamina-logo {
-  position: absolute;
-  top: 1cqh;
-  z-index: 2;
-}
-
-.lamina-logo img {
-  width: 16cqw;
-  object-fit: contain;
-  filter: drop-shadow(0 0.5cqh 1cqh rgba(0, 0, 0, 0.8));
-}
-
-.lamina-logo:first-child {
-  left: 0;
-}
-
-.lamina-logo:first-child img {
-  transform: rotate(-8deg);
-}
-
-.lamina-logo:last-child {
-  right: 0;
-}
-
-.lamina-logo:last-child img {
-  transform: rotate(8deg);
-}
-
-.lamina-cuadro {
-  height: 92%;
-  flex: 0 1 auto;
-  border: 0.55cqh solid #fff;
-  border-radius: 0.8cqh;
-  overflow: hidden;
-  box-shadow: 0 0.4cqh 1.8cqh rgba(0, 0, 0, 0.55), 0 0 0.6cqh rgba(255, 255, 255, 0.15);
-  transition: opacity 0.3s ease;
-}
-
-.lamina-img {
-  display: block;
+.pantalla-anuncio-full img {
+  width: 100%;
   height: 100%;
   object-fit: contain;
-}
-
-.lamina-cargando {
-  font-size: clamp(2rem, 4cqw, 4rem);
-  font-weight: 1000;
-  color: #fff200;
-  text-shadow: 0.45cqh 0.45cqh 0 #000;
-}
-
-.laminas-cabezas {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1cqw;
-  padding: 0.8cqh 0 0.3cqh;
-  border-top: 0.25cqh solid rgba(255, 255, 255, 0.25);
-  white-space: nowrap;
-  overflow: hidden;
-  min-height: 4cqh;
-}
-
-.laminas-cabezas-turno {
-  font-size: clamp(1.1rem, 1.9cqw, 2rem);
-  font-weight: 1000;
-  color: #ffe600;
-  text-shadow: 0.25cqh 0.25cqh 0 #000;
-}
-
-.laminas-cabezas-item {
-  font-size: clamp(1rem, 1.55cqw, 1.7rem);
-  font-weight: 900;
-  color: #ccc;
-  text-shadow: 0.2cqh 0.2cqh 0 #000;
-}
-
-.laminas-cabezas-num {
-  color: #fff;
-  font-weight: 1000;
-  font-size: clamp(1.2rem, 2cqw, 2.2rem);
-}
-
-.laminas-cabezas-sep {
-  color: rgba(255, 255, 255, 0.25);
-  font-size: clamp(1rem, 1.5cqw, 1.6rem);
 }
 
 .captura-contenedor {

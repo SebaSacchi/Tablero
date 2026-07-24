@@ -153,12 +153,12 @@ async function cargarFeriadosManual() {
   return feriadosManual;
 }
 
-const PUB_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg", "pub4.jpg", "pub5.jpg", "pub6.jpg", "pub7.jpg", "pub8.jpg"];
+const ANUNCIO_FULL_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg"];
 const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg"];
 
-let pubImagesCargadas = [];
-let pubIndex = 0;
-let pubInterval = null;
+let anuncioFullImagesCargadas = [];
+let anuncioFullIndex = 0;
+let anuncioFullActivo = false;
 
 let latImagesCargadas = [];
 let latIndex = 0;
@@ -223,10 +223,6 @@ async function cargarLatVideoBases() {
   }
 
   return latVideoBases;
-}
-
-function limpiarPubInterval() {
-  if (pubInterval) { clearInterval(pubInterval); pubInterval = null; }
 }
 
 function limpiarLatInterval() {
@@ -428,7 +424,7 @@ function iniciarLatRotacion() {
   latInterval = setInterval(() => {
     latIndex = (latIndex + 1) % latImagesCargadas.length;
     actualizarPromoLateral();
-  }, 60000);
+  }, 20000);
 }
 
 function cambiarLatImagen(dir) {
@@ -1405,9 +1401,8 @@ function dibujarTurno(turno) {
 
   const promoPreservada = capturarPromoLateralPrevia();
   app.innerHTML = `
-    <main class="pantalla ${estado.clase}${resumenPlus ? " pantalla-con-plus" : ""}">
+    <main class="pantalla ${estado.clase}">
       <header class="topbar">
-        <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
         <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
         <div class="titulo-turno">
           <div class="linea-titulo">
@@ -1432,9 +1427,9 @@ function dibujarTurno(turno) {
         <aside class="promo-lateral">
           ${promoLateralHTML()}
         </aside>
-      </section>
 
-      ${resumenPlus}
+        ${resumenPlus}
+      </section>
     </main>
   `;
   restaurarPromoLateralPrevia(promoPreservada);
@@ -1442,8 +1437,6 @@ function dibujarTurno(turno) {
 
 async function renderTurno(turno) {
   pantallaActual = turno;
-  limpiarPubInterval();
-  limpiarPubCabezasInterval();
   const idRender = ++renderTurnoId;
 
   dibujarTurno(turno);
@@ -1584,7 +1577,6 @@ function dibujarQuinielaPlus() {
   app.innerHTML = `
     <main class="pantalla estado-finalizado">
       <header class="topbar">
-        <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
         <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
         <div class="titulo-turno">
           <div class="linea-titulo">
@@ -1619,8 +1611,6 @@ function dibujarQuinielaPlus() {
 
 async function renderQuinielaPlus() {
   pantallaActual = "QUINIELA_PLUS";
-  limpiarPubInterval();
-  limpiarPubCabezasInterval();
   limpiarCierreInterval();
   const idRender = ++renderTurnoId;
 
@@ -1746,7 +1736,6 @@ function dibujarLotoPlus() {
   app.innerHTML = `
     <main class="pantalla estado-finalizado pantalla-loto-plus">
       <header class="topbar">
-        <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
         <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
         <div class="titulo-turno">
           <div class="linea-titulo">
@@ -1781,8 +1770,6 @@ function dibujarLotoPlus() {
 
 async function renderLotoPlus() {
   pantallaActual = "LOTO_PLUS";
-  limpiarPubInterval();
-  limpiarPubCabezasInterval();
   limpiarCierreInterval();
   const idRender = ++renderTurnoId;
 
@@ -1926,7 +1913,6 @@ function dibujarQuini6() {
   app.innerHTML = `
     <main class="pantalla estado-finalizado pantalla-quini6">
       <header class="topbar">
-        <div class="marca"><img src="assets/logo-izq.png" alt="Agencia El Grillo" onerror="this.replaceWith(document.createTextNode('TABLERO AGENCIA'))"></div>
         <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
         <div class="titulo-turno">
           <div class="linea-titulo">
@@ -1961,8 +1947,6 @@ function dibujarQuini6() {
 
 async function renderQuini6() {
   pantallaActual = "QUINI6";
-  limpiarPubInterval();
-  limpiarPubCabezasInterval();
   limpiarCierreInterval();
   const idRender = ++renderTurnoId;
 
@@ -1992,8 +1976,6 @@ function fechaCabezasPantalla() {
 
 async function renderCabezas({ mostrarCarga = true } = {}) {
   pantallaActual = "CABEZAS";
-  limpiarPubInterval();
-  limpiarPubCabezasInterval();
   limpiarLatInterval();
   limpiarCierreInterval();
   const idRender = ++renderTurnoId;
@@ -2044,8 +2026,6 @@ async function renderCabezas({ mostrarCarga = true } = {}) {
 
 async function renderHistorial({ mostrarCarga = true } = {}) {
   pantallaActual = "HISTORIAL";
-  limpiarPubInterval();
-  limpiarPubCabezasInterval();
   limpiarLatInterval();
   limpiarCierreInterval();
   const idRender = ++renderTurnoId;
@@ -2109,8 +2089,6 @@ function numero4() {
 
 function renderAleatorio() {
   pantallaActual = "ALEATORIO";
-  limpiarPubInterval();
-  limpiarPubCabezasInterval();
   limpiarCierreInterval();
   limpiarLatInterval();
 
@@ -2145,8 +2123,6 @@ function randomQuini() {
 
 function renderQuini() {
   pantallaActual = "QUINI";
-  limpiarPubInterval();
-  limpiarPubCabezasInterval();
   limpiarCierreInterval();
   limpiarLatInterval();
 
@@ -2170,141 +2146,40 @@ function renderQuini() {
   `;
 }
 
-let pubCabezasIndex = 0;
-let pubCabezasInterval = null;
-
-function limpiarPubCabezasInterval() {
-  if (pubCabezasInterval) { clearInterval(pubCabezasInterval); pubCabezasInterval = null; }
+function enHorarioDeSorteo(fecha = new Date()) {
+  const minutos = fecha.getHours() * 60 + fecha.getMinutes();
+  return ordenTurnos.some(turno => {
+    const horario = horariosTurnos[turno];
+    return minutos >= horaAMinutos(horario.inicio) && minutos <= horaAMinutos(horario.fin);
+  });
 }
 
-function getBloquesCabezasConResultados() {
-  const bloques = ultimasCabezasCache.length ? ultimasCabezasCache : getBloquesCabezasFallback();
-  return bloques.filter(b => b.cabezas.some(c => c.numero !== "----"));
-}
-
-const ABREV_LOTERIAS = {
-  PROVINCIA: "PROV",
-  CIUDAD: "CIUDAD",
-  CORDOBA: "CORD",
-  "SANTA FE": "SFE",
-  "ENTRE RIOS": "E.R.",
-  MONTEVIDEO: "ORO"
-};
-
-function renderCabezasBar() {
-  const bar = document.getElementById("laminas-cabezas-bar");
-  if (!bar) return;
-
-  const bloques = getBloquesCabezasConResultados();
-  if (bloques.length === 0) return;
-
-  const b = bloques[pubCabezasIndex % bloques.length];
-  const items = b.cabezas.map(c =>
-    `<span class="laminas-cabezas-item">${ABREV_LOTERIAS[c.loteria] || c.loteria} <span class="laminas-cabezas-num">${c.numero}</span></span>`
-  ).join('<span class="laminas-cabezas-sep">|</span>');
-
-  bar.innerHTML = `
-    <span class="laminas-cabezas-turno">${b.turno} ${b.etiqueta}</span>
-    <span class="laminas-cabezas-sep">|</span>
-    ${items}
-  `;
-}
-
-function cambiarPublicidad(dir) {
-  if (pubImagesCargadas.length <= 2) return;
-  pubIndex = pubIndex + dir * 2;
-  if (pubIndex < 0) pubIndex = pubImagesCargadas.length - 2 + (pubImagesCargadas.length % 2);
-  if (pubIndex >= pubImagesCargadas.length) pubIndex = 0;
-  const cuadros = document.querySelectorAll(".lamina-cuadro");
-  cuadros.forEach(c => c.style.opacity = "0");
-  setTimeout(() => dibujarPublicidad(), 300);
-  limpiarPubInterval();
-  pubInterval = setInterval(() => {
-    if (pantallaActual !== "PUBLICIDAD") { limpiarPubInterval(); return; }
-    pubIndex = pubIndex + 2;
-    if (pubIndex >= pubImagesCargadas.length) pubIndex = 0;
-    const cuadros = document.querySelectorAll(".lamina-cuadro");
-    cuadros.forEach(c => c.style.opacity = "0");
-    setTimeout(() => dibujarPublicidad(), 300);
-  }, 30000);
-}
-
-function dibujarPublicidad() {
-  const img1src = pubImagesCargadas[pubIndex] || "";
-  const img2src = pubImagesCargadas[pubIndex + 1] || "";
-
+function dibujarAnuncioFull(src) {
   app.innerHTML = `
-    <main class="pantalla-simple pantalla-laminas">
-      <div class="laminas-cuerpo">
-        <div class="lamina-logo"><img src="assets/logo-izq.png" onerror="this.parentElement.style.display='none'"></div>
-        ${img1src ? `<div class="lamina-cuadro"><img class="lamina-img" src="${img1src}"></div>` : ""}
-        ${img2src ? `<div class="lamina-cuadro"><img class="lamina-img" src="${img2src}"></div>` : ""}
-        <div class="lamina-logo"><img src="assets/logo-der.png" onerror="this.parentElement.style.display='none'"></div>
-      </div>
-      <div class="laminas-cabezas" id="laminas-cabezas-bar"></div>
+    <main class="pantalla-anuncio-full">
+      <img src="${src}" alt="Publicidad">
     </main>
   `;
-
-  renderCabezasBar();
 }
 
-async function renderPublicidad() {
-  pantallaActual = "PUBLICIDAD";
-  limpiarPubInterval();
-  limpiarLatInterval();
-  limpiarPubCabezasInterval();
-  limpiarCierreInterval();
+async function mostrarAnuncioFull() {
+  if (enHorarioDeSorteo()) return;
 
-  app.innerHTML = `
-    <main class="pantalla-simple pantalla-laminas">
-      <div class="laminas-cuerpo">
-        <div class="lamina-cargando">CARGANDO</div>
-      </div>
-    </main>
-  `;
+  const pantallaPrevia = pantallaActual;
+  const imagenes = await preloadImages(ANUNCIO_FULL_FILES);
+  if (imagenes.length === 0) return;
+  if (enHorarioDeSorteo()) return;
 
-  await Promise.all([
-    preloadImages(PUB_FILES).then(urls => { pubImagesCargadas = urls; }),
-    cargarUltimasCabezasSupabase()
-  ]);
+  anuncioFullIndex = (anuncioFullIndex + 1) % imagenes.length;
+  anuncioFullActivo = true;
+  dibujarAnuncioFull(imagenes[anuncioFullIndex]);
 
-  if (pantallaActual !== "PUBLICIDAD") return;
-
-  if (pubImagesCargadas.length === 0) {
-    app.innerHTML = `
-      <main class="pantalla-simple pantalla-laminas">
-        <div class="laminas-cuerpo">
-          <div class="lamina-cargando">SIN PUBLICIDADES</div>
-        </div>
-      </main>
-    `;
-    return;
-  }
-
-  pubIndex = 0;
-  pubCabezasIndex = 0;
-  dibujarPublicidad();
-
-  if (pubImagesCargadas.length > 2) {
-    pubInterval = setInterval(() => {
-      if (pantallaActual !== "PUBLICIDAD") { limpiarPubInterval(); return; }
-      pubIndex = pubIndex + 2;
-      if (pubIndex >= pubImagesCargadas.length) pubIndex = 0;
-
-      const cuadros = document.querySelectorAll(".lamina-cuadro");
-      cuadros.forEach(c => c.style.opacity = "0");
-      setTimeout(() => dibujarPublicidad(), 300);
-    }, 30000);
-  }
-
-  const bloquesConResultados = getBloquesCabezasConResultados();
-  if (bloquesConResultados.length > 1) {
-    pubCabezasInterval = setInterval(() => {
-      if (pantallaActual !== "PUBLICIDAD") { limpiarPubCabezasInterval(); return; }
-      pubCabezasIndex = (pubCabezasIndex + 1) % bloquesConResultados.length;
-      renderCabezasBar();
-    }, 30000);
-  }
+  setTimeout(() => {
+    anuncioFullActivo = false;
+    const pantalla = PANTALLAS_NAVEGABLES.find(p => p.id === pantallaPrevia);
+    if (pantalla) pantalla.fn();
+    else renderTurno(pantallaPorHora());
+  }, 20000);
 }
 
 function pantallaPorHora() {
@@ -2336,7 +2211,6 @@ const pantallasOrden = [
   { key: "4", fn: () => renderTurno("NOCTURNA") },
   { key: "5", fn: () => siguientePantallaPlusFamilia() },
   { key: "6", fn: () => pantallaActual === "CABEZAS" ? renderHistorial() : renderCabezas() },
-  { key: "7", fn: () => renderPublicidad() },
   { key: "8", fn: () => renderAleatorio() },
   { key: "9", fn: () => renderQuini() }
 ];
@@ -2352,7 +2226,6 @@ const PANTALLAS_NAVEGABLES = [
   { id: "QUINI6", fn: () => renderQuini6() },
   { id: "CABEZAS", fn: () => renderCabezas() },
   { id: "HISTORIAL", fn: () => renderHistorial() },
-  { id: "PUBLICIDAD", fn: () => renderPublicidad() },
   { id: "ALEATORIO", fn: () => renderAleatorio() },
   { id: "QUINI", fn: () => renderQuini() }
 ];
@@ -2383,19 +2256,12 @@ document.addEventListener("keydown", (e) => {
     if (tecla === p.key) { p.fn(); return; }
   }
 
-  if (tecla === "0") { renderPublicidad(); return; }
-
   if (tecla === "ArrowRight" || e.keyCode === 22 || e.keyCode === 166) navegarPantalla(1);
   if (tecla === "ArrowLeft" || e.keyCode === 21 || e.keyCode === 167) navegarPantalla(-1);
 
   if (PANTALLAS_CON_LATERAL.includes(pantallaActual)) {
     if (tecla === "ArrowUp" || e.keyCode === 19) cambiarLatImagen(-1);
     if (tecla === "ArrowDown" || e.keyCode === 20) cambiarLatImagen(1);
-  }
-
-  if (pantallaActual === "PUBLICIDAD") {
-    if (tecla === "ArrowUp" || e.keyCode === 19) cambiarPublicidad(-1);
-    if (tecla === "ArrowDown" || e.keyCode === 20) cambiarPublicidad(1);
   }
 
   if (tecla === "c" || tecla === "C") {
@@ -2447,6 +2313,12 @@ function detectarInicioTurno() {
 }
 
 setInterval(() => {
+  mostrarAnuncioFull();
+}, 45 * 60 * 1000);
+
+setInterval(() => {
+  if (anuncioFullActivo) return;
+
   detectarInicioTurno();
 
   if (ordenTurnos.includes(pantallaActual)) {
