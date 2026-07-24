@@ -2256,6 +2256,8 @@ document.addEventListener("keydown", (e) => {
     if (tecla === p.key) { p.fn(); return; }
   }
 
+  if (tecla === "0") { mostrarAnuncioFull(); return; }
+
   if (tecla === "ArrowRight" || e.keyCode === 22 || e.keyCode === 166) navegarPantalla(1);
   if (tecla === "ArrowLeft" || e.keyCode === 21 || e.keyCode === 167) navegarPantalla(-1);
 
