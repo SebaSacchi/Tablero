@@ -745,7 +745,7 @@ body {
 
 .qplus-banner-promo {
   flex: 0 0 auto;
-  height: clamp(6.9rem, 15.6cqh, 11.8rem);
+  height: clamp(7.9rem, 17.9cqh, 13.6rem);
   aspect-ratio: 1;
   display: flex;
   align-items: center;
@@ -1791,7 +1791,7 @@ body {
 }
 
 .captura-qplus-body .qplus-banner-promo {
-  height: clamp(5.2rem, 13cqh, 9.5rem);
+  height: clamp(6rem, 15cqh, 10.9rem);
 }
 
 .captura-qplus-body .loto-banner-inferior-etiqueta {
@@ -1906,7 +1906,7 @@ body {
 }
 
 .captura-loto-body .qplus-banner-promo {
-  height: clamp(3.6rem, 8.5cqh, 6.4rem);
+  height: clamp(4.1rem, 9.8cqh, 7.4rem);
   aspect-ratio: 1;
 }
 
@@ -2006,7 +2006,7 @@ body {
 }
 
 .captura-quini6-body .qplus-banner-promo {
-  height: clamp(4.4rem, 11cqh, 8rem);
+  height: clamp(5.1rem, 12.7cqh, 9.2rem);
   aspect-ratio: 1;
 }
 
