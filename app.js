@@ -2279,6 +2279,10 @@ document.addEventListener("keydown", (e) => {
     else if (pantallaActual === "QUINI6") capturarQuini6(true);
     else capturarTurno(undefined, true);
   }
+
+  if (tecla === "w" || tecla === "W") {
+    if (ordenTurnos.includes(pantallaActual)) capturarTurnoEstado();
+  }
 });
 
 renderTurno(pantallaPorHora());
@@ -2386,6 +2390,82 @@ async function capturarTurno(turno, modoImpresion = false) {
     const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
     const link = document.createElement("a");
     link.download = `${turno}_${fechaTxt.replace(/\//g, "-")}${modoImpresion ? "_IMPRESION" : ""}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    console.error("Error al capturar:", err);
+    alert("Error al generar la captura");
+  } finally {
+    document.body.removeChild(contenedor);
+  }
+}
+
+const nombresLoteriaEstado = {
+  PROVINCIA: "PROVINCIA",
+  CIUDAD: "CIUDAD",
+  CORDOBA: "CÓRDOBA",
+  "SANTA FE": "SANTA FE",
+  "ENTRE RIOS": "ENTRE RÍOS",
+  MONTEVIDEO: "MONTEVIDEO"
+};
+
+async function capturarTurnoEstado(turno) {
+  if (!turno) {
+    turno = ordenTurnos.includes(pantallaActual) ? pantallaActual : pantallaPorHora();
+  }
+
+  const estado = estadoTurno(turno);
+  const fecha = estado.fechaResultados;
+
+  await cargarResultadosSupabase(turno, fecha);
+  const resultadosRealesTurno = getResultadosRealesTurno(turno, fecha);
+  const resultadosTurno = resultadosRealesTurno || (supabaseConfigurado() ? {} : resultados[turno]);
+
+  const loteriasDelTurno = getLoteriasTurno(turno, fecha);
+  const fechaTxt = fechaCortaTexto(fecha);
+  const diaSemana = fecha.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase();
+
+  const filaHTML = (pos, valor) =>
+    `<div class="captura-wa-fila"><span class="captura-wa-pos">${String(pos).padStart(2, "0")}.</span><span class="captura-wa-num">${valor}</span></div>`;
+
+  const tarjetas = loteriasDelTurno.map(loteria => {
+    const numeros = resultadosTurno[loteria] || [];
+    const primero = numeros[0] || "----";
+    const col1HTML = Array.from({ length: 9 }, (_, i) => filaHTML(i + 2, numeros[i + 1] || "----")).join("");
+    const col2HTML = Array.from({ length: 10 }, (_, i) => filaHTML(i + 11, numeros[i + 10] || "----")).join("");
+    const nombre = nombresLoteriaEstado[loteria] || loteria;
+    return `
+      <div class="captura-wa-card">
+        <div class="captura-wa-card-header">${nombre}</div>
+        <div class="captura-wa-primer"><span>1º</span><strong>${primero}</strong></div>
+        <div class="captura-wa-columnas">
+          <div class="captura-wa-col">${col1HTML}</div>
+          <div class="captura-wa-col">${col2HTML}</div>
+        </div>
+      </div>`;
+  });
+
+  const filasTarjetas = [];
+  for (let i = 0; i < tarjetas.length; i += 3) filasTarjetas.push(tarjetas.slice(i, i + 3));
+  const cuerpoHTML = filasTarjetas
+    .map(fila => `<div class="captura-wa-fila-tarjetas">${fila.join("")}</div>`)
+    .join("");
+
+  const contenedor = document.createElement("div");
+  contenedor.className = "captura-wa-contenedor";
+  contenedor.innerHTML = `
+    <div class="captura-wa-header">
+      <div class="captura-wa-titulo">${turno}</div>
+      <div class="captura-wa-banner"><span>${diaSemana} ${fechaTxt.replace(/-/g, "/")}</span></div>
+    </div>
+    <div class="captura-wa-body">${cuerpoHTML}</div>
+  `;
+  document.body.appendChild(contenedor);
+
+  try {
+    const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
+    const link = document.createElement("a");
+    link.download = `${turno}_${fechaTxt.replace(/\//g, "-")}_ESTADO.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   } catch (err) {
