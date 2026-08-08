@@ -610,6 +610,12 @@ body {
   font-size: clamp(0.62rem, 1cqw, 1.08rem);
 }
 
+.qplus-premio-header .qplus-premio-importe {
+  color: inherit;
+  font-weight: inherit;
+  font-size: inherit;
+}
+
 .qplus-vacante {
   flex: 0 0 auto;
   width: 20.5cqw;
@@ -998,6 +1004,10 @@ body {
 
 .columna-quini6 .qplus-premio-importe {
   font-size: clamp(0.64rem, 1cqw, 1.15rem);
+}
+
+.columna-quini6 .qplus-premio-header .qplus-premio-importe {
+  font-size: inherit;
 }
 
 .quini6-banner-inferior {
