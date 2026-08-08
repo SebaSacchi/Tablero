@@ -1713,6 +1713,7 @@ body {
   letter-spacing: 3px;
 }
 
+/* BACKUP EXPORTACION W - ANTES REDISEÑO PROFESIONAL 08/08/2026
 .captura-wa-contenedor {
   position: fixed;
   left: -9999px;
@@ -1856,6 +1857,205 @@ body {
 
 .captura-wa-num {
   font-size: 27px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.5px;
+  text-shadow: 1.5px 1.5px 0 #000;
+}
+FIN BACKUP EXPORTACION W */
+
+.captura-wa-contenedor {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 1080px;
+  background:
+    linear-gradient(115deg, transparent 40%, rgba(140, 190, 255, 0.07) 44%, transparent 48%),
+    linear-gradient(115deg, transparent 58%, rgba(140, 190, 255, 0.05) 62%, transparent 66%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(ellipse 900px 420px at 50% 6%, rgba(90, 160, 255, 0.35), transparent 70%),
+    radial-gradient(circle at 24% 16%, rgba(255, 255, 255, 0.1), transparent 24%),
+    radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.3), transparent 32%),
+    linear-gradient(150deg, #020817 0%, #0d2f7a 45%, #061a3e 100%);
+  background-size: auto, auto, 26px 26px, 26px 26px, auto, auto, auto, auto;
+  padding: 34px 32px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #fff;
+}
+
+.captura-wa-header {
+  text-align: center;
+  padding-bottom: 16px;
+}
+
+.captura-wa-titulo {
+  font-size: 108px;
+  font-weight: 1000;
+  font-style: italic;
+  letter-spacing: 4px;
+  color: #ffffff;
+  text-shadow:
+    0 2px 0 #eaf2ff,
+    0 4px 2px #c3d6f2,
+    0 6px 4px #7fa3d9,
+    0 10px 16px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(90, 160, 255, 0.55);
+}
+
+.captura-wa-banner {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 12px 40px;
+  background: linear-gradient(180deg, #2d7dfb 0%, #145bd6 45%, #0b2f78 100%);
+  border: 2px solid rgba(180, 215, 255, 0.6);
+  border-radius: 10px;
+  transform: skewX(-8deg);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.45),
+    0 0 22px rgba(60, 140, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -6px 10px rgba(0, 0, 0, 0.25);
+}
+
+.captura-wa-banner span {
+  display: block;
+  transform: skewX(8deg);
+  font-size: 28px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.captura-wa-body {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.captura-wa-fila-tarjetas {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+}
+
+.captura-wa-card {
+  flex: 0 0 316px;
+  width: 316px;
+  background:
+    radial-gradient(circle at 30% 0%, rgba(255, 255, 255, 0.08), transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(0, 0, 0, 0.15) 55%, rgba(255, 255, 255, 0.03) 100%),
+    linear-gradient(160deg, #071026, #030712 85%);
+  border: 2px solid rgba(110, 190, 255, 0.6);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 0 16px rgba(50, 120, 255, 0.35),
+    0 8px 16px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.captura-wa-card-header {
+  padding: 14px 6px 12px;
+  text-align: center;
+  font-size: 29px;
+  font-weight: 1000;
+  font-style: italic;
+  letter-spacing: 1px;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.02) 55%, rgba(0, 0, 0, 0.18) 100%), #0c2358;
+  text-shadow: 2px 2px 0 #000, 0 0 10px rgba(120, 180, 255, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(140, 190, 255, 0.3);
+}
+
+.captura-wa-primer {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 0 12px;
+}
+
+.captura-wa-primer span {
+  font-size: 32px;
+  font-weight: 900;
+  font-style: italic;
+  color: #fff;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.captura-wa-primer strong {
+  position: relative;
+  display: inline-block;
+  font-size: 72px;
+  font-weight: 1000;
+  font-style: italic;
+  color: #ffe066;
+  letter-spacing: 1px;
+  text-shadow:
+    0 1px 0 #fff9d6,
+    0 3px 2px #ffcf3d,
+    0 6px 10px rgba(0, 0, 0, 0.65),
+    0 0 22px rgba(255, 210, 60, 0.75),
+    0 0 40px rgba(255, 190, 40, 0.4);
+}
+
+.captura-wa-primer strong::before,
+.captura-wa-primer strong::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -16px;
+  width: 16px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #fff6c8, transparent);
+  box-shadow: 0 0 6px rgba(255, 240, 150, 0.9);
+}
+
+.captura-wa-primer strong::before {
+  transform: rotate(45deg);
+}
+
+.captura-wa-primer strong::after {
+  transform: rotate(-45deg);
+}
+
+.captura-wa-columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 10px;
+  padding: 8px 14px 20px;
+}
+
+.captura-wa-col {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.captura-wa-col:last-child {
+  border-left: 1px solid rgba(140, 190, 255, 0.18);
+  padding-left: 8px;
+}
+
+.captura-wa-fila {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.captura-wa-pos {
+  font-size: 21px;
+  font-weight: 900;
+  color: #ffd400;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.captura-wa-num {
+  font-size: 30px;
   font-weight: 900;
   color: #fff;
   letter-spacing: 0.5px;
