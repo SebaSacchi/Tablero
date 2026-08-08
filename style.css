@@ -1831,13 +1831,14 @@ body {
 .captura-wa-columnas {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  padding: 6px 14px 16px;
+  column-gap: 10px;
+  padding: 6px 12px 18px;
 }
 
 .captura-wa-col {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 7px;
 }
 
 .captura-wa-fila {
@@ -1847,14 +1848,14 @@ body {
 }
 
 .captura-wa-pos {
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 900;
   color: #ffd400;
   text-shadow: 1px 1px 0 #000;
 }
 
 .captura-wa-num {
-  font-size: 20px;
+  font-size: 25px;
   font-weight: 900;
   color: #fff;
   letter-spacing: 0.5px;
