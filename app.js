@@ -2431,7 +2431,7 @@ async function capturarTurnoEstado(turno) {
   const tarjetas = loteriasDelTurno.map(loteria => {
     const numeros = resultadosTurno[loteria] || [];
     const primero = numeros[0] || "----";
-    const col1HTML = Array.from({ length: 9 }, (_, i) => filaHTML(i + 2, numeros[i + 1] || "----")).join("");
+    const col1HTML = Array.from({ length: 10 }, (_, i) => filaHTML(i + 1, numeros[i] || "----")).join("");
     const col2HTML = Array.from({ length: 10 }, (_, i) => filaHTML(i + 11, numeros[i + 10] || "----")).join("");
     const nombre = nombresLoteriaEstado[loteria] || loteria;
     return `
