@@ -2437,7 +2437,7 @@ async function capturarTurnoEstado(turno) {
     return `
       <div class="captura-wa-card">
         <div class="captura-wa-card-header">${nombre}</div>
-        <div class="captura-wa-primer"><span>1º</span><strong>${primero}</strong></div>
+        <div class="captura-wa-primer"><span>1º</span><strong>${primero}</strong><i class="captura-wa-sparkle">✦</i></div>
         <div class="captura-wa-columnas">
           <div class="captura-wa-col">${col1HTML}</div>
           <div class="captura-wa-col">${col2HTML}</div>
