@@ -3,6 +3,9 @@
 const SUPABASE_URL = "https://ldjwkwfkiqqfypftdeqa.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_birytOVhIQ0AoBY6f0yT-g_HpV01OhE";
 
+const TELEGRAM_BOT_TOKEN = "8739889673:AAFt6-uhd2dYvhwwBVBFnYeQ2LU_p9Y9D2A";
+const TELEGRAM_CHAT_ID = "-1004441850561";
+
 const loterias = ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS", "MONTEVIDEO"];
 
 const loteriasBase = ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS"];
@@ -2347,6 +2350,8 @@ setInterval(() => {
   }
 }, 10000);
 
+setInterval(revisarEnviosAutomaticosTelegram, 60000);
+
 async function capturarTurno(turno, modoImpresion = false) {
   if (!turno) {
     turno = ordenTurnos.includes(pantallaActual) ? pantallaActual : pantallaPorHora();
@@ -2409,13 +2414,9 @@ const nombresLoteriaEstado = {
   MONTEVIDEO: "MONTEVIDEO"
 };
 
-async function capturarTurnoEstado(turno) {
-  if (!turno) {
-    turno = ordenTurnos.includes(pantallaActual) ? pantallaActual : pantallaPorHora();
-  }
-
+async function construirCanvasEstado(turno, fechaForzada) {
   const estado = estadoTurno(turno);
-  const fecha = estado.fechaResultados;
+  const fecha = fechaForzada || estado.fechaResultados;
 
   await cargarResultadosSupabase(turno, fecha);
   const resultadosRealesTurno = getResultadosRealesTurno(turno, fecha);
@@ -2464,6 +2465,19 @@ async function capturarTurnoEstado(turno) {
 
   try {
     const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
+    return { canvas, fechaTxt };
+  } finally {
+    document.body.removeChild(contenedor);
+  }
+}
+
+async function capturarTurnoEstado(turno) {
+  if (!turno) {
+    turno = ordenTurnos.includes(pantallaActual) ? pantallaActual : pantallaPorHora();
+  }
+
+  try {
+    const { canvas, fechaTxt } = await construirCanvasEstado(turno);
     const link = document.createElement("a");
     link.download = `${turno}_${fechaTxt.replace(/\//g, "-")}_ESTADO.png`;
     link.href = canvas.toDataURL("image/png");
@@ -2471,8 +2485,89 @@ async function capturarTurnoEstado(turno) {
   } catch (err) {
     console.error("Error al capturar:", err);
     alert("Error al generar la captura");
-  } finally {
-    document.body.removeChild(contenedor);
+  }
+}
+
+function turnoEstadoCompleto(turno, fecha) {
+  const resultadosRealesTurno = getResultadosRealesTurno(turno, fecha);
+  if (!resultadosRealesTurno) return false;
+
+  const loteriasDelTurno = getLoteriasTurno(turno, fecha);
+  return loteriasDelTurno.every((loteria) => {
+    const numeros = resultadosRealesTurno[loteria];
+    if (!Array.isArray(numeros) || numeros.length < 20) return false;
+    for (let i = 0; i < 20; i++) {
+      if (!numeros[i] || numeros[i] === "----") return false;
+    }
+    return true;
+  });
+}
+
+function telegramConfigurado() {
+  return (
+    TELEGRAM_BOT_TOKEN &&
+    TELEGRAM_CHAT_ID &&
+    TELEGRAM_BOT_TOKEN !== "PEGAR_TELEGRAM_BOT_TOKEN" &&
+    TELEGRAM_CHAT_ID !== "PEGAR_TELEGRAM_CHAT_ID"
+  );
+}
+
+async function enviarCapturaTelegram(canvas, turno, fechaTxt) {
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+  if (!blob) throw new Error("No se pudo generar la imagen para Telegram");
+
+  const formData = new FormData();
+  formData.append("chat_id", TELEGRAM_CHAT_ID);
+  formData.append("caption", `${turno} · ${fechaTxt}`);
+  formData.append("photo", blob, `${turno}_${fechaTxt.replace(/\//g, "-")}_ESTADO.png`);
+
+  const respuesta = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+    method: "POST",
+    body: formData
+  });
+
+  if (!respuesta.ok) {
+    throw new Error(`Telegram respondió ${respuesta.status}`);
+  }
+}
+
+function claveEnvioTelegram(turno, fecha) {
+  return `telegramEstadoEnviado_${fechaISO(fecha)}_${turno}`;
+}
+
+const horariosChequeoTelegram = {
+  PREVIA: "10:25",
+  PRIMERA: "12:15",
+  MATUTINA: "15:15",
+  VESPERTINA: "18:15",
+  NOCTURNA: "21:15"
+};
+
+async function revisarEnviosAutomaticosTelegram() {
+  if (!supabaseConfigurado() || !telegramConfigurado()) return;
+
+  const ahora = new Date();
+  if (ahora.getDay() === 0 || esFeriadoManual(ahora)) return;
+
+  const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes();
+
+  for (const turno of ordenTurnos) {
+    const inicioChequeo = horaAMinutos(horariosChequeoTelegram[turno]);
+    if (minutosAhora < inicioChequeo) continue;
+
+    const clave = claveEnvioTelegram(turno, ahora);
+    if (localStorage.getItem(clave)) continue;
+
+    await cargarResultadosSupabase(turno, ahora);
+    if (!turnoEstadoCompleto(turno, ahora)) continue;
+
+    try {
+      const { canvas, fechaTxt } = await construirCanvasEstado(turno, ahora);
+      await enviarCapturaTelegram(canvas, turno, fechaTxt);
+      localStorage.setItem(clave, "1");
+    } catch (err) {
+      console.error(`Error enviando captura de ${turno} a Telegram:`, err);
+    }
   }
 }
 
