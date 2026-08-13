@@ -2543,7 +2543,10 @@ const horariosChequeoTelegram = {
   NOCTURNA: "21:15"
 };
 
+let revisandoEnviosTelegram = false;
+
 async function revisarEnviosAutomaticosTelegram() {
+  if (revisandoEnviosTelegram) return;
   if (!supabaseConfigurado() || !telegramConfigurado()) return;
 
   const ahora = new Date();
@@ -2551,23 +2554,29 @@ async function revisarEnviosAutomaticosTelegram() {
 
   const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes();
 
-  for (const turno of ordenTurnos) {
-    const inicioChequeo = horaAMinutos(horariosChequeoTelegram[turno]);
-    if (minutosAhora < inicioChequeo) continue;
+  revisandoEnviosTelegram = true;
+  try {
+    for (const turno of ordenTurnos) {
+      const inicioChequeo = horaAMinutos(horariosChequeoTelegram[turno]);
+      if (minutosAhora < inicioChequeo) continue;
 
-    const clave = claveEnvioTelegram(turno, ahora);
-    if (localStorage.getItem(clave)) continue;
+      const clave = claveEnvioTelegram(turno, ahora);
+      if (localStorage.getItem(clave)) continue;
 
-    await cargarResultadosSupabase(turno, ahora);
-    if (!turnoEstadoCompleto(turno, ahora)) continue;
+      await cargarResultadosSupabase(turno, ahora);
+      if (!turnoEstadoCompleto(turno, ahora)) continue;
 
-    try {
-      const { canvas, fechaTxt } = await construirCanvasEstado(turno, ahora);
-      await enviarCapturaTelegram(canvas, turno, fechaTxt);
       localStorage.setItem(clave, "1");
-    } catch (err) {
-      console.error(`Error enviando captura de ${turno} a Telegram:`, err);
+      try {
+        const { canvas, fechaTxt } = await construirCanvasEstado(turno, ahora);
+        await enviarCapturaTelegram(canvas, turno, fechaTxt);
+      } catch (err) {
+        localStorage.removeItem(clave);
+        console.error(`Error enviando captura de ${turno} a Telegram:`, err);
+      }
     }
+  } finally {
+    revisandoEnviosTelegram = false;
   }
 }
 
