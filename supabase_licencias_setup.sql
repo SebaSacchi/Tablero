@@ -19,58 +19,59 @@
 
 create table if not exists public.licencias (
   codigo             text primary key,
-  activo             boolean not null default false,
-  agencia_nombre     text,
-  agencia_legajo     text,
-  agencia_titular    text,
-  agencia_provincia  text,
-  notas              text,
-  creado_en          timestamptz not null default now(),
-  activado_en        timestamptz
-);
+    activo             boolean not null default false,
+      agencia_nombre     text,
+        agencia_legajo     text,
+          agencia_titular    text,
+            agencia_provincia  text,
+              notas              text,
+                creado_en          timestamptz not null default now(),
+                  activado_en        timestamptz
+                  );
 
-alter table public.licencias enable row level security;
+                  alter table public.licencias enable row level security;
 
--- Solo un usuario logueado (vos, via Supabase Auth) puede ver/editar
--- la lista completa de licencias.
-drop policy if exists "licencias_select_auth" on public.licencias;
-create policy "licencias_select_auth"
-  on public.licencias for select
-  to authenticated
-  using (true);
+                  -- Solo un usuario logueado (vos, via Supabase Auth) puede ver/editar
+                  -- la lista completa de licencias.
+                  drop policy if exists "licencias_select_auth" on public.licencias;
+                  create policy "licencias_select_auth"
+                    on public.licencias for select
+                      to authenticated
+                        using (true);
 
-drop policy if exists "licencias_update_auth" on public.licencias;
-create policy "licencias_update_auth"
-  on public.licencias for update
-  to authenticated
-  using (true)
-  with check (true);
+                        drop policy if exists "licencias_update_auth" on public.licencias;
+                        create policy "licencias_update_auth"
+                          on public.licencias for update
+                            to authenticated
+                              using (true)
+                                with check (true);
 
-drop policy if exists "licencias_delete_auth" on public.licencias;
-create policy "licencias_delete_auth"
-  on public.licencias for delete
-  to authenticated
-  using (true);
+                                drop policy if exists "licencias_delete_auth" on public.licencias;
+                                create policy "licencias_delete_auth"
+                                  on public.licencias for delete
+                                    to authenticated
+                                      using (true);
 
--- Funcion publica (anon): cada tablero instalado la llama con su propio
--- codigo. Si el codigo no existe todavia lo registra como pendiente
--- (activo = false) y devuelve el estado actual. Nunca expone el resto
--- de la tabla, solo el booleano del codigo consultado.
-create or replace function public.licencia_estado(p_codigo text)
-returns boolean
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_activo boolean;
-begin
-  insert into licencias (codigo) values (p_codigo)
-  on conflict (codigo) do nothing;
+                                      -- Funcion publica (anon): cada tablero instalado la llama con su propio
+                                      -- codigo. Si el codigo no existe todavia lo registra como pendiente
+                                      -- (activo = false) y devuelve el estado actual. Nunca expone el resto
+                                      -- de la tabla, solo el booleano del codigo consultado.
+                                      create or replace function public.licencia_estado(p_codigo text)
+                                      returns boolean
+                                      language plpgsql
+                                      security definer
+                                      set search_path = public
+                                      as $$
+                                      declare
+                                        v_activo boolean;
+                                        begin
+                                          insert into licencias (codigo) values (p_codigo)
+                                            on conflict (codigo) do nothing;
 
-  select activo into v_activo from licencias where codigo = p_codigo;
-  return coalesce(v_activo, false);
-end;
-$$;
+                                              select activo into v_activo from licencias where codigo = p_codigo;
+                                                return coalesce(v_activo, false);
+                                                end;
+                                                $$;
 
-grant execute on function licencia_estado(text) to anon, authenticated;
+                                                grant execute on function licencia_estado(text) to anon, authenticated;
+                                                

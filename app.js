@@ -2535,6 +2535,50 @@ function claveEnvioTelegram(turno, fecha) {
   return `telegramEstadoEnviado_${fechaISO(fecha)}_${turno}`;
 }
 
+// Este mismo tablero corre en varias PCs/agencias a la vez y todas mandan
+// al mismo canal de Telegram. El localStorage es por dispositivo, asi que
+// no alcanza para evitar que dos dispositivos manden el mismo turno: se
+// reclama la fila (fecha, turno) en Supabase y solo el que logra insertarla
+// primero termina enviando la captura.
+async function reclamarEnvioTelegram(turno, fecha) {
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const fechaTxt = fechaISO(fecha);
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/telegram_envios?on_conflict=fecha,turno`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=representation,resolution=ignore-duplicates"
+      },
+      body: JSON.stringify({ fecha: fechaTxt, turno })
+    });
+    if (!respuesta.ok) return false;
+    const filas = await respuesta.json();
+    return Array.isArray(filas) && filas.length > 0;
+  } catch (error) {
+    console.warn(`Error reclamando envio de ${turno} en Supabase`, error);
+    return false;
+  }
+}
+
+async function liberarEnvioTelegram(turno, fecha) {
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const fechaTxt = fechaISO(fecha);
+  try {
+    await fetch(`${baseUrl}/rest/v1/telegram_envios?fecha=eq.${fechaTxt}&turno=eq.${turno}`, {
+      method: "DELETE",
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+  } catch (error) {
+    console.warn(`Error liberando reclamo de envio de ${turno} en Supabase`, error);
+  }
+}
+
 const horariosChequeoTelegram = {
   PREVIA: "10:25",
   PRIMERA: "12:15",
@@ -2543,11 +2587,49 @@ const horariosChequeoTelegram = {
   NOCTURNA: "21:15"
 };
 
+const CODIGO_LICENCIA_KEY = "tablero_licencia_codigo";
+
+let autorizadoTelegramCache = { valor: null, ts: 0 };
+
+// Por defecto ningun dispositivo manda captura automatica a Telegram: se
+// autoriza por codigo desde el Panel de Licencias (columna "Telegram"),
+// asi solo los dispositivos elegidos (no cualquier PC o TV Android con
+// una licencia activa) hacen la captura y el envio.
+async function dispositivoAutorizadoParaTelegram() {
+  const codigo = localStorage.getItem(CODIGO_LICENCIA_KEY);
+  if (!codigo) return false;
+
+  if (autorizadoTelegramCache.valor !== null && (Date.now() - autorizadoTelegramCache.ts) < 5 * 60 * 1000) {
+    return autorizadoTelegramCache.valor;
+  }
+
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/rpc/licencia_envia_telegram`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ p_codigo: codigo })
+    });
+    if (!respuesta.ok) return autorizadoTelegramCache.valor || false;
+    const autorizado = await respuesta.json();
+    autorizadoTelegramCache = { valor: autorizado === true, ts: Date.now() };
+    return autorizadoTelegramCache.valor;
+  } catch (error) {
+    console.warn("Error consultando autorizacion de Telegram", error);
+    return autorizadoTelegramCache.valor || false;
+  }
+}
+
 let revisandoEnviosTelegram = false;
 
 async function revisarEnviosAutomaticosTelegram() {
   if (revisandoEnviosTelegram) return;
   if (!supabaseConfigurado() || !telegramConfigurado()) return;
+  if (!(await dispositivoAutorizadoParaTelegram())) return;
 
   const ahora = new Date();
   if (ahora.getDay() === 0 || esFeriadoManual(ahora)) return;
@@ -2566,12 +2648,19 @@ async function revisarEnviosAutomaticosTelegram() {
       await cargarResultadosSupabase(turno, ahora);
       if (!turnoEstadoCompleto(turno, ahora)) continue;
 
-      localStorage.setItem(clave, "1");
+      const reclamado = await reclamarEnvioTelegram(turno, ahora);
+      if (!reclamado) {
+        // Otro dispositivo ya reclamo (o ya mando) este turno hoy.
+        localStorage.setItem(clave, "1");
+        continue;
+      }
+
       try {
         const { canvas, fechaTxt } = await construirCanvasEstado(turno, ahora);
         await enviarCapturaTelegram(canvas, turno, fechaTxt);
+        localStorage.setItem(clave, "1");
       } catch (err) {
-        localStorage.removeItem(clave);
+        await liberarEnvioTelegram(turno, ahora);
         console.error(`Error enviando captura de ${turno} a Telegram:`, err);
       }
     }

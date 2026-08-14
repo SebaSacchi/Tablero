@@ -149,8 +149,12 @@ function renderTabla() {
 
   cuerpoTabla.innerHTML = lista.map((l) => filaHtml(l)).join("");
 
-  cuerpoTabla.querySelectorAll("input[type=checkbox]").forEach((el) => {
+  cuerpoTabla.querySelectorAll("input[data-toggle=activo]").forEach((el) => {
     el.addEventListener("change", () => alternarActivo(el.dataset.codigo, el.checked));
+  });
+
+  cuerpoTabla.querySelectorAll("input[data-toggle=envia_telegram]").forEach((el) => {
+    el.addEventListener("change", () => alternarEnviaTelegram(el.dataset.codigo, el.checked));
   });
 
   cuerpoTabla.querySelectorAll("input[data-campo]").forEach((el) => {
@@ -168,10 +172,17 @@ function filaHtml(l) {
       <td class="codigo-txt">${escapeHtml(l.codigo)}</td>
       <td>
         <label class="switch">
-          <input type="checkbox" data-codigo="${escapeHtml(l.codigo)}" ${l.activo ? "checked" : ""}>
+          <input type="checkbox" data-toggle="activo" data-codigo="${escapeHtml(l.codigo)}" ${l.activo ? "checked" : ""}>
           <span class="slider"></span>
         </label>
         <div class="estado-txt" style="color:${l.activo ? "#27ae60" : "#c0392b"}">${l.activo ? "ACTIVO" : "INACTIVO"}</div>
+      </td>
+      <td>
+        <label class="switch">
+          <input type="checkbox" data-toggle="envia_telegram" data-codigo="${escapeHtml(l.codigo)}" ${l.envia_telegram ? "checked" : ""}>
+          <span class="slider"></span>
+        </label>
+        <div class="estado-txt" style="color:${l.envia_telegram ? "#27ae60" : "#c0392b"}">${l.envia_telegram ? "SÍ" : "NO"}</div>
       </td>
       <td><input type="text" value="${escapeHtml(l.agencia_nombre)}" data-codigo="${escapeHtml(l.codigo)}" data-campo="agencia_nombre" placeholder="Nombre fantasía"></td>
       <td><input type="text" value="${escapeHtml(l.agencia_legajo)}" data-codigo="${escapeHtml(l.codigo)}" data-campo="agencia_legajo" placeholder="Legajo"></td>
@@ -200,6 +211,18 @@ async function alternarActivo(codigo, nuevoValor) {
     if (nuevoValor) item.activado_en = patch.activado_en;
   }
   mostrarMensaje(nuevoValor ? `Licencia ${codigo} activada.` : `Licencia ${codigo} desactivada.`, false);
+  renderTabla();
+}
+
+async function alternarEnviaTelegram(codigo, nuevoValor) {
+  const { error } = await client.from("licencias").update({ envia_telegram: nuevoValor }).eq("codigo", codigo);
+  if (error) {
+    mostrarMensaje("Error al actualizar: " + error.message, true);
+    return;
+  }
+  const item = licencias.find((l) => l.codigo === codigo);
+  if (item) item.envia_telegram = nuevoValor;
+  mostrarMensaje(nuevoValor ? `Licencia ${codigo} autorizada a mandar a Telegram.` : `Licencia ${codigo} ya no manda a Telegram.`, false);
   renderTabla();
 }
 

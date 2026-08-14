@@ -239,19 +239,28 @@
     }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
+    .tab-panel-iframe {
+      display: block;
+      width: 100%;
+      height: calc(100dvh - 170px);
+      min-height: 500px;
+      border: none;
+      border-radius: 16px;
+      background: #0a0a2e;
+    }
   </style>
 </head>
 <body>
   <script src="admin-auth.js"></script>
   <h1>ADMINISTRACIÓN DEL TABLERO</h1>
 
-  <a href="rifa.html" class="btn-rifa" target="_blank" rel="noopener">🏐 RIFA</a>
-
   <div class="tabs">
     <button type="button" class="tab-btn active" data-tab="general">GENERAL</button>
     <button type="button" class="tab-btn" data-tab="plus">QUINIELA PLUS</button>
     <button type="button" class="tab-btn" data-tab="loto">LOTO PLUS</button>
     <button type="button" class="tab-btn" data-tab="quini6">QUINI 6</button>
+    <button type="button" class="tab-btn" data-tab="licencias">LICENCIAS</button>
+    <button type="button" class="tab-btn" data-tab="rifa">🏐 RIFA</button>
   </div>
 
   <!-- ===================================================================== -->
@@ -423,6 +432,20 @@
     <div class="estado" id="estadoGuardarQ6"></div>
   </section>
 
+  <!-- ===================================================================== -->
+  <!-- LICENCIAS (panel propio, con su login de Supabase)                    -->
+  <!-- ===================================================================== -->
+  <section class="tab-panel" data-tab="licencias">
+    <iframe class="tab-panel-iframe" data-src="licencias.html" title="Panel de Licencias"></iframe>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- RIFA (panel propio, con su login de Supabase)                         -->
+  <!-- ===================================================================== -->
+  <section class="tab-panel" data-tab="rifa">
+    <iframe class="tab-panel-iframe" data-src="rifa.html" title="Rifa"></iframe>
+  </section>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
   async function iniciarPagina() {
@@ -440,7 +463,13 @@
         document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
         document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
         btn.classList.add("active");
-        document.querySelector(`.tab-panel[data-tab="${btn.dataset.tab}"]`).classList.add("active");
+        const panel = document.querySelector(`.tab-panel[data-tab="${btn.dataset.tab}"]`);
+        panel.classList.add("active");
+        const iframe = panel.querySelector("iframe[data-src]");
+        if (iframe) {
+          iframe.src = iframe.dataset.src;
+          iframe.removeAttribute("data-src");
+        }
       });
     });
 
