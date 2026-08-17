@@ -20,7 +20,27 @@
     return codigo;
   }
 
+  // Si la app Android (TableroAndroid.getDeviceId) esta presente, el codigo
+  // se deriva de un ID del sistema (Settings.Secure.ANDROID_ID) que no vive
+  // en el almacenamiento de la app, asi que sobrevive a un "Borrar datos" o
+  // limpiador de cache. En un navegador comun (sin esa app) se sigue usando
+  // el codigo aleatorio guardado en localStorage, como antes.
+  function obtenerCodigoNativo() {
+    try {
+      if (window.TableroAndroid && typeof window.TableroAndroid.getDeviceId === "function") {
+        const idNativo = window.TableroAndroid.getDeviceId();
+        if (idNativo) return `TV-${idNativo}`;
+      }
+    } catch (err) {
+      // sin bridge nativo disponible: seguimos con el codigo de localStorage
+    }
+    return null;
+  }
+
   function obtenerCodigo() {
+    const codigoNativo = obtenerCodigoNativo();
+    if (codigoNativo) return codigoNativo;
+
     let codigo = localStorage.getItem(CODIGO_KEY);
     if (!codigo) {
       codigo = generarCodigo();
@@ -36,6 +56,13 @@
     if (ua.includes("Chrome/")) return "Chrome";
     if (ua.includes("Safari/")) return "Safari";
     return "Navegador";
+  }
+
+  function detectarDispositivo() {
+    if (window.TableroAndroid && typeof window.TableroAndroid.getDeviceId === "function") {
+      return `TV Android (${detectarNavegador()})`;
+    }
+    return `PC (${detectarNavegador()})`;
   }
 
   async function consultarEstado(codigo) {
@@ -157,7 +184,7 @@
       <div class="licencia-caja">
         <div class="licencia-col licencia-col-izq">
           <h2>Código de Acceso URL</h2>
-          <p class="licencia-dispositivo">Dispositivo: PC (${detectarNavegador()})</p>
+          <p class="licencia-dispositivo">Dispositivo: ${detectarDispositivo()}</p>
           <div class="licencia-codigo">${codigo}</div>
           <p class="licencia-estado" id="licencia-estado-texto">Código pendiente de activación</p>
           <p>Para activar el acceso, contáctenos por WhatsApp e incluya los datos de su agencia:</p>
