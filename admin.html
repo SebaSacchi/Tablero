@@ -251,6 +251,7 @@
   </style>
 </head>
 <body>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="admin-auth.js"></script>
   <h1>ADMINISTRACIÓN DEL TABLERO</h1>
 
@@ -636,12 +637,7 @@
       const baseUrl = SUPABASE_URL.replace(/\/$/, "");
       const res = await fetch(`${baseUrl}/rest/v1/config_tablero?on_conflict=clave`, {
         method: "POST",
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json",
-          "Prefer": "resolution=merge-duplicates,return=minimal"
-        },
+        headers: await obtenerHeadersEscrituraAdmin(),
         body: JSON.stringify([{ clave: CLAVE_LAT_VIDEOS, valor: [...latVideoBasesAdmin].join(","), actualizado_en: new Date().toISOString() }])
       });
       if (!res.ok) throw new Error(await res.text());
@@ -875,12 +871,7 @@
       const baseUrl = SUPABASE_URL.replace(/\/$/, "");
       const res = await fetch(`${baseUrl}/rest/v1/config_tablero?on_conflict=clave`, {
         method: "POST",
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json",
-          "Prefer": "resolution=merge-duplicates,return=minimal"
-        },
+        headers: await obtenerHeadersEscrituraAdmin(),
         body: JSON.stringify([{ clave: CLAVE_FERIADOS, valor: feriados.join(","), actualizado_en: new Date().toISOString() }])
       });
       if (!res.ok) throw new Error(await res.text());
@@ -1262,12 +1253,7 @@
         const baseUrl = SUPABASE_URL.replace(/\/$/, "");
         const res = await fetch(`${baseUrl}/rest/v1/resultados_plus?on_conflict=juego,fecha`, {
           method: "POST",
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "resolution=merge-duplicates,return=minimal"
-          },
+          headers: await obtenerHeadersEscrituraAdmin(),
           body: JSON.stringify(filas)
         });
 
@@ -1319,12 +1305,7 @@
       const baseUrl = SUPABASE_URL.replace(/\/$/, "");
       const res = await fetch(`${baseUrl}/rest/v1/config_tablero?on_conflict=clave`, {
         method: "POST",
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json",
-          "Prefer": "resolution=merge-duplicates,return=minimal"
-        },
+        headers: await obtenerHeadersEscrituraAdmin(),
         body: JSON.stringify([{ clave: CLAVE_PROXIMO_SORTEO_PLUS, valor, actualizado_en: new Date().toISOString() }])
       });
       if (!res.ok) throw new Error(await res.text());
@@ -1657,12 +1638,7 @@
         const baseUrl = SUPABASE_URL.replace(/\/$/, "");
         const res = await fetch(`${baseUrl}/rest/v1/resultados_loterias?on_conflict=loteria,subjuego,fecha`, {
           method: "POST",
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "resolution=merge-duplicates,return=minimal"
-          },
+          headers: await obtenerHeadersEscrituraAdmin(),
           body: JSON.stringify(filas)
         });
 
@@ -1714,12 +1690,7 @@
       const baseUrl = SUPABASE_URL.replace(/\/$/, "");
       const res = await fetch(`${baseUrl}/rest/v1/config_tablero?on_conflict=clave`, {
         method: "POST",
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json",
-          "Prefer": "resolution=merge-duplicates,return=minimal"
-        },
+        headers: await obtenerHeadersEscrituraAdmin(),
         body: JSON.stringify([{ clave: CLAVE_PROXIMO_SORTEO, valor, actualizado_en: new Date().toISOString() }])
       });
       if (!res.ok) throw new Error(await res.text());
@@ -2040,12 +2011,7 @@
         const baseUrl = SUPABASE_URL.replace(/\/$/, "");
         const res = await fetch(`${baseUrl}/rest/v1/resultados_loterias?on_conflict=loteria,subjuego,fecha`, {
           method: "POST",
-          headers: {
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "resolution=merge-duplicates,return=minimal"
-          },
+          headers: await obtenerHeadersEscrituraAdmin(),
           body: JSON.stringify(filas)
         });
 
@@ -2097,12 +2063,7 @@
       const baseUrl = SUPABASE_URL.replace(/\/$/, "");
       const res = await fetch(`${baseUrl}/rest/v1/config_tablero?on_conflict=clave`, {
         method: "POST",
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json",
-          "Prefer": "resolution=merge-duplicates,return=minimal"
-        },
+        headers: await obtenerHeadersEscrituraAdmin(),
         body: JSON.stringify([{ clave: CLAVE_PROXIMO_SORTEO_Q6, valor, actualizado_en: new Date().toISOString() }])
       });
       if (!res.ok) throw new Error(await res.text());

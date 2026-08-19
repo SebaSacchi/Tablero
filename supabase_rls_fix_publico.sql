@@ -11,37 +11,37 @@
 --
 -- Que necesita realmente cada tabla (repasado en el codigo):
 --   - config_tablero, resultados_plus, resultados_loterias:
---       * El tablero publico (index.html / app.js) SOLO LEE.
---       * admin.html LEE y hace upsert (insert+update, nunca delete)
---         usando la anon key, porque admin.html no usa Supabase Auth:
---         solo valida un password contra una funcion RPC (ver
---         supabase_admin_auth_setup.sql) y despues sigue llamando a
---         la REST API con la misma anon key de siempre. Por eso estas
---         3 tablas necesitan permitir insert/update anonimo: hoy es
---         indispensable para que el panel de admin no se rompa.
+--       * El tablero publico (index.html / app.js) SOLO LEE, sin
+--         haber iniciado sesion -> select para "anon".
+--       * admin.html LEE y hace upsert (insert+update, nunca delete).
+--         admin.html ahora inicia sesion de verdad con Supabase Auth
+--         (ver admin-auth.js) y manda el token de esa sesion en cada
+--         escritura, asi que insert/update se restringen a
+--         "authenticated" -> ya no cualquiera con la anon key puede
+--         escribir, solo quien inicio sesion con el usuario admin.
 --   - resultados_quiniela:
 --       * El tablero publico SOLO LEE.
 --       * Se escribe desde un script aparte (tablero_sync.py, fuera
 --         de este repo) que usa la SERVICE ROLE KEY por variable de
 --         entorno, no la anon key. La service role IGNORA RLS por
 --         completo, asi que esta tabla no necesita ninguna policy de
---         insert/update/delete para anon ni authenticated.
+--         insert/update/delete para nadie.
 --
 -- Ninguna de las 4 tablas se borra (DELETE) desde el frontend, asi que
 -- no se crea policy de delete para nadie salvo el dueño del proyecto
 -- (via el SQL Editor, que corre como owner y no esta sujeto a RLS).
 --
--- IMPORTANTE - riesgo que queda (no se soluciona con este script):
--- como admin.html no usa Supabase Auth, cualquiera que consiga la
--- anon key (publica, no hay forma de evitarlo en un sitio 100%
--- frontend) puede escribir directo en config_tablero/resultados_plus/
--- resultados_loterias sin pasar por el password del panel. El
--- password de admin.html solo protege la UI, no la base. Si en algun
--- momento queres cerrar tambien ese hueco, la solucion es migrar
--- admin.html a Supabase Auth real (como ya funciona en licencias.html
--- y rifa.html) y cambiar estas policies de "to anon" a "to
--- authenticated". Es un cambio mas grande, no se aplica en este
--- script para no romper el panel actual.
+-- PASO PREVIO OBLIGATORIO - crear el usuario admin en Supabase Auth:
+--   admin.html ya no usa un password guardado en una tabla propia:
+--   ahora pide email + contraseña y valida contra Supabase Auth, igual
+--   que licencias.html. Antes de correr este script (o al menos antes
+--   de que alguien vuelva a entrar a admin.html):
+--     1. Supabase -> Authentication -> Users -> Add user
+--     2. Cargá tu email y una contraseña (podés reusar el mismo
+--        usuario que ya tengas para licencias.html si querés).
+--     3. Con eso ya podés loguearte en admin.html.
+--   La vieja contraseña de admin_auth (la que se creaba desde el panel
+--   la primera vez) queda sin uso.
 --
 -- Antes de correr esto: se recomienda ejecutar primero el diagnostico
 -- del final del archivo (o pegarlo solo) para confirmar que estas son
@@ -69,18 +69,19 @@ create policy "config_tablero_select_anon"
   to anon
   using (true);
 
--- Insert/update publico: admin.html escribe con la anon key (no usa
--- Supabase Auth). Ver nota de riesgo arriba.
+-- Insert/update solo para el admin logueado (ver nota arriba).
 drop policy if exists "config_tablero_insert_anon" on public.config_tablero;
-create policy "config_tablero_insert_anon"
+drop policy if exists "config_tablero_insert_auth" on public.config_tablero;
+create policy "config_tablero_insert_auth"
   on public.config_tablero for insert
-  to anon
+  to authenticated
   with check (true);
 
 drop policy if exists "config_tablero_update_anon" on public.config_tablero;
-create policy "config_tablero_update_anon"
+drop policy if exists "config_tablero_update_auth" on public.config_tablero;
+create policy "config_tablero_update_auth"
   on public.config_tablero for update
-  to anon
+  to authenticated
   using (true)
   with check (true);
 
@@ -97,15 +98,17 @@ create policy "resultados_plus_select_anon"
   using (true);
 
 drop policy if exists "resultados_plus_insert_anon" on public.resultados_plus;
-create policy "resultados_plus_insert_anon"
+drop policy if exists "resultados_plus_insert_auth" on public.resultados_plus;
+create policy "resultados_plus_insert_auth"
   on public.resultados_plus for insert
-  to anon
+  to authenticated
   with check (true);
 
 drop policy if exists "resultados_plus_update_anon" on public.resultados_plus;
-create policy "resultados_plus_update_anon"
+drop policy if exists "resultados_plus_update_auth" on public.resultados_plus;
+create policy "resultados_plus_update_auth"
   on public.resultados_plus for update
-  to anon
+  to authenticated
   using (true)
   with check (true);
 
@@ -122,15 +125,17 @@ create policy "resultados_loterias_select_anon"
   using (true);
 
 drop policy if exists "resultados_loterias_insert_anon" on public.resultados_loterias;
-create policy "resultados_loterias_insert_anon"
+drop policy if exists "resultados_loterias_insert_auth" on public.resultados_loterias;
+create policy "resultados_loterias_insert_auth"
   on public.resultados_loterias for insert
-  to anon
+  to authenticated
   with check (true);
 
 drop policy if exists "resultados_loterias_update_anon" on public.resultados_loterias;
-create policy "resultados_loterias_update_anon"
+drop policy if exists "resultados_loterias_update_auth" on public.resultados_loterias;
+create policy "resultados_loterias_update_auth"
   on public.resultados_loterias for update
-  to anon
+  to authenticated
   using (true)
   with check (true);
 
@@ -138,7 +143,7 @@ create policy "resultados_loterias_update_anon"
 -- RESULTADOS_QUINIELA
 -- Solo lectura publica. Se escribe con la SERVICE ROLE KEY desde
 -- tablero_sync.py (fuera de este repo), que ignora RLS: por eso NO se
--- crea ninguna policy de insert/update/delete para anon.
+-- crea ninguna policy de insert/update/delete.
 -- ---------------------------------------------------------------------
 alter table public.resultados_quiniela enable row level security;
 
@@ -149,8 +154,20 @@ create policy "resultados_quiniela_select_anon"
   using (true);
 
 -- =====================================================================
--- FIN DEL SCRIPT
+-- FIN DEL SCRIPT PRINCIPAL
 -- =====================================================================
+
+-- ---------------------------------------------------------------------
+-- LIMPIEZA OPCIONAL (correla aparte, y solo despues de haber entrado a
+-- admin.html con el nuevo login de Supabase Auth y confirmar que anda):
+-- borra la tabla y las funciones del password viejo de admin_auth, que
+-- ya no se usan.
+-- ---------------------------------------------------------------------
+-- drop function if exists public.existe_admin_password();
+-- drop function if exists public.crear_admin_password(text);
+-- drop function if exists public.verificar_admin_password(text);
+-- drop function if exists public.set_admin_password(text, text);
+-- drop table if exists public.admin_auth;
 
 -- ---------------------------------------------------------------------
 -- DIAGNOSTICO (opcional): correlo solo, antes o despues, para ver el
