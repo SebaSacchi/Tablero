@@ -1251,23 +1251,15 @@
 
       try {
         const baseUrl = SUPABASE_URL.replace(/\/$/, "");
-        const headersEscritura = await obtenerHeadersEscrituraAdmin();
         const res = await fetch(`${baseUrl}/rest/v1/resultados_plus?on_conflict=juego,fecha`, {
           method: "POST",
-          headers: headersEscritura,
+          headers: await obtenerHeadersEscrituraAdmin(),
           body: JSON.stringify(filas)
         });
 
         if (!res.ok) {
           const txt = await res.text();
-          let debugRol = "";
-          try {
-            const payload = JSON.parse(atob(headersEscritura.Authorization.split(".")[1]));
-            debugRol = ` [DEBUG rol=${payload.role}, aud=${payload.aud}]`;
-          } catch (e) {
-            debugRol = ` [DEBUG no se pudo decodificar el token: ${e.message}]`;
-          }
-          throw new Error(txt + debugRol);
+          throw new Error(txt);
         }
 
         estadoGuardarPlus.className = "estado ok";

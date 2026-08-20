@@ -179,3 +179,43 @@ create policy "resultados_quiniela_select_anon"
 -- from pg_tables
 -- where schemaname = 'public'
 -- order by tablename;
+
+-- =====================================================================
+-- FIX ADICIONAL OBLIGATORIO - SELECT para "authenticated" en las
+-- tablas que admin.html guarda con upsert (on_conflict=...)
+-- =====================================================================
+-- Sin esto, admin.html tira "new row violates row-level security
+-- policy" al guardar Quiniela Plus, Loto Plus/Quini 6 o config_tablero
+-- (feriados, videos de promo, próximo sorteo manual, etc), aunque el
+-- login sea correcto y el token diga role=authenticated.
+--
+-- Motivo: cuando el INSERT trae "ON CONFLICT ... DO UPDATE" (el upsert
+-- que arma PostgREST con on_conflict=juego,fecha / on_conflict=clave),
+-- Postgres necesita poder verificar si ya existe una fila en conflicto
+-- para decidir si inserta o actualiza, y esa verificación exige una
+-- policy de SELECT para el rol que ejecuta la consulta. Como las 3
+-- tablas solo tenian SELECT para "anon" (no para "authenticated"), el
+-- admin logueado podia leer via el panel pero no podia hacer ningun
+-- upsert: la falta de SELECT para su propio rol hacia caer TODO el
+-- insert/update, con un mensaje de error que no menciona SELECT para
+-- nada (por eso costo tanto encontrarlo).
+--
+-- Correr esto despues del script principal de arriba (se puede repetir
+-- sin problema, cada create va precedido de su drop if exists):
+drop policy if exists "resultados_plus_select_auth" on public.resultados_plus;
+create policy "resultados_plus_select_auth"
+  on public.resultados_plus for select
+  to authenticated
+  using (true);
+
+drop policy if exists "resultados_loterias_select_auth" on public.resultados_loterias;
+create policy "resultados_loterias_select_auth"
+  on public.resultados_loterias for select
+  to authenticated
+  using (true);
+
+drop policy if exists "config_tablero_select_auth" on public.config_tablero;
+create policy "config_tablero_select_auth"
+  on public.config_tablero for select
+  to authenticated
+  using (true);
