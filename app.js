@@ -166,6 +166,8 @@ let anuncioFullActivo = false;
 let latImagesCargadas = [];
 let latIndex = 0;
 let latInterval = null;
+let latEndedVideo = null;
+let latEndedHandler = null;
 let latCacheTiempo = 0;
 let latSlotActivoIdx = 0;
 
@@ -229,7 +231,10 @@ async function cargarLatVideoBases() {
 }
 
 function limpiarLatInterval() {
-  if (latInterval) { clearInterval(latInterval); latInterval = null; }
+  if (latInterval) { clearTimeout(latInterval); latInterval = null; }
+  if (latEndedVideo && latEndedHandler) latEndedVideo.removeEventListener("ended", latEndedHandler);
+  latEndedVideo = null;
+  latEndedHandler = null;
 }
 
 async function cargarLatImages() {
@@ -273,7 +278,7 @@ function promoLateralHTML() {
   const actual = latImagenActual();
   if (!actual) return "";
   if (actual.tipo === "video") {
-    return `<video src="${actual.src}" autoplay muted loop playsinline preload="auto"></video>`;
+    return `<video src="${actual.src}" autoplay muted playsinline preload="auto"></video>`;
   }
   return `<img src="${actual.src}" alt="">`;
 }
@@ -284,7 +289,7 @@ function crearElementoLat(actual) {
     if (actual.tipo === "video") {
       const video = document.createElement("video");
       video.muted = true;
-      video.loop = true;
+      video.loop = false;
       video.playsInline = true;
       video.preload = "auto";
       const listo = () => resolve(video);
@@ -352,9 +357,10 @@ function restaurarPromoLateralPrevia(nodos) {
 // slot se revela recien cuando hay imagen real en pantalla y no se ve
 // la flecha de "pausado" que muestran los smart TV mientras el video
 // esta cargado pero todavia no reproduce.
-// El video tiene loop=true (nunca dispara "ended"): se repite solo hasta
-// que el timer de 60s de iniciarLatRotacion avance a la siguiente, igual
-// que las imagenes.
+// El video tiene loop=false: se reproduce una sola vez y dispara "ended",
+// lo que hace avanzar la rotacion de inmediato (ver programarSiguienteLat)
+// en vez de esperar un timer fijo. Asi no se repite de mas ni se decodifica
+// video de mas en la TV.
 function activarVideoDelSlot(slot) {
   const video = slot.querySelector("video");
   // dibujarTurno/etc. redibujan la pantalla cada 10s y llaman de nuevo a
@@ -415,6 +421,38 @@ async function actualizarPromoLateral() {
   precargarSiguienteLat(contenedorActual);
 }
 
+async function avanzarLat() {
+  latIndex = (latIndex + 1) % latImagesCargadas.length;
+  await actualizarPromoLateral();
+  programarSiguienteLat();
+}
+
+// Si el slot activo es un video, espera a que termine solo (evento "ended")
+// en vez de cortarlo con un timer fijo: asi se ve una sola vez completo y
+// se pasa al siguiente apenas termina, sin loopear de mas ni decodificar
+// video de mas en la TV. El setTimeout de 30s es solo un tope de seguridad
+// por si el video nunca dispara "ended" (error, archivo corrupto, etc).
+// Las imagenes siguen con los 20s fijos de siempre.
+function programarSiguienteLat() {
+  if (latInterval) return;
+  if (latImagesCargadas.length <= 1) return;
+
+  const actual = latImagenActual();
+  if (actual && actual.tipo === "video") {
+    const contenedor = document.querySelector(".promo-lateral");
+    const slots = contenedor ? obtenerSlotsLat(contenedor) : [];
+    const video = slots[latSlotActivoIdx] ? slots[latSlotActivoIdx].querySelector("video") : null;
+    if (video) {
+      latEndedVideo = video;
+      latEndedHandler = () => { limpiarLatInterval(); avanzarLat(); };
+      video.addEventListener("ended", latEndedHandler, { once: true });
+      latInterval = setTimeout(avanzarLat, 30000);
+      return;
+    }
+  }
+  latInterval = setTimeout(avanzarLat, 20000);
+}
+
 function iniciarLatRotacion() {
   const contenedor = document.querySelector(".promo-lateral");
   if (contenedor) {
@@ -422,12 +460,7 @@ function iniciarLatRotacion() {
     activarVideoDelSlot(slots[latSlotActivoIdx]);
     precargarSiguienteLat(contenedor);
   }
-  if (latInterval) return;
-  if (latImagesCargadas.length <= 1) return;
-  latInterval = setInterval(() => {
-    latIndex = (latIndex + 1) % latImagesCargadas.length;
-    actualizarPromoLateral();
-  }, 20000);
+  programarSiguienteLat();
 }
 
 function cambiarLatImagen(dir) {
