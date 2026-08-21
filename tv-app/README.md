@@ -23,6 +23,14 @@ Eso significa que la primera vez vas a tener que reactivar el código de licenci
 
 **Recomendación:** una vez que generes tu clave de firma en Android Studio, guardala en un lugar seguro (fuera del repo) y reusala siempre para este proyecto — así las próximas actualizaciones si se pueden instalar encima sin desinstalar.
 
+## Autoinicio al prender la TV
+
+La app tiene un `BootReceiver` que la lanza sola apenas el sistema Android termina de arrancar (`BOOT_COMPLETED` / `QUICKBOOT_POWERON`).
+
+Ojo con una distinción importante: en un Smart TV normal (o una TV box cara), "prender la TV" con el control remoto casi siempre es **despertar de un estado de reposo (standby)**, no un arranque completo de Android — en ese caso el sistema nunca vuelve a bootear y este mecanismo no aplica; simplemente vuelve a mostrar lo que ya estaba en memoria (el propio tablero, si ya estaba abierto, o el launcher/home si no). En cambio, en TV boxes chicas tipo ONN/genéricas que se apagan de verdad (sin standby real), cada "prendido" sí dispara un boot completo y ahí este mecanismo funciona como autoinicio real.
+
+Si después de instalar esto la TV no abre la app sola al encenderla, revisar en Ajustes del dispositivo si existe algo como "Autostart" / "Inicio automático" / "Administrador de apps en segundo plano" — muchas TV boxes Android (sobre todo las económicas) traen un permiso aparte por app para poder correr en el arranque, además del permiso que ya declara el manifest.
+
 ## Si cambia la URL del tablero
 
 Está hardcodeada en `app/src/main/java/com/tableronuevo/tv/MainActivity.java`, constante `TABLERO_URL`.
