@@ -422,6 +422,15 @@ async function actualizarPromoLateral() {
 }
 
 async function avanzarLat() {
+  // Se llama tanto desde el evento "ended" (que ya paso por limpiarLatInterval)
+  // como directo desde los setTimeout de arriba cuando se cumple el plazo: en
+  // ese segundo caso latInterval todavia apunta al timeout que acaba de
+  // disparar, y si no se limpia aca, el guard de programarSiguienteLat lo ve
+  // como "truthy" y se niega a programar el siguiente turno -> la rotacion
+  // queda trabada para siempre en lo que sea que se muestre despues.
+  latInterval = null;
+  latEndedVideo = null;
+  latEndedHandler = null;
   latIndex = (latIndex + 1) % latImagesCargadas.length;
   await actualizarPromoLateral();
   programarSiguienteLat();
