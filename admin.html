@@ -518,6 +518,42 @@
     const PUB_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg"];
     const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg"];
 
+    // Anuncio pantalla completa: cubre toda la pantalla (hasta 4K), se permite mas resolucion.
+    const PUB_MAX_DIM = 2560;
+    const PUB_CALIDAD = 0.85;
+    // Promo lateral: ocupa ~26.5% del ancho de pantalla (~1000px en 4K), alcanza con menos resolucion.
+    const LAT_MAX_DIM = 1280;
+    const LAT_CALIDAD = 0.8;
+
+    function comprimirImagen(file, maxDim, calidad) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            const ratio = Math.min(maxDim / width, maxDim / height);
+            width = Math.max(1, Math.round(width * ratio));
+            height = Math.max(1, Math.round(height * ratio));
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(blob => {
+            if (!blob) { reject(new Error("No se pudo comprimir la imagen")); return; }
+            resolve(new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" }));
+          }, "image/jpeg", calidad);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("No se pudo leer la imagen")); };
+        img.src = url;
+      });
+    }
+
     const btnSubir = document.getElementById("btn-subir");
     const estadoSubir = document.getElementById("estadoSubir");
     const inputsPub = [];
@@ -778,13 +814,16 @@
     btnSubir.addEventListener("click", async () => {
       btnSubir.disabled = true;
       estadoSubir.className = "estado cargando";
-      estadoSubir.textContent = "Subiendo...";
+      estadoSubir.textContent = "Comprimiendo y subiendo...";
 
       try {
         const uploads = [];
         for (const { fileInput, archivo } of inputsPub) {
-          if (fileInput.files[0]) {
-            uploads.push(uploadFile(fileInput.files[0], archivo));
+          const f = fileInput.files[0];
+          if (f) {
+            uploads.push(
+              comprimirImagen(f, PUB_MAX_DIM, PUB_CALIDAD).then(comprimida => uploadFile(comprimida, archivo))
+            );
           }
         }
 
@@ -793,9 +832,15 @@
           const f = fileInput.files[0];
           if (f) {
             const esVideo = f.type.startsWith("video/");
-            uploads.push(uploadFile(f, esVideo ? `${nombreBase}.mp4` : `${nombreBase}.jpg`));
-            if (esVideo) latVideoBasesAdmin.add(nombreBase);
-            else latVideoBasesAdmin.delete(nombreBase);
+            if (esVideo) {
+              uploads.push(uploadFile(f, `${nombreBase}.mp4`));
+              latVideoBasesAdmin.add(nombreBase);
+            } else {
+              uploads.push(
+                comprimirImagen(f, LAT_MAX_DIM, LAT_CALIDAD).then(comprimida => uploadFile(comprimida, `${nombreBase}.jpg`))
+              );
+              latVideoBasesAdmin.delete(nombreBase);
+            }
             cambioVideos = true;
           }
         }
