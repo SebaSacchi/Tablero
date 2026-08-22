@@ -157,7 +157,7 @@ async function cargarFeriadosManual() {
 }
 
 const ANUNCIO_FULL_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg"];
-const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg"];
+const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg", "lat9.jpg", "lat10.jpg"];
 
 let anuncioFullImagesCargadas = [];
 let anuncioFullIndex = 0;
