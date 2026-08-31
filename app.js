@@ -52,7 +52,7 @@ function getLoteriasTurno(turno, fecha = new Date()) {
 
 
 const ordenTurnos = ["PREVIA", "PRIMERA", "MATUTINA", "VESPERTINA", "NOCTURNA"];
-const PANTALLAS_CON_LATERAL = [...ordenTurnos, "QUINIELA_PLUS", "LOTO_PLUS", "QUINI6"];
+const PANTALLAS_CON_LATERAL = [...ordenTurnos, "QUINIELA_PLUS", "LOTO_PLUS", "QUINI6", "TELEKINO"];
 
 const horariosTurnos = {
   PREVIA: { inicio: "10:15", fin: "10:45" },
@@ -182,6 +182,11 @@ let latVideoBasesCacheTiempo = 0;
 // descarga una sola vez por pestaña y las repeticiones del loop las sirve la
 // cache del navegador (esto fue lo que agoto la cuota de Cached Egress).
 const latVideoCacheBust = Date.now();
+
+// Mismo motivo que latVideoCacheBust: la pantalla de Telekino se redibuja
+// cada 10s (reloj, cabezas), y si el "?v=" cambiara en cada redibujo el
+// navegador volveria a descargar la imagen entera cada vez.
+const telekinoCacheBust = Date.now();
 
 function getMediaBase() {
   return supabaseConfigurado()
@@ -2241,28 +2246,63 @@ function pantallaPorHora() {
   return "NOCTURNA";
 }
 
+function mostrarTelekinoFaltante(imgEl) {
+  const contenedor = imgEl.closest(".tabla-telekino");
+  if (contenedor) {
+    contenedor.innerHTML = `<div class="qplus-sin-datos">TODAVÍA NO SE CARGÓ EL EXTRACTO DE ESTA SEMANA</div>`;
+  }
+}
+
+function dibujarTelekino() {
+  const src = `${getMediaBase()}/${TELEKINO_FILE}?v=${telekinoCacheBust}`;
+
+  const promoPreservada = capturarPromoLateralPrevia();
+  app.innerHTML = `
+    <main class="pantalla estado-finalizado pantalla-telekino">
+      <header class="topbar">
+        <div class="topbar-hora" id="topbar-hora">${soloHoraTexto()}</div>
+        <div class="titulo-turno">
+          <div class="linea-titulo">
+            <span>EXTRACTO</span>
+            <strong>TELEKINO</strong>
+          </div>
+        </div>
+        <div class="topbar-cierre"></div>
+        <div class="fecha">${soloFechaTexto()}</div>
+      </header>
+
+      <section class="zona-vivo">
+        <aside class="panel-izquierdo">
+          ${bloqueIzquierdo("TELEKINO")}
+        </aside>
+
+        <section class="tabla-telekino">
+          <img src="${src}" alt="Extracto Telekino" onerror="mostrarTelekinoFaltante(this)">
+        </section>
+
+        <aside class="promo-lateral">
+          ${promoLateralHTML()}
+        </aside>
+      </section>
+    </main>
+  `;
+  restaurarPromoLateralPrevia(promoPreservada);
+}
+
 async function renderTelekino() {
   pantallaActual = "TELEKINO";
   limpiarCierreInterval();
-  limpiarLatInterval();
 
-  const [src] = await preloadImages([TELEKINO_FILE]);
+  dibujarTelekino();
 
-  if (pantallaActual !== "TELEKINO") return;
+  await Promise.all([
+    cargarUltimasCabezasSupabase(),
+    cargarLatImages()
+  ]);
 
-  if (src) {
-    dibujarAnuncioFull(src);
-  } else {
-    app.innerHTML = `
-      <main class="pantalla-simple">
-        <header class="simple-header">
-          <h1>TELEKINO</h1>
-        </header>
-        <section class="simple-body">
-          <h1 style="font-size:40px;">Todavía no se cargó el extracto de esta semana</h1>
-        </section>
-      </main>
-    `;
+  if (pantallaActual === "TELEKINO") {
+    dibujarTelekino();
+    iniciarLatRotacion();
   }
 }
 
@@ -2416,6 +2456,9 @@ setInterval(() => {
   }
   if (pantallaActual === "QUINI6") {
     renderQuini6();
+  }
+  if (pantallaActual === "TELEKINO") {
+    renderTelekino();
   }
 }, 10000);
 
