@@ -321,7 +321,14 @@
       <input type="text" id="sorteoPlus" placeholder="12797" inputmode="numeric">
     </div>
 
-    <h2 class="seccion">CARGAR DESDE PDF (opcional)</h2>
+    <h2 class="seccion">CARGAR AUTOMÁTICO (recomendado)</h2>
+    <div class="card">
+      <label>Trae el sorteo de hoy directo de la web oficial de Lotería de la Provincia de Buenos Aires y completa el formulario. Revisá los datos abajo antes de guardar. (También corre solo cada 6hs por las dudas te olvides.)</label>
+      <button type="button" class="btn-secundario" id="btn-buscar-oficial-plus">BUSCAR SORTEO DE HOY</button>
+      <div class="estado" id="estadoOficialPlus"></div>
+    </div>
+
+    <h2 class="seccion">CARGAR DESDE PDF (alternativa manual)</h2>
     <div class="card">
       <input type="file" id="archivoPdfPlus" accept="application/pdf">
       <button class="btn-parsear-pdf" id="btn-parsear-pdf-plus" disabled>LEER PDF Y COMPLETAR FORMULARIO</button>
@@ -1397,6 +1404,46 @@
         estadoGuardarPlus.textContent = "Error al guardar: " + error.message;
       } finally {
         btnGuardarPlus.disabled = false;
+      }
+    });
+
+    // --- Carga automática (sin PDF): trae el sorteo de hoy vía la función de Supabase ---
+    // La fuente (loteria.gba.gob.ar) no tiene CORS abierto, así que el fetch + parseo de
+    // PDF corren server-side en la función "sync-quiniela-plus" y el botón solo le pide
+    // el resultado. Usa el anon key legacy (JWT) como Bearer para pasar el gate verify_jwt
+    // de la función (no es secreto: mismo tipo de key ya expuesta en este archivo).
+
+    const ANON_JWT_LEGACY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkandrd2ZraXFxZnlwZnRkZXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyODM2NjYsImV4cCI6MjA5Nzg1OTY2Nn0.RtbEDrG04KjHYxcrRFXs7F_Qn0LvskxXX5feen-mvh8";
+
+    async function traerUltimoSorteoOficialPlus() {
+      const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+      const resp = await fetch(`${baseUrl}/functions/v1/sync-quiniela-plus`, {
+        headers: { Authorization: `Bearer ${ANON_JWT_LEGACY}` }
+      });
+      const json = await resp.json();
+      if (!json.ok) throw new Error(json.error || "Error desconocido");
+      if (!json.datos) throw new Error(json.mensaje || "Todavía no hay sorteo de hoy");
+      return json.datos;
+    }
+
+    const btnBuscarOficialPlus = document.getElementById("btn-buscar-oficial-plus");
+    const estadoOficialPlus = document.getElementById("estadoOficialPlus");
+
+    btnBuscarOficialPlus.addEventListener("click", async () => {
+      btnBuscarOficialPlus.disabled = true;
+      estadoOficialPlus.className = "estado cargando";
+      estadoOficialPlus.textContent = "Buscando en la web oficial...";
+
+      try {
+        const datos = await traerUltimoSorteoOficialPlus();
+        rellenarFormularioPlus(datos);
+        estadoOficialPlus.className = "estado ok";
+        estadoOficialPlus.textContent = `Sorteo ${datos.sorteo} (${datos.fecha}) traído de la web oficial. Revisá los datos abajo antes de guardar.`;
+      } catch (error) {
+        estadoOficialPlus.className = "estado err";
+        estadoOficialPlus.textContent = "No se pudo traer el sorteo: " + error.message + ". Probá con el PDF.";
+      } finally {
+        btnBuscarOficialPlus.disabled = false;
       }
     });
 
