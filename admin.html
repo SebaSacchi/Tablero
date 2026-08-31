@@ -414,7 +414,14 @@
       <input type="text" id="sorteoQ6" placeholder="3389" inputmode="numeric">
     </div>
 
-    <h2 class="seccion">CARGAR DESDE PDF (opcional)</h2>
+    <h2 class="seccion">ABRIR EXTRACTO OFICIAL (atajo)</h2>
+    <div class="card">
+      <label>Abre en una pestaña nueva el PDF oficial del próximo concurso (Lotería de Santa Fe), para no tener que buscarlo a mano en la web. Descargalo y subilo abajo en "Cargar desde PDF". (Si todavía no está publicado vas a ver un error 404: probá de nuevo más tarde.)</label>
+      <button type="button" class="btn-secundario" id="btn-abrir-extracto-q6">ABRIR EXTRACTO OFICIAL</button>
+      <div class="estado" id="estadoExtractoQ6"></div>
+    </div>
+
+    <h2 class="seccion">CARGAR DESDE PDF</h2>
     <div class="card">
       <input type="file" id="archivoPdfQ6" accept="application/pdf">
       <button class="btn-parsear-pdf" id="btn-parsear-pdf-q6" disabled>LEER PDF Y COMPLETAR FORMULARIO</button>
@@ -2155,6 +2162,51 @@
         estadoPdfQ6.textContent = "No se pudo leer el PDF: " + error.message + ". Cargá los datos a mano.";
       } finally {
         btnParsearQ6.disabled = false;
+      }
+    });
+
+    // --- Abrir extracto oficial (atajo): abre el PDF del próximo concurso en una pestaña nueva ---
+    // La URL del PDF es predecible por número de concurso, pero la web de Lotería de Santa Fe
+    // bloquea el acceso desde servidores en la nube y no tiene CORS abierto, así que no se puede
+    // traer y parsear solo como con Loto Plus. Esto solo le ahorra al admin buscar el link a
+    // mano: abre el PDF con un clic para descargarlo y subirlo en "CARGAR DESDE PDF".
+
+    const btnAbrirExtractoQ6 = document.getElementById("btn-abrir-extracto-q6");
+    const estadoExtractoQ6 = document.getElementById("estadoExtractoQ6");
+
+    btnAbrirExtractoQ6.addEventListener("click", async () => {
+      btnAbrirExtractoQ6.disabled = true;
+      estadoExtractoQ6.className = "estado cargando";
+      estadoExtractoQ6.textContent = "Buscando el último concurso guardado...";
+
+      try {
+        const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+        const params = new URLSearchParams({
+          select: "sorteo",
+          loteria: "eq.QUINI6",
+          subjuego: "eq.TRADICIONAL",
+          order: "fecha.desc",
+          limit: "1"
+        });
+        const res = await fetch(`${baseUrl}/rest/v1/resultados_loterias?${params.toString()}`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const filas = await res.json();
+        const ultimoSorteo = parseInt(filas[0]?.sorteo, 10);
+        if (!Number.isFinite(ultimoSorteo)) throw new Error("No hay ningún sorteo de Quini 6 guardado todavía");
+
+        const candidato = ultimoSorteo + 1;
+        const url = `https://loteriasantafe.gov.ar/uploads/extractosdigitales/Extracto_Sorteo_Q6_${candidato}.pdf`;
+        window.open(url, "_blank");
+
+        estadoExtractoQ6.className = "estado ok";
+        estadoExtractoQ6.textContent = `Abriendo el concurso ${candidato} en una pestaña nueva.`;
+      } catch (error) {
+        estadoExtractoQ6.className = "estado err";
+        estadoExtractoQ6.textContent = "No se pudo calcular el extracto: " + error.message;
+      } finally {
+        btnAbrirExtractoQ6.disabled = false;
       }
     });
 
