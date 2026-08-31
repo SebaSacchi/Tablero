@@ -278,6 +278,17 @@
     <button class="btn-guardar" id="btn-subir" disabled>SUBIR IMÁGENES</button>
     <div class="estado" id="estadoSubir"></div>
 
+    <h2 class="seccion">EXTRACTO TELEKINO (tecla 5, junto a Quiniela Plus / Loto Plus / Quini 6)</h2>
+    <label style="margin-bottom:8px;">Subí una foto o captura del extracto oficial del Telekino. Se muestra a pantalla completa tal cual la subís. Actualizala una vez por semana.</label>
+    <div class="card card-pub" style="margin-bottom:16px;">
+      <h3>IMAGEN DEL EXTRACTO</h3>
+      <img class="preview" id="preview_telekino">
+      <button type="button" class="btn-elegir" id="btn_telekino">ELEGIR IMAGEN</button>
+      <input type="file" class="oculto" id="file_telekino" accept="image/*">
+    </div>
+    <button class="btn-guardar" id="btn-subir-telekino" disabled>SUBIR EXTRACTO</button>
+    <div class="estado" id="estadoTelekino"></div>
+
     <h2 class="seccion">FERIADOS SIN SORTEO (afecta todo el tablero)</h2>
     <div class="card">
       <label>Marcá acá los días sin sorteo por feriado. Ese día, todas las pantallas (1 a 5) van a seguir mostrando el último resultado real con la etiqueta "FERIADO", en vez de mostrar guiones vacíos, hasta que arranque el próximo sorteo real.</label>
@@ -853,6 +864,64 @@
         estadoSubir.className = "estado err";
         estadoSubir.textContent = "Error al subir: " + err.message;
         btnSubir.disabled = false;
+      }
+    });
+
+    // ==================================================================
+    // GENERAL: EXTRACTO TELEKINO (imagen única, tecla 5)
+    // ==================================================================
+
+    const TELEKINO_FILE = "telekino.jpg";
+    const TELEKINO_MAX_DIM = 2200;
+    const TELEKINO_CALIDAD = 0.9;
+
+    const fileTelekino = document.getElementById("file_telekino");
+    const previewTelekino = document.getElementById("preview_telekino");
+    const btnElegirTelekino = document.getElementById("btn_telekino");
+    const btnSubirTelekino = document.getElementById("btn-subir-telekino");
+    const estadoTelekino = document.getElementById("estadoTelekino");
+
+    btnElegirTelekino.addEventListener("click", () => fileTelekino.click());
+    fileTelekino.addEventListener("change", () => {
+      const f = fileTelekino.files[0];
+      if (f) {
+        previewTelekino.src = URL.createObjectURL(f);
+        previewTelekino.classList.add("visible");
+        btnElegirTelekino.textContent = "CAMBIAR IMAGEN";
+        btnElegirTelekino.classList.add("selected");
+        btnSubirTelekino.disabled = false;
+      }
+    });
+
+    (function cargarExistenteTelekino() {
+      const base = `${SUPABASE_URL}/storage/v1/object/public/media`;
+      const cache = Date.now();
+      const img = new Image();
+      img.onload = () => {
+        previewTelekino.src = `${base}/${TELEKINO_FILE}?v=${cache}`;
+        previewTelekino.classList.add("visible");
+      };
+      img.src = `${base}/${TELEKINO_FILE}?v=${cache}`;
+    })();
+
+    btnSubirTelekino.addEventListener("click", async () => {
+      const f = fileTelekino.files[0];
+      if (!f) return;
+
+      btnSubirTelekino.disabled = true;
+      estadoTelekino.className = "estado cargando";
+      estadoTelekino.textContent = "Comprimiendo y subiendo...";
+
+      try {
+        const comprimida = await comprimirImagen(f, TELEKINO_MAX_DIM, TELEKINO_CALIDAD);
+        await uploadFile(comprimida, TELEKINO_FILE);
+        estadoTelekino.className = "estado ok";
+        estadoTelekino.textContent = "Extracto actualizado correctamente";
+        fileTelekino.value = "";
+      } catch (err) {
+        estadoTelekino.className = "estado err";
+        estadoTelekino.textContent = "Error al subir: " + err.message;
+        btnSubirTelekino.disabled = false;
       }
     });
 

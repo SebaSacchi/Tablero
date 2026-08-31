@@ -157,6 +157,7 @@ async function cargarFeriadosManual() {
 }
 
 const ANUNCIO_FULL_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg"];
+const TELEKINO_FILE = "telekino.jpg";
 const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg", "lat9.jpg", "lat10.jpg"];
 
 let anuncioFullImagesCargadas = [];
@@ -2240,8 +2241,33 @@ function pantallaPorHora() {
   return "NOCTURNA";
 }
 
-const ORDEN_PLUS_FAMILIA = ["QUINIELA_PLUS", "LOTO_PLUS", "QUINI6"];
-const RENDER_PLUS_FAMILIA = { QUINIELA_PLUS: renderQuinielaPlus, LOTO_PLUS: renderLotoPlus, QUINI6: renderQuini6 };
+async function renderTelekino() {
+  pantallaActual = "TELEKINO";
+  limpiarCierreInterval();
+  limpiarLatInterval();
+
+  const [src] = await preloadImages([TELEKINO_FILE]);
+
+  if (pantallaActual !== "TELEKINO") return;
+
+  if (src) {
+    dibujarAnuncioFull(src);
+  } else {
+    app.innerHTML = `
+      <main class="pantalla-simple">
+        <header class="simple-header">
+          <h1>TELEKINO</h1>
+        </header>
+        <section class="simple-body">
+          <h1 style="font-size:40px;">Todavía no se cargó el extracto de esta semana</h1>
+        </section>
+      </main>
+    `;
+  }
+}
+
+const ORDEN_PLUS_FAMILIA = ["QUINIELA_PLUS", "LOTO_PLUS", "QUINI6", "TELEKINO"];
+const RENDER_PLUS_FAMILIA = { QUINIELA_PLUS: renderQuinielaPlus, LOTO_PLUS: renderLotoPlus, QUINI6: renderQuini6, TELEKINO: renderTelekino };
 
 function siguientePantallaPlusFamilia() {
   const actual = ORDEN_PLUS_FAMILIA.includes(pantallaActual) ? pantallaActual : "QUINIELA_PLUS";
@@ -2269,6 +2295,7 @@ const PANTALLAS_NAVEGABLES = [
   { id: "QUINIELA_PLUS", fn: () => renderQuinielaPlus() },
   { id: "LOTO_PLUS", fn: () => renderLotoPlus() },
   { id: "QUINI6", fn: () => renderQuini6() },
+  { id: "TELEKINO", fn: () => renderTelekino() },
   { id: "CABEZAS", fn: () => renderCabezas() },
   { id: "HISTORIAL", fn: () => renderHistorial() },
   { id: "ALEATORIO", fn: () => renderAleatorio() },
