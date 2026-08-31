@@ -356,7 +356,14 @@
       <input type="text" id="sorteo" placeholder="3898" inputmode="numeric">
     </div>
 
-    <h2 class="seccion">CARGAR DESDE PDF (opcional)</h2>
+    <h2 class="seccion">CARGAR AUTOMÁTICO (recomendado)</h2>
+    <div class="card">
+      <label>Trae el último sorteo directo de la web oficial de Lotería de la Ciudad y completa el formulario. Revisá los datos abajo antes de guardar. (También corre solo cada 6hs por las dudas te olvides.)</label>
+      <button type="button" class="btn-secundario" id="btn-buscar-oficial">BUSCAR ÚLTIMO SORTEO OFICIAL</button>
+      <div class="estado" id="estadoOficial"></div>
+    </div>
+
+    <h2 class="seccion">CARGAR DESDE PDF (alternativa manual)</h2>
     <div class="card">
       <input type="file" id="archivoPdf" accept="application/pdf">
       <button class="btn-parsear-pdf" id="btn-parsear-pdf" disabled>LEER PDF Y COMPLETAR FORMULARIO</button>
@@ -1684,6 +1691,99 @@
         estadoPdf.textContent = "No se pudo leer el PDF: " + error.message + ". Cargá los datos a mano.";
       } finally {
         btnParsear.disabled = false;
+      }
+    });
+
+    // --- Carga automática (sin PDF): trae el último sorteo directo de la web oficial ---
+    // Misma fuente que usa la función automática de Supabase (sync-loto-plus):
+    // https://loto.loteriadelaciudad.gob.ar/includes/resultados-data.php (JSON público, CORS abierto).
+
+    const SUBJUEGOS_MAP_OFICIAL = {
+      "Tradicional": "TRADICIONAL",
+      "Match": "MATCH",
+      "Desquite": "DESQUITE",
+      "Sale o Sale": "SALE_O_SALE"
+    };
+
+    async function traerUltimoSorteoOficial() {
+      const resp = await fetch("https://loto.loteriadelaciudad.gob.ar/includes/resultados-data.php");
+      if (!resp.ok) throw new Error(`La web oficial respondió ${resp.status}`);
+      const texto = await resp.text();
+
+      const match = texto.match(/window\.PREMIOS_DATA\s*=\s*(\[.*?\]);/s);
+      if (!match) throw new Error("No se encontraron datos en la respuesta de la web oficial");
+
+      const premiosData = JSON.parse(match[1]);
+      if (!Array.isArray(premiosData) || premiosData.length === 0) {
+        throw new Error("La web oficial no tiene sorteos disponibles todavía");
+      }
+
+      const ultimo = premiosData.reduce((a, b) => (b.sorteo > a.sorteo ? b : a));
+      const [d, m, y] = ultimo.fecha.split("/");
+      const fecha = `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+
+      let proximoFecha = "";
+      try {
+        const xmlResp = await fetch(`https://loto.loteriadelaciudad.gob.ar/${ultimo.archivos.xml}`);
+        if (xmlResp.ok) {
+          const xmlTexto = await xmlResp.text();
+          const mProxima = xmlTexto.match(/<FechaProximoSorteo>([\d-]+)<\/FechaProximoSorteo>/);
+          if (mProxima) {
+            const [pd, pm, py] = mProxima[1].split("-");
+            proximoFecha = `${py}-${pm.padStart(2, "0")}-${pd.padStart(2, "0")}`;
+          }
+        }
+      } catch (_e) {
+        // No es crítico: si falla, queda vacío y el tablero calcula la próxima fecha solo.
+      }
+
+      const datos = {
+        fecha,
+        sorteo: String(ultimo.sorteo),
+        numeroPlus: ultimo.numeros_juegos?.["Número Plus"]?.[0] || "",
+        proximoFecha,
+        proximoPozo: ultimo.pozoEstimado || 0,
+        subjuegos: {}
+      };
+
+      (ultimo.juegos || []).forEach(juego => {
+        const subjuego = SUBJUEGOS_MAP_OFICIAL[juego.juego];
+        if (!subjuego) return;
+
+        const nivelTope = (juego.niveles || []).reduce((a, b) => (!a || b.aciertos > a.aciertos ? b : a), null);
+
+        datos.subjuegos[subjuego] = {
+          numeros: ultimo.numeros_juegos?.[juego.juego] || [],
+          pozo: nivelTope ? nivelTope.pozo : 0,
+          premios: (juego.niveles || []).map(n => ({
+            nivel: String(n.label || "").toUpperCase(),
+            ganadores: String(n.ganadores),
+            importe: (n.ganadores === "VACANTE" || !n.premio_unid) ? "" : `$ ${formatoNumeroAR(n.premio_unid)}`
+          }))
+        };
+      });
+
+      return datos;
+    }
+
+    const btnBuscarOficial = document.getElementById("btn-buscar-oficial");
+    const estadoOficial = document.getElementById("estadoOficial");
+
+    btnBuscarOficial.addEventListener("click", async () => {
+      btnBuscarOficial.disabled = true;
+      estadoOficial.className = "estado cargando";
+      estadoOficial.textContent = "Buscando en la web oficial...";
+
+      try {
+        const datos = await traerUltimoSorteoOficial();
+        rellenarFormulario(datos);
+        estadoOficial.className = "estado ok";
+        estadoOficial.textContent = `Sorteo ${datos.sorteo} (${datos.fecha}) traído de la web oficial. Revisá los datos abajo antes de guardar.`;
+      } catch (error) {
+        estadoOficial.className = "estado err";
+        estadoOficial.textContent = "No se pudo traer el sorteo: " + error.message + ". Probá con el PDF.";
+      } finally {
+        btnBuscarOficial.disabled = false;
       }
     });
 
