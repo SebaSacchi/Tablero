@@ -161,10 +161,11 @@ const TELEKINO_FILE = "telekino.jpg";
 const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg", "lat9.jpg", "lat10.jpg"];
 
 // Promo lateral por día (lunes a sábado, 5 espacios cada uno): permite dejar
-// cargada de antemano una lámina distinta para cada día de la semana, que se
-// muestra sola sin tocar nada. Domingo no tiene set propio (no hay sorteos).
-// Si el día actual no tiene ningún archivo cargado, se usa LAT_FILES (arriba)
-// como respaldo genérico, así nunca queda el espacio vacío.
+// cargada de antemano una lámina distinta para cada día de la semana (p.ej.
+// efemérides), que se muestra sin tocar nada. Domingo no tiene set propio
+// (no hay sorteos). Estas láminas del día se SUMAN a LAT_FILES (arriba, la
+// promo genérica que se sube a diario) en vez de reemplazarla: ambos sets
+// rotan juntos en la misma promo lateral.
 const LAT_SLOTS_POR_DIA = 5;
 const LAT_DIAS_CODIGO = { 1: "lu", 2: "ma", 3: "mi", 4: "ju", 5: "vi", 6: "sa" };
 
@@ -289,12 +290,10 @@ async function cargarLatImages() {
   const cache = Date.now();
 
   const archivosDelDia = latFilesDelDia(diaActual);
-  let resultados = archivosDelDia ? await resolverArchivosLat(archivosDelDia, base, cache) : [];
-  if (resultados.length === 0) {
-    resultados = await resolverArchivosLat(LAT_FILES, base, cache);
-  }
+  const resultadosDia = archivosDelDia ? await resolverArchivosLat(archivosDelDia, base, cache) : [];
+  const resultadosGenericos = await resolverArchivosLat(LAT_FILES, base, cache);
 
-  latImagesCargadas = resultados;
+  latImagesCargadas = [...resultadosDia, ...resultadosGenericos];
   latImagesCargadasDia = diaActual;
   latCacheTiempo = Date.now();
   if (latImagesCargadas.length === 0) latIndex = 0;
