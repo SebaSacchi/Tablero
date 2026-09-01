@@ -160,11 +160,28 @@ const ANUNCIO_FULL_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg"];
 const TELEKINO_FILE = "telekino.jpg";
 const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg", "lat9.jpg", "lat10.jpg"];
 
+// Promo lateral por día (lunes a sábado, 5 espacios cada uno): permite dejar
+// cargada de antemano una lámina distinta para cada día de la semana, que se
+// muestra sola sin tocar nada. Domingo no tiene set propio (no hay sorteos).
+// Si el día actual no tiene ningún archivo cargado, se usa LAT_FILES (arriba)
+// como respaldo genérico, así nunca queda el espacio vacío.
+const LAT_SLOTS_POR_DIA = 5;
+const LAT_DIAS_CODIGO = { 1: "lu", 2: "ma", 3: "mi", 4: "ju", 5: "vi", 6: "sa" };
+
+function latFilesDelDia(dia) {
+  const codigo = LAT_DIAS_CODIGO[dia];
+  if (!codigo) return null;
+  const files = [];
+  for (let i = 1; i <= LAT_SLOTS_POR_DIA; i++) files.push(`lat_${codigo}_${i}.jpg`);
+  return files;
+}
+
 let anuncioFullImagesCargadas = [];
 let anuncioFullIndex = 0;
 let anuncioFullActivo = false;
 
 let latImagesCargadas = [];
+let latImagesCargadasDia = null;
 let latIndex = 0;
 let latInterval = null;
 let latEndedVideo = null;
@@ -243,16 +260,8 @@ function limpiarLatInterval() {
   latEndedHandler = null;
 }
 
-async function cargarLatImages() {
-  if (latImagesCargadas.length > 0 && (Date.now() - latCacheTiempo) < 300000) {
-    return latImagesCargadas;
-  }
-
-  await cargarLatVideoBases();
-  const base = getMediaBase();
-  const cache = Date.now();
-
-  const resultados = await Promise.all(LAT_FILES.map(file => {
+function resolverArchivosLat(archivos, base, cache) {
+  return Promise.all(archivos.map(file => {
     const nombreBase = file.replace(/\.\w+$/, "");
     if (latVideoBases.has(nombreBase)) {
       return Promise.resolve({ src: `${base}/${nombreBase}.mp4?v=${latVideoCacheBust}`, tipo: "video" });
@@ -266,9 +275,27 @@ async function cargarLatImages() {
       img.onerror = () => resolve(null);
       img.src = `${base}/${file}?v=${cache}`;
     });
-  }));
+  })).then(resultados => resultados.filter(Boolean));
+}
 
-  latImagesCargadas = resultados.filter(Boolean);
+async function cargarLatImages() {
+  const diaActual = new Date().getDay();
+  if (latImagesCargadas.length > 0 && latImagesCargadasDia === diaActual && (Date.now() - latCacheTiempo) < 300000) {
+    return latImagesCargadas;
+  }
+
+  await cargarLatVideoBases();
+  const base = getMediaBase();
+  const cache = Date.now();
+
+  const archivosDelDia = latFilesDelDia(diaActual);
+  let resultados = archivosDelDia ? await resolverArchivosLat(archivosDelDia, base, cache) : [];
+  if (resultados.length === 0) {
+    resultados = await resolverArchivosLat(LAT_FILES, base, cache);
+  }
+
+  latImagesCargadas = resultados;
+  latImagesCargadasDia = diaActual;
   latCacheTiempo = Date.now();
   if (latImagesCargadas.length === 0) latIndex = 0;
   else latIndex = latIndex % latImagesCargadas.length;

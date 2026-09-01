@@ -167,6 +167,22 @@
       gap: 10px;
     }
 
+    /* Promo lateral por día (acordeón) */
+    .dia-lat {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      padding: 4px 12px;
+    }
+    .dia-lat summary {
+      cursor: pointer;
+      padding: 10px 0;
+      font-size: 0.95rem;
+      color: #ffe600;
+      font-weight: bold;
+    }
+    .dia-lat[open] summary { padding-bottom: 4px; }
+
     /* Publicidades (upload) */
     .card-pub { text-align: center; }
     .card-pub h3 { font-size: 0.9rem; color: #ccc; }
@@ -268,8 +284,12 @@
   <!-- GENERAL: Publicidades + Feriados                                      -->
   <!-- ===================================================================== -->
   <section class="tab-panel active" data-tab="general">
-    <h2 class="seccion">PROMO LATERAL (panel derecho en sorteos)</h2>
-    <label style="margin-bottom:8px;">En cada espacio podés subir una imagen o un video mp4 corto (recomendado ~15 segundos). El video se reproduce en loop mientras esté su turno.</label>
+    <h2 class="seccion">PROMO LATERAL POR DÍA (opcional)</h2>
+    <label style="margin-bottom:8px;">Dejá cargadas de antemano láminas distintas para cada día de la semana (5 espacios por día): el tablero cambia solo a las 00hs, sin que tengas que tocar nada. Si un día no le cargás nada, ese día se usa automáticamente la "Promo Lateral genérica" de abajo.</label>
+    <div id="seccion-lat-dias"></div>
+
+    <h2 class="seccion">PROMO LATERAL GENÉRICA (panel derecho en sorteos)</h2>
+    <label style="margin-bottom:8px;">En cada espacio podés subir una imagen o un video mp4 corto (recomendado ~15 segundos). El video se reproduce en loop mientras esté su turno. Se usa siempre que el día actual no tenga su propio set cargado arriba.</label>
     <div id="seccion-lat"></div>
 
     <h2 class="seccion">ANUNCIO PANTALLA COMPLETA (cada 45 min, tecla 0)</h2>
@@ -550,6 +570,18 @@
     const PUB_FILES = ["img1.jpg", "img2.jpg", "pub3.jpg"];
     const LAT_FILES = ["img3.jpg", "lat2.jpg", "lat3.jpg", "lat4.jpg", "lat5.jpg", "lat6.jpg", "lat7.jpg", "lat8.jpg", "lat9.jpg", "lat10.jpg"];
 
+    // Promo lateral por día (ver misma lógica en app.js): 5 espacios por día,
+    // lunes a sábado. Si un día se deja vacío, el tablero muestra LAT_FILES.
+    const LAT_DIAS = [
+      { codigo: "lu", nombre: "LUNES" },
+      { codigo: "ma", nombre: "MARTES" },
+      { codigo: "mi", nombre: "MIÉRCOLES" },
+      { codigo: "ju", nombre: "JUEVES" },
+      { codigo: "vi", nombre: "VIERNES" },
+      { codigo: "sa", nombre: "SÁBADO" }
+    ];
+    const LAT_SLOTS_POR_DIA = 5;
+
     // Anuncio pantalla completa: cubre toda la pantalla (hasta 4K), se permite mas resolucion.
     const PUB_MAX_DIM = 2560;
     const PUB_CALIDAD = 0.85;
@@ -778,6 +810,17 @@
         inputsLat.push({ fileInput, nombreBase, btnDel, previewWrap });
       });
     }
+
+    const contenedorLatDias = document.getElementById("seccion-lat-dias");
+    LAT_DIAS.forEach(({ codigo, nombre }) => {
+      const archivosDia = Array.from({ length: LAT_SLOTS_POR_DIA }, (_, i) => `lat_${codigo}_${i + 1}.jpg`);
+      const details = document.createElement("details");
+      details.className = "dia-lat";
+      const contenedorId = `seccion-lat-${codigo}`;
+      details.innerHTML = `<summary>${nombre}</summary><div id="${contenedorId}"></div>`;
+      contenedorLatDias.appendChild(details);
+      crearCardsLat(contenedorId, archivosDia, `lat${codigo}`);
+    });
 
     crearCardsPub("seccion-pub", PUB_FILES, "pub");
     crearCardsLat("seccion-lat", LAT_FILES, "lat");
