@@ -691,8 +691,8 @@ body {
   object-fit: fill;
   border-radius: 6px;
   background: #fff;
-  border: 0.85cqh solid #ffd400;
-  box-shadow: 0 0 0.8cqh rgba(255, 212, 0, 0.3);
+  border: 0.85cqh solid #fff;
+  box-shadow: 0 0 0.8cqh rgba(255, 255, 255, 0.3);
 }
 
 .qplus-banner {
