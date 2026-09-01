@@ -1670,6 +1670,10 @@ body {
   grid-template-columns: repeat(6, 1fr);
 }
 
+.captura-cols-7 {
+  grid-template-columns: repeat(7, 1fr);
+}
+
 .captura-columna {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(255, 255, 255, 0.035) 100%),

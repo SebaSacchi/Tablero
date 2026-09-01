@@ -10,6 +10,14 @@ const loterias = ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS", "M
 
 const loteriasBase = ["PROVINCIA", "CIUDAD", "CORDOBA", "SANTA FE", "ENTRE RIOS"];
 
+// Sorteo de Mendoza: se muestra solo en los dispositivos cuya licencia lo
+// tiene habilitado (columna "sorteo_mendoza" en el Panel de Licencias), asi
+// se puede mostrar en agencias de CABA sin que aparezca en las de Provincia.
+// Arranca en false y se actualiza en segundo plano (ver cargarMendozaHabilitado
+// mas abajo), asi que el primer render puede no tenerlo un instante hasta que
+// se resuelve la consulta.
+let mendozaHabilitado = false;
+
 // Más adelante estos feriados los cargamos desde Supabase.
 // Formato: "YYYY-MM-DD"
 const feriadosUruguay = [
@@ -45,6 +53,10 @@ function getLoteriasTurno(turno, fecha = new Date()) {
 
   if (montevideoHabilitado) {
     lista.push("MONTEVIDEO");
+  }
+
+  if (mendozaHabilitado) {
+    lista.push("MENDOZA");
   }
 
   return lista;
@@ -1142,6 +1154,10 @@ function cabezasDesdeResultados(turno, fecha, resultadoTurno) {
     loteriasCandidatas.push("MONTEVIDEO");
   }
 
+  if (mendozaHabilitado && resultadoTurno.MENDOZA?.[0]) {
+    loteriasCandidatas.push("MENDOZA");
+  }
+
   const loteriasDisponibles = loteriasCandidatas.filter((loteria) => {
     const numero = resultadoTurno[loteria]?.[0];
     return numero && numero !== "----";
@@ -1369,7 +1385,14 @@ function loteriasHistorialTurno(turno, fechas, datos) {
     (turno === "MATUTINA" || turno === "NOCTURNA") &&
     fechas.some(fecha => datos[fechaISO(fecha)]?.[turno]?.MONTEVIDEO?.[0]);
 
-  return incluirMontevideo ? [...loteriasBase, "MONTEVIDEO"] : [...loteriasBase];
+  const incluirMendoza =
+    mendozaHabilitado &&
+    fechas.some(fecha => datos[fechaISO(fecha)]?.[turno]?.MENDOZA?.[0]);
+
+  const lista = [...loteriasBase];
+  if (incluirMontevideo) lista.push("MONTEVIDEO");
+  if (incluirMendoza) lista.push("MENDOZA");
+  return lista;
 }
 
 function getBloquesCabezasFallback() {
@@ -2083,7 +2106,9 @@ async function renderCabezas({ mostrarCarga = true } = {}) {
     ${ordenTurnos.map(t => `<div class="planilla-celda planilla-titulo">${t}</div>`).join("")}
   `;
 
-  const filas = loterias.map(loteria => `
+  const loteriasCabezas = mendozaHabilitado ? [...loterias, "MENDOZA"] : loterias;
+
+  const filas = loteriasCabezas.map(loteria => `
     <div class="planilla-celda planilla-loteria">${logoLoteria(loteria)}</div>
     ${ordenTurnos.map(turno => `<div class="planilla-celda planilla-numero">${cabezaPlanillaDia(resultadosDia, turno, loteria)}</div>`).join("")}
   `).join("");
@@ -2094,7 +2119,7 @@ async function renderCabezas({ mostrarCarga = true } = {}) {
         <h1>CABEZAS DEL DÍA: <span>${fechaCabezasTexto(fecha)}</span></h1>
       </header>
       <section class="simple-body">
-        <div class="planilla-cabezas">${encabezado}${filas}</div>
+        <div class="planilla-cabezas" style="grid-template-rows: 7cqh repeat(${loteriasCabezas.length}, minmax(0, 1fr));">${encabezado}${filas}</div>
       </section>
       <footer class="footer">Teclas: 1 a 5 sorteos · 7 últimos días · 8 aleatorio · 9 Quini/Loto · 0 publicidades</footer>
     </main>
@@ -2549,7 +2574,8 @@ const nombresLoteriaEstado = {
   CORDOBA: "CÓRDOBA",
   "SANTA FE": "SANTA FE",
   "ENTRE RIOS": "ENTRE RÍOS",
-  MONTEVIDEO: "MONTEVIDEO"
+  MONTEVIDEO: "MONTEVIDEO",
+  MENDOZA: "MENDOZA"
 };
 
 async function construirCanvasEstado(turno, fechaForzada) {
@@ -2760,6 +2786,37 @@ async function dispositivoAutorizadoParaTelegram() {
     console.warn("Error consultando autorizacion de Telegram", error);
     return autorizadoTelegramCache.valor || false;
   }
+}
+
+// Igual que dispositivoAutorizadoParaTelegram, pero para el sorteo de
+// Mendoza (columna "Mendoza" en el Panel de Licencias): actualiza
+// mendozaHabilitado en segundo plano, que es lo que lee getLoteriasTurno
+// y compania para decidir si suman esa columna en esta agencia.
+async function cargarMendozaHabilitado() {
+  const codigo = localStorage.getItem(CODIGO_LICENCIA_KEY);
+  if (!codigo) return;
+
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  try {
+    const respuesta = await fetch(`${baseUrl}/rest/v1/rpc/licencia_muestra_mendoza`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ p_codigo: codigo })
+    });
+    if (!respuesta.ok) return;
+    mendozaHabilitado = (await respuesta.json()) === true;
+  } catch (error) {
+    console.warn("Error consultando habilitacion del sorteo de Mendoza", error);
+  }
+}
+
+if (supabaseConfigurado()) {
+  cargarMendozaHabilitado();
+  setInterval(cargarMendozaHabilitado, 5 * 60 * 1000);
 }
 
 let revisandoEnviosTelegram = false;

@@ -157,6 +157,10 @@ function renderTabla() {
     el.addEventListener("change", () => alternarEnviaTelegram(el.dataset.codigo, el.checked));
   });
 
+  cuerpoTabla.querySelectorAll("input[data-toggle=sorteo_mendoza]").forEach((el) => {
+    el.addEventListener("change", () => alternarSorteoMendoza(el.dataset.codigo, el.checked));
+  });
+
   cuerpoTabla.querySelectorAll("input[data-campo]").forEach((el) => {
     el.addEventListener("blur", () => guardarCampo(el.dataset.codigo, el.dataset.campo, el.value));
   });
@@ -183,6 +187,13 @@ function filaHtml(l) {
           <span class="slider"></span>
         </label>
         <div class="estado-txt" style="color:${l.envia_telegram ? "#27ae60" : "#c0392b"}">${l.envia_telegram ? "SÍ" : "NO"}</div>
+      </td>
+      <td>
+        <label class="switch">
+          <input type="checkbox" data-toggle="sorteo_mendoza" data-codigo="${escapeHtml(l.codigo)}" ${l.sorteo_mendoza ? "checked" : ""}>
+          <span class="slider"></span>
+        </label>
+        <div class="estado-txt" style="color:${l.sorteo_mendoza ? "#27ae60" : "#c0392b"}">${l.sorteo_mendoza ? "SÍ" : "NO"}</div>
       </td>
       <td><input type="text" value="${escapeHtml(l.agencia_nombre)}" data-codigo="${escapeHtml(l.codigo)}" data-campo="agencia_nombre" placeholder="Nombre fantasía"></td>
       <td><input type="text" value="${escapeHtml(l.agencia_legajo)}" data-codigo="${escapeHtml(l.codigo)}" data-campo="agencia_legajo" placeholder="Legajo"></td>
@@ -223,6 +234,18 @@ async function alternarEnviaTelegram(codigo, nuevoValor) {
   const item = licencias.find((l) => l.codigo === codigo);
   if (item) item.envia_telegram = nuevoValor;
   mostrarMensaje(nuevoValor ? `Licencia ${codigo} autorizada a mandar a Telegram.` : `Licencia ${codigo} ya no manda a Telegram.`, false);
+  renderTabla();
+}
+
+async function alternarSorteoMendoza(codigo, nuevoValor) {
+  const { error } = await client.from("licencias").update({ sorteo_mendoza: nuevoValor }).eq("codigo", codigo);
+  if (error) {
+    mostrarMensaje("Error al actualizar: " + error.message, true);
+    return;
+  }
+  const item = licencias.find((l) => l.codigo === codigo);
+  if (item) item.sorteo_mendoza = nuevoValor;
+  mostrarMensaje(nuevoValor ? `Licencia ${codigo} ahora muestra el sorteo de Mendoza.` : `Licencia ${codigo} ya no muestra el sorteo de Mendoza.`, false);
   renderTabla();
 }
 
