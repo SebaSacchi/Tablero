@@ -190,7 +190,6 @@ function latFilesDelDia(dia) {
 }
 
 let anuncioFullImagesCargadas = [];
-let anuncioFullIndex = 0;
 let anuncioFullActivo = false;
 
 let latImagesCargadas = [];
@@ -2272,16 +2271,23 @@ async function mostrarAnuncioFull() {
   if (imagenes.length === 0) return;
   if (enHorarioDeSorteo()) return;
 
-  anuncioFullIndex = (anuncioFullIndex + 1) % imagenes.length;
   anuncioFullActivo = true;
-  dibujarAnuncioFull(imagenes[anuncioFullIndex]);
 
-  setTimeout(() => {
+  const volverAPantallaPrevia = () => {
     anuncioFullActivo = false;
     const pantalla = PANTALLAS_NAVEGABLES.find(p => p.id === pantallaPrevia);
     if (pantalla) pantalla.fn();
     else renderTurno(pantallaPorHora());
-  }, 20000);
+  };
+
+  let i = 0;
+  const mostrarSiguiente = () => {
+    if (i >= imagenes.length) { volverAPantallaPrevia(); return; }
+    dibujarAnuncioFull(imagenes[i]);
+    i++;
+    setTimeout(mostrarSiguiente, 20000);
+  };
+  mostrarSiguiente();
 }
 
 function pantallaPorHora() {
@@ -2483,7 +2489,7 @@ function detectarInicioTurno() {
 
 setInterval(() => {
   mostrarAnuncioFull();
-}, 45 * 60 * 1000);
+}, 30 * 60 * 1000);
 
 setInterval(() => {
   if (anuncioFullActivo) return;
