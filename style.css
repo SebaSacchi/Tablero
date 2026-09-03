@@ -1710,7 +1710,6 @@ body {
 }
 
 .captura-cols-7 .captura-fila {
-  grid-template-columns: 36px 1fr;
   gap: 8px;
 }
 
@@ -1743,9 +1742,9 @@ body {
 }
 
 .captura-fila {
-  display: grid;
-  grid-template-columns: 48px 1fr;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 16px;
   padding: 4px 10px;
 }
@@ -1755,6 +1754,7 @@ body {
 }
 
 .captura-pos {
+  flex: 0 0 auto;
   font-size: 18px;
   font-weight: 900;
   text-align: right;
