@@ -2603,8 +2603,9 @@ FIN BACKUP EXPORTACION W */
 
 .captura-contenedor.modo-claro .captura-columna {
   background: #ffffff;
-  border-left: 2px solid #1ea6d6;
-  border-right: 2px solid #1ea6d6;
+  border-left: 3px solid #1ea6d6;
+  border-right: 3px solid #1ea6d6;
+  border-bottom: 4px solid #1ea6d6;
   box-shadow: none;
 }
 
@@ -2616,7 +2617,7 @@ FIN BACKUP EXPORTACION W */
 }
 
 .captura-contenedor.modo-claro .captura-sep {
-  border-top: 1px solid rgba(10, 30, 60, 0.18);
+  border-top: 2px solid rgba(10, 30, 60, 0.45);
 }
 
 .captura-contenedor.modo-claro .captura-pos {
