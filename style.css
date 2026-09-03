@@ -2576,3 +2576,66 @@ FIN BACKUP EXPORTACION W */
 .captura-contenedor.modo-impresion .captura-fila:first-of-type .captura-num {
   color: #a30d0d;
 }
+
+/* Modo claro: captura celeste con Mendoza incluido */
+.captura-contenedor.modo-claro {
+  background: #eef5f9;
+  color: #0a2049;
+  box-shadow: 0 0 0 1px rgba(10, 30, 60, 0.15);
+}
+
+.captura-contenedor.modo-claro .captura-header {
+  margin: -14px -12px 12px;
+  padding: 16px 12px 12px;
+  background: #1ea6d6;
+  border-bottom: 6px solid #ffcc00;
+}
+
+.captura-contenedor.modo-claro .captura-titulo {
+  color: #fff;
+  text-shadow: none;
+}
+
+.captura-contenedor.modo-claro .captura-fecha {
+  color: #fff;
+  text-shadow: none;
+}
+
+.captura-contenedor.modo-claro .captura-columna {
+  background: #ffffff;
+  border-left: 2px solid #1ea6d6;
+  border-right: 2px solid #1ea6d6;
+  box-shadow: none;
+}
+
+.captura-contenedor.modo-claro .captura-columna h2 {
+  background: #1ea6d6;
+  color: #fff;
+  text-shadow: none;
+  border-bottom: 3px solid #ffcc00;
+}
+
+.captura-contenedor.modo-claro .captura-sep {
+  border-top: 1px solid rgba(10, 30, 60, 0.18);
+}
+
+.captura-contenedor.modo-claro .captura-pos {
+  color: #0a2049;
+  opacity: 0.85;
+  text-shadow: none;
+}
+
+.captura-contenedor.modo-claro .captura-num {
+  color: #16233f;
+  text-shadow: none;
+}
+
+.captura-contenedor.modo-claro .captura-fila:first-of-type {
+  background: #ffe600;
+  border-radius: 6px;
+}
+
+.captura-contenedor.modo-claro .captura-fila:first-of-type .captura-num,
+.captura-contenedor.modo-claro .captura-fila:first-of-type .captura-pos {
+  color: #16233f;
+}

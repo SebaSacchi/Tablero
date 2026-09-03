@@ -2521,6 +2521,42 @@ setInterval(() => {
 
 setInterval(revisarEnviosAutomaticosTelegram, 60000);
 
+async function descargarCapturaTurno(turno, loterias, resultadosTurno, fechaCompleta, fechaTxt, sufijoArchivo, temaClase) {
+  const columnas = loterias.map(loteria => {
+    const numeros = resultadosTurno[loteria] || [];
+    const filas = Array.from({ length: 20 }, (_, i) => {
+      const num = numeros[i] || "----";
+      const sep = (i === 5 || i === 10 || i === 15) ? " captura-sep" : "";
+      return `<div class="captura-fila${sep}"><span class="captura-pos">${String(i + 1).padStart(2, "0")}.</span><span class="captura-num">${num}</span></div>`;
+    }).join("");
+    return `<div class="captura-columna"><h2>${loteria}</h2>${filas}</div>`;
+  }).join("");
+
+  const contenedor = document.createElement("div");
+  contenedor.className = ["captura-contenedor", temaClase].filter(Boolean).join(" ");
+  contenedor.innerHTML = `
+    <div class="captura-header">
+      <div class="captura-titulo">${turno}</div>
+      <div class="captura-fecha">${fechaCompleta}</div>
+    </div>
+    <div class="captura-grilla captura-cols-${loterias.length}">${columnas}</div>
+  `;
+  document.body.appendChild(contenedor);
+
+  try {
+    const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
+    const link = document.createElement("a");
+    link.download = `${turno}_${fechaTxt.replace(/\//g, "-")}${sufijoArchivo}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    console.error("Error al capturar:", err);
+    alert("Error al generar la captura");
+  } finally {
+    document.body.removeChild(contenedor);
+  }
+}
+
 async function capturarTurno(turno, modoImpresion = false) {
   if (!turno) {
     turno = ordenTurnos.includes(pantallaActual) ? pantallaActual : pantallaPorHora();
@@ -2537,41 +2573,28 @@ async function capturarTurno(turno, modoImpresion = false) {
   const fechaTxt = fechaCortaTexto(fecha);
   const diaSemana = fecha.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase();
   const fechaCompleta = `${diaSemana}, ${fechaTxt.replace(/-/g, "/")}`;
-  const etiqueta = estado.etiqueta;
 
-  const columnas = loteriasDelTurno.map(loteria => {
-    const numeros = resultadosTurno[loteria] || [];
-    const filas = Array.from({ length: 20 }, (_, i) => {
-      const num = numeros[i] || "----";
-      const sep = (i === 5 || i === 10 || i === 15) ? " captura-sep" : "";
-      return `<div class="captura-fila${sep}"><span class="captura-pos">${String(i + 1).padStart(2, "0")}.</span><span class="captura-num">${num}</span></div>`;
-    }).join("");
-    return `<div class="captura-columna"><h2>${loteria}</h2>${filas}</div>`;
-  }).join("");
-
-  const contenedor = document.createElement("div");
-  contenedor.className = modoImpresion ? "captura-contenedor modo-impresion" : "captura-contenedor";
-  contenedor.innerHTML = `
-    <div class="captura-header">
-      <div class="captura-titulo">${turno}</div>
-      <div class="captura-fecha">${fechaCompleta}</div>
-    </div>
-    <div class="captura-grilla captura-cols-${loteriasDelTurno.length}">${columnas}</div>
-  `;
-  document.body.appendChild(contenedor);
-
-  try {
-    const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
-    const link = document.createElement("a");
-    link.download = `${turno}_${fechaTxt.replace(/\//g, "-")}${modoImpresion ? "_IMPRESION" : ""}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  } catch (err) {
-    console.error("Error al capturar:", err);
-    alert("Error al generar la captura");
-  } finally {
-    document.body.removeChild(contenedor);
+  // En turnos con el sorteo de Mendoza habilitado, la tecla "C" genera 2
+  // capturas: la version clasica azul oscuro sin Mendoza (para el uso de
+  // siempre) y una segunda version celeste con Mendoza incluido (para las
+  // agencias/canales que si muestran ese sorteo).
+  if (!modoImpresion && loteriasDelTurno.includes("MENDOZA")) {
+    const sinMendoza = loteriasDelTurno.filter(loteria => loteria !== "MENDOZA");
+    await descargarCapturaTurno(turno, sinMendoza, resultadosTurno, fechaCompleta, fechaTxt, "", "");
+    await new Promise(resolve => setTimeout(resolve, 400));
+    await descargarCapturaTurno(turno, loteriasDelTurno, resultadosTurno, fechaCompleta, fechaTxt, "_MENDOZA", "modo-claro");
+    return;
   }
+
+  await descargarCapturaTurno(
+    turno,
+    loteriasDelTurno,
+    resultadosTurno,
+    fechaCompleta,
+    fechaTxt,
+    modoImpresion ? "_IMPRESION" : "",
+    modoImpresion ? "modo-impresion" : ""
+  );
 }
 
 const nombresLoteriaEstado = {
