@@ -2521,7 +2521,7 @@ setInterval(() => {
 
 setInterval(revisarEnviosAutomaticosTelegram, 60000);
 
-async function descargarCapturaTurno(turno, loterias, resultadosTurno, fechaCompleta, fechaTxt, sufijoArchivo, temaClase) {
+async function construirCanvasCapturaTurno(turno, loterias, resultadosTurno, fechaCompleta, temaClase) {
   const columnas = loterias.map(loteria => {
     const numeros = resultadosTurno[loteria] || [];
     const filas = Array.from({ length: 20 }, (_, i) => {
@@ -2544,7 +2544,15 @@ async function descargarCapturaTurno(turno, loterias, resultadosTurno, fechaComp
   document.body.appendChild(contenedor);
 
   try {
-    const canvas = await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
+    return await html2canvas(contenedor, { scale: 2, useCORS: true, backgroundColor: null });
+  } finally {
+    document.body.removeChild(contenedor);
+  }
+}
+
+async function descargarCapturaTurno(turno, loterias, resultadosTurno, fechaCompleta, fechaTxt, sufijoArchivo, temaClase) {
+  try {
+    const canvas = await construirCanvasCapturaTurno(turno, loterias, resultadosTurno, fechaCompleta, temaClase);
     const link = document.createElement("a");
     link.download = `${turno}_${fechaTxt.replace(/\//g, "-")}${sufijoArchivo}.png`;
     link.href = canvas.toDataURL("image/png");
@@ -2552,9 +2560,30 @@ async function descargarCapturaTurno(turno, loterias, resultadosTurno, fechaComp
   } catch (err) {
     console.error("Error al capturar:", err);
     alert("Error al generar la captura");
-  } finally {
-    document.body.removeChild(contenedor);
   }
+}
+
+// Arma las mismas capturas que genera la tecla "C" (1 o 2 imagenes segun si
+// el turno tiene Mendoza habilitado) para mandarlas por Telegram.
+async function construirCapturasEnvioTurno(turno, fecha) {
+  const resultadosRealesTurno = getResultadosRealesTurno(turno, fecha) || {};
+  const loteriasDelTurno = getLoteriasTurno(turno, fecha);
+  const fechaTxt = fechaCortaTexto(fecha);
+  const diaSemana = fecha.toLocaleDateString("es-AR", { weekday: "long" }).toUpperCase();
+  const fechaCompleta = `${diaSemana}, ${fechaTxt.replace(/-/g, "/")}`;
+
+  if (loteriasDelTurno.includes("MENDOZA")) {
+    const sinMendoza = loteriasDelTurno.filter(loteria => loteria !== "MENDOZA");
+    const canvasSinMendoza = await construirCanvasCapturaTurno(turno, sinMendoza, resultadosRealesTurno, fechaCompleta, "");
+    const canvasMendoza = await construirCanvasCapturaTurno(turno, loteriasDelTurno, resultadosRealesTurno, fechaCompleta, "modo-claro");
+    return [
+      { canvas: canvasSinMendoza, sufijo: "" },
+      { canvas: canvasMendoza, sufijo: "_MENDOZA" }
+    ];
+  }
+
+  const canvas = await construirCanvasCapturaTurno(turno, loteriasDelTurno, resultadosRealesTurno, fechaCompleta, "");
+  return [{ canvas, sufijo: "" }];
 }
 
 async function capturarTurno(turno, modoImpresion = false) {
@@ -2705,14 +2734,14 @@ function telegramConfigurado() {
   );
 }
 
-async function enviarCapturaTelegram(canvas, turno, fechaTxt) {
+async function enviarCapturaTelegram(canvas, turno, fechaTxt, sufijo = "") {
   const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
   if (!blob) throw new Error("No se pudo generar la imagen para Telegram");
 
   const formData = new FormData();
   formData.append("chat_id", TELEGRAM_CHAT_ID);
-  formData.append("caption", `${turno} · ${fechaTxt}`);
-  formData.append("photo", blob, `${turno}_${fechaTxt.replace(/\//g, "-")}_ESTADO.png`);
+  formData.append("caption", `${turno}${sufijo === "_MENDOZA" ? " (Mendoza)" : ""} · ${fechaTxt}`);
+  formData.append("photo", blob, `${turno}_${fechaTxt.replace(/\//g, "-")}${sufijo}.png`);
 
   const respuesta = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
     method: "POST",
@@ -2880,8 +2909,11 @@ async function revisarEnviosAutomaticosTelegram() {
       }
 
       try {
-        const { canvas, fechaTxt } = await construirCanvasEstado(turno, ahora);
-        await enviarCapturaTelegram(canvas, turno, fechaTxt);
+        const fechaTxt = fechaCortaTexto(ahora);
+        const capturas = await construirCapturasEnvioTurno(turno, ahora);
+        for (const { canvas, sufijo } of capturas) {
+          await enviarCapturaTelegram(canvas, turno, fechaTxt, sufijo);
+        }
         localStorage.setItem(clave, "1");
       } catch (err) {
         await liberarEnvioTelegram(turno, ahora);
