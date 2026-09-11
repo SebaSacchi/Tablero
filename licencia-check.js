@@ -7,6 +7,29 @@
   const REINTENTO_MS = 20000;
   const RECHEQUEO_MS = 5 * 60 * 1000;
 
+  // Si el dispositivo se reinicia (corte de luz, TV que se cuelga, etc.) sin
+  // internet, no puede confirmar la licencia contra Supabase y se quedaria
+  // trabado en la pantalla de activacion en vez de mostrar el tablero. Para
+  // que un corte de conexion no tape los ultimos numeros disponibles, se
+  // guarda la ultima vez que la licencia se confirmo activa: mientras esa
+  // marca tenga menos de ULTIMA_OK_GRACIA_MS, el tablero arranca igual (y
+  // sigue reintentando en segundo plano) aunque no logre conectarse.
+  const ULTIMA_OK_KEY = "tablero_licencia_ultima_ok";
+  const ULTIMA_OK_GRACIA_MS = 7 * 24 * 60 * 60 * 1000;
+
+  function registrarVerificacionOk() {
+    try { localStorage.setItem(ULTIMA_OK_KEY, String(Date.now())); } catch (err) {}
+  }
+
+  function dentroDeGraciaSinConexion() {
+    try {
+      const ultimaOk = Number(localStorage.getItem(ULTIMA_OK_KEY) || 0);
+      return ultimaOk > 0 && (Date.now() - ultimaOk) < ULTIMA_OK_GRACIA_MS;
+    } catch (err) {
+      return false;
+    }
+  }
+
   function baseUrl() {
     return SUPABASE_URL.replace(/\/$/, "");
   }
@@ -217,7 +240,8 @@
     setInterval(async () => {
       try {
         const activo = await consultarEstado(codigo);
-        if (!activo) location.reload();
+        if (activo) registrarVerificacionOk();
+        else location.reload();
       } catch (err) {
         // sin conexión: no cortamos el tablero por un error de red puntual
       }
@@ -232,6 +256,7 @@
         try {
           const activo = await consultarEstado(codigo);
           if (activo) {
+            registrarVerificacionOk();
             quitarOverlay();
             resolve();
             programarRechequeo(codigo);
@@ -241,6 +266,12 @@
             crearOverlay(codigo);
           }
         } catch (err) {
+          if (dentroDeGraciaSinConexion()) {
+            quitarOverlay();
+            resolve();
+            programarRechequeo(codigo);
+            return;
+          }
           if (!document.getElementById("licencia-overlay")) {
             crearOverlay(codigo);
           }
