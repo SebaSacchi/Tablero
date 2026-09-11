@@ -875,7 +875,8 @@
             "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
             "apikey": SUPABASE_ANON_KEY,
             "Content-Type": file.type,
-            "x-upsert": "true"
+            "x-upsert": "true",
+            "cache-control": "31536000"
           },
           body: file
         }
