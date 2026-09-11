@@ -323,7 +323,7 @@ function promoLateralHTML() {
   if (actual.tipo === "video") {
     return `<video src="${actual.src}" autoplay muted playsinline preload="auto"></video>`;
   }
-  return `<img src="${actual.src}" alt="">`;
+  return `<img src="${actual.src}" alt="" onerror="this.remove()">`;
 }
 
 function crearElementoLat(actual) {
@@ -342,9 +342,8 @@ function crearElementoLat(actual) {
     } else {
       const img = document.createElement("img");
       img.alt = "";
-      const listo = () => resolve(img);
-      img.addEventListener("load", listo, { once: true });
-      img.addEventListener("error", listo, { once: true });
+      img.addEventListener("load", () => resolve(img), { once: true });
+      img.addEventListener("error", () => resolve(null), { once: true });
       img.src = actual.src;
     }
   });
