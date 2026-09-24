@@ -396,6 +396,37 @@ body {
   box-shadow: inset 0 0 1.3cqh rgba(0, 0, 0, 0.35);
 }
 
+.columna-demorada {
+  position: relative;
+}
+
+.marca-demorado {
+  position: absolute;
+  inset: 3.25cqh 0 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.marca-demorado span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: min(9cqh, 5.6cqw);
+  font-weight: 1000;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: #ffd400;
+  text-shadow: 0.35cqh 0.35cqh 0 #000, 0 0 1.2cqh rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  animation: parpadeo-demorado 1.6s ease-in-out infinite;
+}
+
+@keyframes parpadeo-demorado {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
 .columna-loteria h2 {
   margin: 0;
   padding: 0.45cqh 0.15cqw;
