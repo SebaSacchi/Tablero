@@ -214,7 +214,7 @@ function mediaURL(file) {
 }
 
 async function cargarMediaVersiones() {
-  if (!supabaseConfigurado() || Date.now() - mediaVersionesTiempo < 60000) return;
+  if (!supabaseConfigurado() || Date.now() - mediaVersionesTiempo < 300000) return;
   if (mediaVersionesPendiente) return mediaVersionesPendiente;
   mediaVersionesPendiente = (async () => {
     try {
@@ -257,7 +257,7 @@ async function preloadImages(files) {
 
 async function cargarLatVideoBases() {
   if (!supabaseConfigurado()) return latVideoBases;
-  if (latVideoBasesCacheTiempo > 0 && (Date.now() - latVideoBasesCacheTiempo) < 60000) {
+  if (latVideoBasesCacheTiempo > 0 && (Date.now() - latVideoBasesCacheTiempo) < 300000) {
     return latVideoBases;
   }
 
@@ -2901,10 +2901,11 @@ async function cargarMendozaHabilitado() {
 
 if (supabaseConfigurado()) {
   cargarMendozaHabilitado();
-  setInterval(cargarMendozaHabilitado, 5 * 60 * 1000);
+  setInterval(cargarMendozaHabilitado, 30 * 60 * 1000);
 }
 
 let revisandoEnviosTelegram = false;
+const ultimoChequeoTelegram = {};
 
 async function revisarEnviosAutomaticosTelegram() {
   if (revisandoEnviosTelegram) return;
@@ -2924,6 +2925,10 @@ async function revisarEnviosAutomaticosTelegram() {
 
       const clave = claveEnvioTelegram(turno, ahora);
       if (localStorage.getItem(clave)) continue;
+
+      // Turnos incompletos: reconsultar como maximo cada 5 min (antes, cada minuto).
+      if (Date.now() - (ultimoChequeoTelegram[clave] || 0) < 5 * 60 * 1000) continue;
+      ultimoChequeoTelegram[clave] = Date.now();
 
       await cargarResultadosSupabase(turno, ahora);
       if (!turnoEstadoCompleto(turno, ahora)) continue;
