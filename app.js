@@ -1489,18 +1489,21 @@ function dibujarTurno(turno) {
   const resultadosRealesTurno = getResultadosRealesTurno(turno, estado.fechaResultados);
   const resultadosTurno = resultadosRealesTurno || (supabaseConfigurado() ? {} : resultados[turno]);
 
-  // Una loteria se marca DEMORADO cuando el sorteo ya empezo, ella todavia
-  // no tiene la cabeza y alguna otra loteria del mismo turno ya salio.
+  // La falta de cabeza solo indica demora una vez transcurridos 20 minutos.
   const tieneCabeza = (loteria) => {
     const cabeza = resultadosTurno[loteria]?.[0];
     return !!cabeza && cabeza !== "----";
   };
-  const sorteoIniciado = estado.clase !== "estado-pendiente";
-  const algunaSalio = loteriasDelTurno.some(tieneCabeza);
+  const ahora = new Date();
+  const minutosDesdeInicio = ahora.getHours() * 60 + ahora.getMinutes()
+    - horaAMinutos(horariosTurnos[turno].inicio);
+  const demoraAutomatica = fechaISO(estado.fechaResultados) === fechaISO(ahora)
+    && ahora.getDay() !== 0 && !esFeriadoManual(ahora)
+    && minutosDesdeInicio >= 20;
 
   const columnas = loteriasDelTurno.map(loteria => {
     const numeros = resultadosTurno[loteria] || [];
-    const demorado = sorteoIniciado && algunaSalio && !tieneCabeza(loteria);
+    const demorado = demoraAutomatica && !tieneCabeza(loteria);
     const filas = Array.from({ length: 20 }, (_, i) => {
       const num = numeros[i] || "";
       return `
