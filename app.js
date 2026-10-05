@@ -204,18 +204,35 @@ let latSlotActivoIdx = 0;
 let latVideoBases = new Set();
 let latVideoBasesCacheTiempo = 0;
 
-// Fijo por pestaña (no por Date.now() en cada refresco de latImagesCargadas):
-// si el "?v=" de los videos cambiara cada 5 minutos, el navegador los trataria
-// como un recurso nuevo y los volveria a descargar enteros desde Supabase
-// Storage aunque el archivo no haya cambiado. Con un valor fijo, el video se
-// descarga una sola vez por pestaña y las repeticiones del loop las sirve la
-// cache del navegador (esto fue lo que agoto la cuota de Cached Egress).
-const latVideoCacheBust = Date.now();
+// Persistent file versions, updated only after an admin upload.
+let mediaVersiones = {};
+let mediaVersionesTiempo = 0;
+let mediaVersionesPendiente = null;
 
-// Mismo motivo que latVideoCacheBust: la pantalla de Telekino se redibuja
-// cada 10s (reloj, cabezas), y si el "?v=" cambiara en cada redibujo el
-// navegador volveria a descargar la imagen entera cada vez.
-const telekinoCacheBust = Date.now();
+function mediaURL(file) {
+  return `${getMediaBase()}/${file}?v=${encodeURIComponent(mediaVersiones[file] || "original")}`;
+}
+
+async function cargarMediaVersiones() {
+  if (!supabaseConfigurado() || Date.now() - mediaVersionesTiempo < 60000) return;
+  if (mediaVersionesPendiente) return mediaVersionesPendiente;
+  mediaVersionesPendiente = (async () => {
+    try {
+      const params = new URLSearchParams({ select: "clave,valor", clave: "like.media_version_*" });
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/config_tablero?${params}`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+      });
+      if (!res.ok) throw new Error(`Versiones multimedia: ${res.status}`);
+      const siguientes = {};
+      for (const fila of await res.json()) siguientes[fila.clave.slice("media_version_".length)] = fila.valor;
+      if (JSON.stringify(siguientes) !== JSON.stringify(mediaVersiones)) latCacheTiempo = 0;
+      mediaVersiones = siguientes;
+    } catch (error) {
+      console.warn("Error consultando versiones multimedia", error);
+    } finally { mediaVersionesTiempo = Date.now(); }
+  })();
+  try { await mediaVersionesPendiente; } finally { mediaVersionesPendiente = null; }
+}
 
 function getMediaBase() {
   return supabaseConfigurado()
@@ -223,18 +240,17 @@ function getMediaBase() {
     : "media";
 }
 
-function preloadImages(files) {
-  const base = getMediaBase();
-  const cache = Date.now();
+async function preloadImages(files) {
+  await cargarMediaVersiones();
   return Promise.all(
     files.map(file => new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
         if (img.naturalWidth <= 1 && img.naturalHeight <= 1) resolve(null);
-        else resolve(`${base}/${file}`);
+        else resolve(mediaURL(file));
       };
       img.onerror = () => resolve(null);
-      img.src = `${base}/${file}?v=${cache}`;
+      img.src = mediaURL(file);
     }))
   ).then(urls => urls.filter(Boolean));
 }
@@ -272,37 +288,35 @@ function limpiarLatInterval() {
   latEndedHandler = null;
 }
 
-function resolverArchivosLat(archivos, base, cache) {
+function resolverArchivosLat(archivos) {
   return Promise.all(archivos.map(file => {
     const nombreBase = file.replace(/\.\w+$/, "");
     if (latVideoBases.has(nombreBase)) {
-      return Promise.resolve({ src: `${base}/${nombreBase}.mp4?v=${latVideoCacheBust}`, tipo: "video" });
+      return Promise.resolve({ src: mediaURL(`${nombreBase}.mp4`), tipo: "video" });
     }
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
         if (img.naturalWidth <= 1 && img.naturalHeight <= 1) resolve(null);
-        else resolve({ src: `${base}/${file}?v=${cache}`, tipo: "imagen" });
+        else resolve({ src: mediaURL(file), tipo: "imagen" });
       };
       img.onerror = () => resolve(null);
-      img.src = `${base}/${file}?v=${cache}`;
+      img.src = mediaURL(file);
     });
   })).then(resultados => resultados.filter(Boolean));
 }
 
 async function cargarLatImages() {
+  await cargarMediaVersiones();
   const diaActual = new Date().getDay();
   if (latImagesCargadas.length > 0 && latImagesCargadasDia === diaActual && (Date.now() - latCacheTiempo) < 300000) {
     return latImagesCargadas;
   }
 
   await cargarLatVideoBases();
-  const base = getMediaBase();
-  const cache = Date.now();
-
   const archivosDelDia = latFilesDelDia(diaActual);
-  const resultadosDia = archivosDelDia ? await resolverArchivosLat(archivosDelDia, base, cache) : [];
-  const resultadosGenericos = await resolverArchivosLat(LAT_FILES, base, cache);
+  const resultadosDia = archivosDelDia ? await resolverArchivosLat(archivosDelDia) : [];
+  const resultadosGenericos = await resolverArchivosLat(LAT_FILES);
 
   latImagesCargadas = [...resultadosDia, ...resultadosGenericos];
   latImagesCargadasDia = diaActual;
@@ -2321,7 +2335,7 @@ function mostrarTelekinoFaltante(imgEl) {
 }
 
 function dibujarTelekino() {
-  const src = `${getMediaBase()}/${TELEKINO_FILE}?v=${telekinoCacheBust}`;
+  const src = mediaURL(TELEKINO_FILE);
 
   const promoPreservada = capturarPromoLateralPrevia();
   app.innerHTML = `
