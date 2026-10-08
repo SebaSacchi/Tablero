@@ -141,7 +141,7 @@ function esFeriadoManual(fecha) {
 
 async function cargarFeriadosManual() {
   if (!supabaseConfigurado()) return feriadosManual;
-  if (feriadosManualCacheTiempo > 0 && (Date.now() - feriadosManualCacheTiempo) < 60000) {
+  if (feriadosManualCacheTiempo > 0 && (Date.now() - feriadosManualCacheTiempo) < 10 * 60 * 1000) {
     return feriadosManual;
   }
 
@@ -717,71 +717,156 @@ function tieneResultadosReales(resultadoTurno) {
   );
 }
 
+const resultadosVacioTiempo = {};
+
+// Cuanto tiempo se reutiliza una consulta de resultados antes de repetirla.
+// Solo hace falta refrescar rapido (15 s) mientras el turno esta en juego o
+// recien termino; fuera de esa ventana el dato casi no cambia, y consultar
+// cada 15 s por turnos futuros o pasados era la mayor fuente de requests.
+function ttlResultadosMs(turno, fecha) {
+  if (fechaISO(fecha) !== fechaISO(new Date())) return 30 * 60 * 1000;
+  const horario = horariosTurnos[turno];
+  if (!horario) return 15000;
+  const ahora = new Date();
+  const minutos = ahora.getHours() * 60 + ahora.getMinutes();
+  const enVentana = minutos >= horaAMinutos(horario.inicio) - 5 && minutos <= horaAMinutos(horario.fin) + 90;
+  return enVentana ? 45000 : 5 * 60 * 1000;
+}
+
+// PostgREST corta las respuestas en 1000 filas por defecto. Si la consulta
+// de un dia entero llega a ese tope, puede venir truncada y se pide turno
+// por turno.
+const LIMITE_FILAS_DIA = 1000;
+const resultadosFechaEnCurso = {};
+
+function agruparFilasResultados(filas) {
+  const agrupado = {};
+
+  filas.forEach((fila) => {
+    const loteria = fila.loteria;
+    const posicion = Number(fila.posicion);
+
+    if (!loteria || !Number.isFinite(posicion) || posicion < 1) {
+      return;
+    }
+
+    if (!agrupado[loteria]) {
+      agrupado[loteria] = [];
+    }
+
+    agrupado[loteria][posicion - 1] = loteria === "MONTEVIDEO"
+      ? String(fila.numero)
+      : String(fila.numero).padStart(4, "0");
+  });
+
+  return agrupado;
+}
+
+function guardarResultadosTurnoCache(turno, fecha, filas) {
+  const key = cacheKeyResultados(turno, fecha);
+
+  if (!filas || filas.length === 0) {
+    delete resultadosSupabaseCache[key];
+    resultadosVacioTiempo[key] = Date.now();
+    return null;
+  }
+
+  const agrupado = agruparFilasResultados(filas);
+  resultadosSupabaseCache[key] = agrupado;
+  resultadosCacheTiempo[key] = Date.now();
+  delete resultadosVacioTiempo[key];
+  return agrupado;
+}
+
+async function pedirResultadosSupabase(fecha, turno) {
+  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
+  const params = new URLSearchParams({
+    select: turno ? "loteria,posicion,numero" : "turno,loteria,posicion,numero",
+    fecha: `eq.${fechaISO(fecha)}`,
+    order: "loteria.asc,posicion.asc"
+  });
+  if (turno) {
+    params.set("turno", `eq.${turno}`);
+  }
+
+  const respuesta = await fetch(`${baseUrl}/rest/v1/resultados_quiniela?${params.toString()}`, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+    }
+  });
+
+  if (!respuesta.ok) {
+    console.warn("No se pudieron cargar resultados desde Supabase", respuesta.status);
+    return null;
+  }
+
+  const filas = await respuesta.json();
+  return Array.isArray(filas) ? filas : [];
+}
+
+// Una sola consulta trae todos los turnos de la fecha y reparte las filas en
+// el cache por turno. Las llamadas simultaneas para la misma fecha comparten
+// la misma consulta.
+function refrescarResultadosFecha(fecha) {
+  const fechaTxt = fechaISO(fecha);
+  if (resultadosFechaEnCurso[fechaTxt]) {
+    return resultadosFechaEnCurso[fechaTxt];
+  }
+
+  const promesa = (async () => {
+    try {
+      const filas = await pedirResultadosSupabase(fecha, null);
+      if (filas === null) return;
+
+      if (filas.length >= LIMITE_FILAS_DIA) {
+        await Promise.all(ordenTurnos.map(async (turno) => {
+          const filasTurno = await pedirResultadosSupabase(fecha, turno);
+          if (filasTurno !== null) guardarResultadosTurnoCache(turno, fecha, filasTurno);
+        }));
+        return;
+      }
+
+      ordenTurnos.forEach((turno) => {
+        guardarResultadosTurnoCache(turno, fecha, filas.filter((fila) => fila.turno === turno));
+      });
+    } catch (error) {
+      console.warn("Error cargando resultados desde Supabase", error);
+    } finally {
+      delete resultadosFechaEnCurso[fechaTxt];
+    }
+  })();
+
+  resultadosFechaEnCurso[fechaTxt] = promesa;
+  return promesa;
+}
+
 async function cargarResultadosSupabase(turno, fecha) {
   if (!supabaseConfigurado()) {
     return null;
   }
 
   const key = cacheKeyResultados(turno, fecha);
-  if (resultadosSupabaseCache[key] && (Date.now() - (resultadosCacheTiempo[key] || 0)) < 15000) {
+  const ttl = ttlResultadosMs(turno, fecha);
+  if (resultadosSupabaseCache[key] && (Date.now() - (resultadosCacheTiempo[key] || 0)) < ttl) {
     return resultadosSupabaseCache[key];
   }
-
-  const fechaTxt = fechaISO(fecha);
-  const baseUrl = SUPABASE_URL.replace(/\/$/, "");
-  const params = new URLSearchParams({
-    select: "loteria,posicion,numero",
-    fecha: `eq.${fechaTxt}`,
-    turno: `eq.${turno}`,
-    order: "loteria.asc,posicion.asc"
-  });
-
-  try {
-    const respuesta = await fetch(`${baseUrl}/rest/v1/resultados_quiniela?${params.toString()}`, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-      }
-    });
-
-    if (!respuesta.ok) {
-      console.warn("No se pudieron cargar resultados desde Supabase", respuesta.status);
-      return null;
-    }
-
-    const filas = await respuesta.json();
-
-    if (!Array.isArray(filas) || filas.length === 0) {
-      delete resultadosSupabaseCache[cacheKeyResultados(turno, fecha)];
-      return null;
-    }
-
-    const agrupado = {};
-
-    filas.forEach((fila) => {
-      const loteria = fila.loteria;
-      const posicion = Number(fila.posicion);
-
-      if (!loteria || !Number.isFinite(posicion) || posicion < 1) {
-        return;
-      }
-
-      if (!agrupado[loteria]) {
-        agrupado[loteria] = [];
-      }
-
-      agrupado[loteria][posicion - 1] = loteria === "MONTEVIDEO"
-        ? String(fila.numero)
-        : String(fila.numero).padStart(4, "0");
-    });
-
-    resultadosSupabaseCache[key] = agrupado;
-    resultadosCacheTiempo[key] = Date.now();
-    return agrupado;
-  } catch (error) {
-    console.warn("Error cargando resultados desde Supabase", error);
+  if (!resultadosSupabaseCache[key] && resultadosVacioTiempo[key] && (Date.now() - resultadosVacioTiempo[key]) < ttl) {
     return null;
   }
+
+  if (!ordenTurnos.includes(turno)) {
+    try {
+      const filas = await pedirResultadosSupabase(fecha, turno);
+      return filas === null ? null : guardarResultadosTurnoCache(turno, fecha, filas);
+    } catch (error) {
+      console.warn("Error cargando resultados desde Supabase", error);
+      return null;
+    }
+  }
+
+  await refrescarResultadosFecha(fecha);
+  return resultadosSupabaseCache[key] || null;
 }
 
 function nombreJuegoPlus(juego) {
@@ -1193,8 +1278,16 @@ async function cargarUltimasCabezasSupabase() {
   const hoy = new Date();
   const ayer = ultimoDiaSorteo(hoy);
 
+  // Antes de que abra el primer turno del dia no puede haber resultados de
+  // hoy: se evita consultarlos y se muestran directamente los de ayer.
+  const minutosAhora = hoy.getHours() * 60 + hoy.getMinutes();
+  const hoyYaEmpezo = ordenTurnos.some((turno) => {
+    const horario = horariosTurnos[turno];
+    return !horario || minutosAhora >= horaAMinutos(horario.inicio) - 5;
+  });
+
   const bloques = await Promise.all(ordenTurnos.map(async (turno) => {
-    const resultadoHoy = await cargarResultadosSupabase(turno, hoy);
+    const resultadoHoy = hoyYaEmpezo ? await cargarResultadosSupabase(turno, hoy) : null;
 
     if (tieneResultadosReales(resultadoHoy)) {
       return {
@@ -2506,6 +2599,7 @@ function detectarInicioTurno() {
     const key = cacheKeyResultados(turnoVivo, ahora);
     delete resultadosSupabaseCache[key];
     delete resultadosCacheTiempo[key];
+    delete resultadosVacioTiempo[key];
     ultimasCabezasCache = [];
     ultimasCabezasCacheTiempo = 0;
     renderTurno(turnoVivo);
